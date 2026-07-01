@@ -1,0 +1,78 @@
+@page "{id:guid}"
+@model Bibliotheca.Web.Pages.Feed.DetailsModel
+@{
+    ViewData["Title"] = Model.Book?.Name ?? "Livro";
+}
+
+@if (Model.Book is null)
+{
+    <p>Livro não encontrado.</p>
+}
+else
+{
+    <article>
+        <h1>@Model.Book.Name</h1>
+        <p class="text-muted">@string.Join(", ", Model.Book.AuthorNames) — @Model.Book.PublicationYear</p>
+
+        <table class="table table-sm w-auto">
+            <tbody>
+                <tr><th>Editora</th><td>@Model.Book.Publisher</td></tr>
+                <tr><th>Edição</th><td>@Model.Book.Edition</td></tr>
+                <tr><th>Idioma</th><td>@Model.Book.Language</td></tr>
+                <tr><th>Páginas</th><td>@Model.Book.Pages</td></tr>
+                <tr><th>ISBN</th><td>@Model.Book.ISBN</td></tr>
+                <tr><th>Condição</th><td>@Model.Book.Condition</td></tr>
+                <tr><th>Valor estimado</th><td>@Model.Book.EstimatedValue.ToString("C")</td></tr>
+            </tbody>
+        </table>
+    </article>
+
+    <hr/>
+
+    <h2>Comentários</h2>
+
+    @if (!Model.Comments.Any())
+    {
+        <p>Nenhum comentário ainda.</p>
+    }
+    else
+    {
+        <ul class="list-group mb-4">
+            @foreach (var comment in Model.Comments)
+            {
+                <li class="list-group-item">
+                    <strong>@comment.UserName</strong>
+                    <p class="mb-1">@comment.Content</p>
+                    @if (!string.IsNullOrWhiteSpace(comment.Link))
+                    {
+                        <a href="@comment.Link" target="_blank" rel="noopener">@comment.Link</a>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @if (Model.ErrorMessage is not null)
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.Book.Id">
+            <div class="mb-3">
+                <label class="form-label">Comentário</label>
+                <textarea asp-for="NewCommentContent" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Link (opcional)</label>
+                <input asp-for="NewCommentLink" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Comentar</button>
+        </form>
+    }
+    else
+    {
+        <p><a asp-page="/Account/Login">Faça login</a> para comentar.</p>
+    }
+}

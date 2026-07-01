@@ -1,0 +1,24 @@
+{
+    cat PromptBase.txt
+    echo
+
+    find .. \
+      \( -path "*/bin" -o -path "*/obj" -o -path "*/.git" \) -prune -o \
+      \( \
+          -name "*.cs" \
+          -o -name "*.cshtml" \
+          -o -name "*.razor" \
+          -o -name "*.csproj" \
+          -o -name "appsettings*.json" \
+      \) -type f -print0 |
+    while IFS= read -r -d '' file; do
+        echo
+        echo "=================================================="
+        echo "ARQUIVO: ${file#../}"
+        echo "=================================================="
+        cat "$file"
+    done
+} > codigo_completo.txt
+
+
+

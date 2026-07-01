@@ -1,0 +1,91 @@
+@page
+@model Bibliotheca.Web.Pages.Profile.IndexModel
+@{
+    ViewData["Title"] = "Meu perfil";
+}
+
+<h1>Meu perfil</h1>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+@if (Model.SuccessMessage is not null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+
+<h2>Dados pessoais</h2>
+
+<form method="post" asp-page-handler="UpdateName" class="row gx-2 align-items-end mb-2">
+    <div class="col-md-4">
+        <label asp-for="NameInput.Name" class="form-label">Nome</label>
+        <input asp-for="NameInput.Name" class="form-control"/>
+        <span asp-validation-for="NameInput.Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">E-mail</label>
+        <input value="@Model.Account?.Email" class="form-control" disabled/>
+        <div class="form-text">O e-mail não pode ser alterado.</div>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+</form>
+
+<hr/>
+
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Meus livros</h2>
+    <a asp-page="/Profile/Books/Create" class="btn btn-primary btn-sm">Cadastrar novo livro</a>
+</div>
+
+@if (!Model.Books.Items.Any())
+{
+    <p>Você ainda não cadastrou nenhum livro.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var book in Model.Books.Items)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a asp-page="/Feed/Details" asp-route-id="@book.Id">
+                        <strong>@book.Name</strong>
+                    </a>
+                    <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
+                </div>
+                <div>
+                    <a asp-page="/Profile/Books/Edit" asp-route-id="@book.Id" class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="DeleteBook" asp-route-id="@book.Id"
+                          asp-route-pageNumber="@Model.PageNumber" class="d-inline"
+                          onsubmit="return confirm('Tem certeza que deseja remover este livro?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+
+    @if (Model.Books.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(Model.Books.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Profile/Index" asp-route-pageNumber="@(Model.PageNumber - 1)">Anterior</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Página @Model.Books.PageNumber de @Model.Books.TotalPages</span>
+                </li>
+                <li class="page-item @(Model.Books.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Profile/Index" asp-route-pageNumber="@(Model.PageNumber + 1)">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}

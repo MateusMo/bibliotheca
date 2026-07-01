@@ -1,0 +1,59 @@
+@page
+@model Bibliotheca.Web.Pages.Feed.IndexModel
+@{
+    ViewData["Title"] = "Feed";
+}
+
+<h1>Livros cadastrados</h1>
+
+<form method="get" class="row gx-2 gy-2 align-items-end mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Título</label>
+        <input asp-for="Filter.Name" class="form-control"/>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Autor</label>
+        <input asp-for="Filter.AuthorName" class="form-control"/>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Idioma</label>
+        <input asp-for="Filter.Language" class="form-control"/>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Condição</label>
+        <select asp-for="Filter.Condition" asp-items="Model.ConditionOptions" class="form-select">
+            <option value="">Todas</option>
+        </select>
+    </div>
+    <div class="col-md-1">
+        <label class="form-label">Ano de</label>
+        <input asp-for="Filter.YearFrom" class="form-control"/>
+    </div>
+    <div class="col-md-1">
+        <label class="form-label">Ano até</label>
+        <input asp-for="Filter.YearTo" class="form-control"/>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <a asp-page="/Feed/Index" class="btn btn-outline-secondary btn-sm">Limpar filtros</a>
+    </div>
+</form>
+
+@if (!Model.Books.Any())
+{
+    <p>Nenhum livro encontrado.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var book in Model.Books)
+        {
+            <li class="list-group-item">
+                <a asp-page="/Feed/Details" asp-route-id="@book.Id">
+                    <strong>@book.Name</strong>
+                </a>
+                <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
+            </li>
+        }
+    </ul>
+}

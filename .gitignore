@@ -1,0 +1,78 @@
+## ---- Build / compilação ----
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.binlog
+
+## ---- Publish ----
+[Pp]ublish/
+*.publish.xml
+*.azurePubxml
+*.pubxml
+*.publishproj
+
+## ---- Testes ----
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+## ---- Visual Studio ----
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+## ---- JetBrains Rider ----
+.idea/
+*.sln.iml
+riderModule.iml
+*.iml
+
+## ---- ReSharper ----
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## ---- NuGet ----
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+
+## ---- Scaffolding / análise estática ----
+ScaffoldingReadMe.txt
+StyleCopReport.xml
+
+## ---- Segredos e configuração sensível ----
+# Segredos via dotnet user-secrets nunca devem ir pro repositório
+**/secrets.json
+.env
+.env.*
+docker-compose.override.yml
+
+# appsettings locais com valores reais (credenciais, connection strings de produção etc.)
+appsettings.*.local.json
+
+## ---- Sistema operacional ----
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*~

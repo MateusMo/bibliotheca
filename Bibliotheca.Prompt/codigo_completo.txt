@@ -1,0 +1,5116 @@
+Bibliotheca — Especificação Geral do Projeto
+1. Introdução
+1.1 Visão Geral
+
+A Bibliotheca é uma plataforma colaborativa para catalogação de bibliotecas pessoais, livros raros, edições históricas e exemplares físicos, inspirada no conceito do Discogs.
+
+Diferentemente de plataformas tradicionais de leitura, a Bibliotheca possui como principal objetivo preservar e documentar a história de cada exemplar físico, permitindo que colecionadores, pesquisadores, bibliotecas, sebos e leitores registrem suas coleções de forma detalhada.
+
+O sistema não trata apenas o livro como uma obra intelectual, mas também como um objeto histórico.
+
+Cada exemplar possui sua própria identidade, podendo conter características únicas como edição, estado de conservação, autógrafos, ex-líbris, dedicatórias, fotos, local de publicação e diversas outras informações relevantes para colecionadores.
+
+1.2 Objetivo
+
+Construir a maior plataforma colaborativa em língua portuguesa voltada para:
+
+catalogação de bibliotecas pessoais;
+preservação da história editorial;
+documentação de livros raros;
+organização de coleções particulares;
+descoberta de novas bibliotecas;
+formação de uma comunidade de colecionadores.
+
+A plataforma deverá permitir que qualquer usuário explore bibliotecas públicas, descubra obras históricas e acompanhe estatísticas detalhadas das coleções.
+
+1.3 Público-alvo
+
+A plataforma é destinada principalmente a:
+
+Colecionadores de livros.
+Bibliófilos.
+Pesquisadores.
+Universidades.
+Bibliotecas públicas.
+Sebos.
+Antiquários.
+Historiadores.
+Leitores de literatura clássica.
+2. Requisitos Funcionais
+RF-01 — Cadastro de Usuários
+
+O sistema deverá permitir que novos usuários realizem cadastro utilizando:
+
+Nome
+E-mail
+Senha
+
+Cada usuário possuirá um perfil público.
+
+RF-02 — Autenticação
+
+O sistema deverá permitir:
+
+Login.
+Logout.
+Recuperação futura de senha.
+Sessão autenticada via Cookie Authentication.
+RF-03 — Biblioteca Pessoal
+
+Cada usuário possuirá uma biblioteca própria.
+
+A biblioteca representa a coleção física daquele usuário.
+
+Cada livro pertence exclusivamente à biblioteca de um usuário.
+
+RF-04 — Cadastro de Exemplares
+
+O usuário poderá cadastrar exemplares contendo informações como:
+
+Livro
+Autor
+Editora
+Ano
+Local de publicação
+Idioma
+Número de páginas
+ISBN (quando existir)
+Estado de conservação
+Primeira edição
+Autografado
+Ex-líbris
+Dedicatórias
+Observações
+Fotos
+Data de aquisição
+RF-05 — Status da Coleção
+
+Cada exemplar poderá possuir um status.
+
+Exemplos:
+
+Possuo
+Lido
+Lendo
+Quero adquirir
+Emprestado
+Vendido
+Restaurando
+RF-06 — Cadastro de Autores
+
+O sistema deverá permitir cadastro e consulta de autores.
+
+Cada autor poderá possuir:
+
+Nome
+Nacionalidade
+Data de nascimento
+Data de falecimento
+Biografia
+Foto
+RF-07 — Cadastro de Obras
+
+Cada obra poderá possuir múltiplas edições.
+
+Uma obra representa o conteúdo intelectual.
+
+Uma edição representa uma publicação específica.
+
+RF-08 — Cadastro de Edições
+
+Cada edição poderá conter:
+
+Editora
+Ano
+Cidade
+País
+Idioma
+Número de páginas
+ISBN
+Tipo de capa
+Coleção
+Volume
+RF-09 — Biblioteca Pública
+
+Todo usuário poderá optar por tornar sua biblioteca pública.
+
+Visitantes poderão visualizar:
+
+Livros
+Estatísticas
+Autores
+Coleções
+Fotos
+Comentários
+RF-10 — Pesquisa
+
+O sistema deverá permitir pesquisa por:
+
+Livro
+Autor
+Editora
+Ano
+Idioma
+País
+Biblioteca
+Usuário
+Século
+Categoria
+RF-11 — Comentários
+
+Usuários autenticados poderão comentar:
+
+Livros
+Edições
+Bibliotecas
+RF-12 — Avaliações
+
+Usuários poderão avaliar:
+
+Obras
+Edições
+RF-13 — Perfil Público
+
+Cada perfil exibirá:
+
+Foto
+Descrição
+Biblioteca
+Estatísticas
+Índice Bibliotheca
+Comentários
+RF-14 — Estatísticas da Biblioteca
+
+O sistema deverá calcular automaticamente:
+
+Quantidade de livros
+Quantidade de autores
+Livro mais antigo
+Livro mais recente
+Média de idade da coleção
+Distribuição por século
+Distribuição por idioma
+Distribuição por editora
+Distribuição por país
+Percentual de primeiras edições
+Percentual de exemplares autografados
+Percentual de livros raros
+Evolução da coleção ao longo do tempo
+RF-15 — Índice Bibliotheca
+
+Cada biblioteca possuirá um índice calculado automaticamente.
+
+O índice considera fatores como:
+
+Quantidade de livros
+Diversidade de autores
+Antiguidade média da coleção
+Quantidade de primeiras edições
+Quantidade de exemplares raros
+Diversidade de idiomas
+Diversidade geográfica
+Conservação da coleção
+
+Exemplo:
+
+Biblioteca de Mateus
+
+438 livros
+
+217 autores
+
+Livro mais antigo: 1798
+
+Média da coleção: 83 anos
+
+37 primeiras edições
+
+12 exemplares autografados
+
+84% publicados antes de 1950
+
+Índice Bibliotheca: 91/100
+RF-16 — Feed Público
+
+Visitantes poderão navegar por:
+
+Novos livros cadastrados
+Novas bibliotecas
+Novos comentários
+Novas coleções
+RF-17 — Administração
+
+Administradores poderão:
+
+Moderar comentários
+Moderar usuários
+Moderar livros
+Moderar autores
+3. Requisitos Não Funcionais
+RNF-01 — Arquitetura
+
+O projeto deverá seguir Clean Architecture.
+
+RNF-02 — Escalabilidade
+
+O sistema deverá suportar milhares de usuários simultaneamente.
+
+Toda listagem deverá utilizar paginação.
+
+RNF-03 — Segurança
+
+As senhas deverão utilizar BCrypt.
+
+Jamais poderão ser armazenadas em texto puro.
+
+RNF-04 — Autorização
+
+Toda operação de escrita deverá validar o proprietário do recurso.
+
+RNF-05 — Performance
+
+Consultas deverão utilizar paginação.
+
+Operações assíncronas deverão utilizar async/await.
+
+RNF-06 — Persistência
+
+Banco MySQL utilizando EF Core.
+
+RNF-07 — Soft Delete
+
+Nenhuma entidade será removida fisicamente.
+
+Toda exclusão utilizará:
+
+IsActive = false
+RNF-08 — Concorrência
+
+Cada requisição utilizará seu próprio DbContext.
+
+RNF-09 — Padronização
+
+Todos os Services retornarão:
+
+ResponseDto<T>
+RNF-10 — Código
+
+Todo acesso ao banco ocorrerá exclusivamente através de Repositories.
+
+A camada Web nunca acessará diretamente o DbContext.
+
+RNF-11 — Testabilidade
+
+Toda dependência deverá possuir interface.
+
+RNF-12 — Organização
+
+Nenhuma camada poderá violar as dependências da Clean Architecture.
+
+4. Arquitetura do Sistema
+Stack
+ASP.NET Core 9
+Razor Pages
+Entity Framework Core
+MySQL
+Pomelo
+Bootstrap
+BCrypt
+Cookie Authentication
+Estrutura
+Bibliotheca.Domain
+│
+├── Entities
+├── Enums
+├── Interfaces
+└── ValueObjects
+
+Bibliotheca.Data
+│
+├── Context
+├── Mappings
+├── Repositories
+├── UnitOfWork
+└── Filters
+
+Bibliotheca.Application
+│
+├── DTOs
+├── Services
+├── Interfaces
+├── InfraServices
+└── Mappers
+
+Bibliotheca.Web
+│
+├── Razor Pages
+├── ViewModels
+├── Program.cs
+└── wwwroot
+Padrões Arquiteturais
+
+O projeto deverá utilizar:
+
+Clean Architecture
+Repository Pattern
+Generic Repository
+Unit of Work
+Dependency Injection
+DTO Pattern
+Service Layer
+SOLID
+Async/Await
+DataAnnotations
+Cookie Authentication
+5. Objetivos Arquiteturais
+Objetivo 1 — Suporte a múltiplos usuários
+
+Cada usuário possui sua própria biblioteca.
+
+Todo recurso pertence exclusivamente ao seu proprietário.
+
+Consultas deverão ser isoladas por UserId.
+
+Toda edição deverá validar a posse do recurso no servidor.
+
+Objetivo 2 — Segurança
+BCrypt
+Cookie Authentication
+DataAnnotations
+Soft Delete
+SQL parametrizado
+DTOs sem exposição de senha
+Verificação de autorização em todas as operações de escrita
+Objetivo 3 — Manutenibilidade
+Separação rigorosa entre camadas
+Repositories especializados
+Unit of Work
+Generic Repository
+DTOs
+Services
+Interfaces
+ResponseDto padronizado
+Convenção uniforme de nomenclatura
+Filtros encapsulados em objetos próprios
+
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/Common/BaseService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Services;
+
+public abstract class BaseService
+{
+    protected static ResponseDto<T> Success<T>(
+        T data,
+        string message = "Success",
+        int statusCode = 200)
+    {
+        return new ResponseDto<T>
+        {
+            StatusCode = statusCode,
+            IsSuccess = true,
+            Message = message,
+            Data = data
+        };
+    }
+
+    protected static ResponseDto<T> Failure<T>(
+        string message,
+        int statusCode = 400)
+    {
+        return new ResponseDto<T>
+        {
+            StatusCode = statusCode,
+            IsSuccess = false,
+            Message = message
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/BookService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Data.Repositories.Dto;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Application.Services;
+
+public class BookService : BaseService, IBookService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public BookService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ResponseDto<BookDto>> GetByIdAsync(Guid id)
+    {
+        var book = await _unitOfWork.Books.GetByIdWithAuthorsAsync(id);
+
+        if (book is null || !book.IsActive)
+            return Failure<BookDto>("Book not found", 404);
+
+        return Success(ToDto(book));
+    }
+
+    public async Task<ResponseDto<List<BookDto>>> GetAllAsync()
+    {
+        var books = await _unitOfWork.Books.GetAllWithAuthorsAsync();
+        return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<List<BookDto>>> GetByUserIdAsync(Guid userId)
+    {
+        var books = await _unitOfWork.Books.GetByUserIdAsync(userId);
+        return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<List<BookDto>>> GetByAuthorIdAsync(Guid authorId)
+    {
+        var books = await _unitOfWork.Books.GetByAuthorIdAsync(authorId);
+        return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<List<BookDto>>> SearchAsync(BookFilterDto filter)
+    {
+        var searchFilter = new BookSearchFilter
+        {
+            Name = filter.Name,
+            AuthorName = filter.AuthorName,
+            Language = filter.Language,
+            Publisher = filter.Publisher,
+            Condition = filter.Condition,
+            YearFrom = filter.YearFrom,
+            YearTo = filter.YearTo
+        };
+
+        var books = await _unitOfWork.Books.SearchAsync(searchFilter);
+        return Success(books.Select(ToDto).ToList());
+    }
+
+    // NOVO: "meus livros" paginado, pra usar na página de Perfil.
+    // Traduz o PagedResult<Book> do Data pro PagedResultDto<BookDto> da Application.
+    public async Task<ResponseDto<PagedResultDto<BookDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize)
+    {
+        var paged = await _unitOfWork.Books.GetByUserIdPagedAsync(userId, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<BookDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
+    }
+
+    public async Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto)
+    {
+        if (dto.AuthorIds.Count == 0)
+            return Failure<BookDto>("At least one author is required", 400);
+
+        var authorIds = dto.AuthorIds.Distinct().ToList();
+        var authors = (await _unitOfWork.Authors.FindAllAsync(a => authorIds.Contains(a.Id) && a.IsActive)).ToList();
+
+        if (authors.Count != authorIds.Count)
+            return Failure<BookDto>("One or more authors not found", 404);
+
+        var book = new Book
+        {
+            Id = Guid.NewGuid(),
+            UserId = dto.UserId,
+            IsOwner = dto.IsOwner,
+            Name = dto.Name,
+            PublicationYear = dto.PublicationYear,
+            Photos = dto.Photos,
+            Language = dto.Language,
+            Publisher = dto.Publisher,
+            ISBN = dto.ISBN,
+            Pages = dto.Pages,
+            Edition = dto.Edition,
+            EstimatedValue = dto.EstimatedValue,
+            Condition = dto.Condition,
+            Authors = authors,
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        await _unitOfWork.Books.AddAsync(book);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(book), "Book created successfully", 201);
+    }
+
+    public async Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto)
+    {
+        var book = await _unitOfWork.Books.GetByIdWithAuthorsAsync(dto.Id);
+
+        if (book is null || !book.IsActive)
+            return Failure<BookDto>("Book not found", 404);
+
+        if (dto.AuthorIds.Count == 0)
+            return Failure<BookDto>("At least one author is required", 400);
+
+        var authorIds = dto.AuthorIds.Distinct().ToList();
+        var authors = (await _unitOfWork.Authors.FindAllAsync(a => authorIds.Contains(a.Id) && a.IsActive)).ToList();
+
+        if (authors.Count != authorIds.Count)
+            return Failure<BookDto>("One or more authors not found", 404);
+
+        book.IsOwner = dto.IsOwner;
+        book.Name = dto.Name;
+        book.PublicationYear = dto.PublicationYear;
+        book.Photos = dto.Photos;
+        book.Language = dto.Language;
+        book.Publisher = dto.Publisher;
+        book.ISBN = dto.ISBN;
+        book.Pages = dto.Pages;
+        book.Edition = dto.Edition;
+        book.EstimatedValue = dto.EstimatedValue;
+        book.Condition = dto.Condition;
+        book.UpdatedAt = DateTimeOffset.UtcNow;
+
+        book.Authors.Clear();
+        foreach (var author in authors)
+            book.Authors.Add(author);
+
+        _unitOfWork.Books.Update(book);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(book), "Book updated successfully");
+    }
+
+    // Soft delete: só zera IsActive, não remove a linha (herdado de AbstractBase).
+    public async Task<ResponseDto<bool>> DeleteAsync(Guid id)
+    {
+        var book = await _unitOfWork.Books.GetByIdAsync(id);
+
+        if (book is null || !book.IsActive)
+            return Failure<bool>("Book not found", 404);
+
+        book.IsActive = false;
+        book.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Books.Update(book);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(true, "Book removed successfully");
+    }
+
+    private static BookDto ToDto(Book book)
+    {
+        return new BookDto
+        {
+            Id = book.Id,
+            CreatedAt = book.CreatedAt,
+            UpdatedAt = book.UpdatedAt,
+            UserId = book.UserId,
+            AuthorIds = book.Authors.Select(a => a.Id).ToList(),
+            AuthorNames = book.Authors.Select(a => a.Name).ToList(),
+            IsOwner = book.IsOwner,
+            Name = book.Name,
+            PublicationYear = book.PublicationYear,
+            Photos = book.Photos,
+            Language = book.Language,
+            Publisher = book.Publisher,
+            ISBN = book.ISBN,
+            Pages = book.Pages,
+            Edition = book.Edition,
+            EstimatedValue = book.EstimatedValue,
+            Condition = book.Condition
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IAuthService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Auth;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.User;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IAuthService
+{
+    Task<ResponseDto<UserDto>> LoginAsync(LoginDto dto);
+    Task<ResponseDto<UserDto>> RegisterAsync(CreateUserDto dto);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IProfileService.cs
+==================================================
+// Bibliotheca.Application/Services/IProfileService.cs
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.Profile;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IProfileService
+{
+    Task<ResponseDto<ProfileDto>> GetByIdAsync(Guid id);
+    Task<ResponseDto<ProfileDto>> GetByUserIdAsync(Guid userId);
+    Task<ResponseDto<ProfileDto>> CreateAsync(CreateProfileDto dto);
+    Task<ResponseDto<ProfileDto>> UpdateAsync(UpdateProfileDto dto);
+    Task<ResponseDto<bool>> DeleteAsync(Guid id);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IAuthorService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Author;
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IAuthorService
+{
+    Task<ResponseDto<AuthorDto>> GetByIdAsync(Guid id);
+
+    Task<ResponseDto<List<AuthorDto>>> GetAllAsync();
+
+    Task<ResponseDto<AuthorDto>> CreateAsync(CreateAuthorDto dto);
+
+    Task<ResponseDto<AuthorDto>> UpdateAsync(UpdateAuthorDto dto);
+
+    Task<ResponseDto<bool>> DeleteAsync(Guid id);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/UserService.cs
+==================================================
+// Bibliotheca.Application/Services/UserService.cs
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.User;
+using Bibliotheca.Application.InfraServices;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Application.Services;
+
+public class UserService : BaseService, IUserService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICrypto _crypto;
+
+    public UserService(IUnitOfWork unitOfWork, ICrypto crypto)
+    {
+        _unitOfWork = unitOfWork;
+        _crypto = crypto;
+    }
+
+    public async Task<ResponseDto<UserDto>> GetByIdAsync(Guid id)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(id);
+
+        if (user is null || !user.IsActive)
+            return Failure<UserDto>("User not found", 404);
+
+        return Success(ToDto(user));
+    }
+
+    public async Task<ResponseDto<List<UserDto>>> GetAllAsync()
+    {
+        var users = await _unitOfWork.Users.FindAllAsync(u => u.IsActive);
+        return Success(users.Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<UserDto>> GetByEmailAsync(string email)
+    {
+        var user = await _unitOfWork.Users.GetByEmailAsync(email);
+
+        if (user is null || !user.IsActive)
+            return Failure<UserDto>("User not found", 404);
+
+        return Success(ToDto(user));
+    }
+
+    public async Task<ResponseDto<UserDto>> CreateAsync(CreateUserDto dto)
+    {
+        var emailExists = await _unitOfWork.Users.EmailExistsAsync(dto.Email);
+        if (emailExists)
+            return Failure<UserDto>("Email already in use", 409);
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            Email = dto.Email,
+            Password = _crypto.HashPassword(dto.Password),
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+        await _unitOfWork.Users.AddAsync(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(user), "User created successfully", 201);
+    }
+
+    public async Task<ResponseDto<UserDto>> UpdateAsync(UpdateUserDto dto)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(dto.Id);
+
+        if (user is null || !user.IsActive)
+            return Failure<UserDto>("User not found", 404);
+
+        if (!string.Equals(user.Email, dto.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            var emailExists = await _unitOfWork.Users.EmailExistsAsync(dto.Email);
+            if (emailExists)
+                return Failure<UserDto>("Email already in use", 409);
+        }
+
+        user.Name = dto.Name;
+        user.Email = dto.Email;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Users.Update(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(user), "User updated successfully");
+    }
+
+    public async Task<ResponseDto<bool>> DeleteAsync(Guid id)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(id);
+
+        if (user is null || !user.IsActive)
+            return Failure<bool>("User not found", 404);
+
+        user.IsActive = false;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Users.Update(user);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(true, "User removed successfully");
+    }
+
+    private static UserDto ToDto(User user)
+    {
+        return new UserDto
+        {
+            Id = user.Id,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            Name = user.Name,
+            Email = user.Email
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/CommentService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Comment;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Application.Services;
+
+public class CommentService : BaseService, ICommentService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CommentService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ResponseDto<CommentDto>> GetByIdAsync(Guid id)
+    {
+        var comment = await _unitOfWork.Comments.GetByIdAsync(id);
+
+        if (comment is null || !comment.IsActive)
+            return Failure<CommentDto>("Comment not found", 404);
+
+        return Success(ToDto(comment));
+    }
+
+    public async Task<ResponseDto<List<CommentDto>>> GetAllAsync()
+    {
+        var comments = await _unitOfWork.Comments.FindAllAsync(c => c.IsActive);
+        return Success(comments.Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<List<CommentDto>>> GetByUserIdAsync(Guid userId)
+    {
+        var comments = await _unitOfWork.Comments.GetByUserIdAsync(userId);
+        return Success(comments.Where(c => c.IsActive).Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<List<CommentDto>>> GetByBookIdAsync(Guid bookId)
+    {
+        var comments = await _unitOfWork.Comments.GetByBookIdAsync(bookId);
+        return Success(comments.Where(c => c.IsActive).Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<CommentDto>> CreateAsync(CreateCommentDto dto)
+    {
+        var userExists = await _unitOfWork.Users.ExistsAsync(u => u.Id == dto.UserId && u.IsActive);
+        if (!userExists)
+            return Failure<CommentDto>("User not found", 404);
+
+        var bookExists = await _unitOfWork.Books.ExistsAsync(b => b.Id == dto.BookId && b.IsActive);
+        if (!bookExists)
+            return Failure<CommentDto>("Book not found", 404);
+
+        var comment = new Comment
+        {
+            Id = Guid.NewGuid(),
+            UserId = dto.UserId,
+            BookId = dto.BookId,
+            Content = dto.Content,
+            Link = dto.Link,
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        await _unitOfWork.Comments.AddAsync(comment);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(comment), "Comment created successfully", 201);
+    }
+
+    public async Task<ResponseDto<CommentDto>> UpdateAsync(UpdateCommentDto dto)
+    {
+        var comment = await _unitOfWork.Comments.GetByIdAsync(dto.Id);
+
+        if (comment is null || !comment.IsActive)
+            return Failure<CommentDto>("Comment not found", 404);
+
+        comment.Content = dto.Content;
+        comment.Link = dto.Link;
+        comment.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Comments.Update(comment);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(comment), "Comment updated successfully");
+    }
+
+    public async Task<ResponseDto<bool>> DeleteAsync(Guid id)
+    {
+        var comment = await _unitOfWork.Comments.GetByIdAsync(id);
+
+        if (comment is null || !comment.IsActive)
+            return Failure<bool>("Comment not found", 404);
+
+        comment.IsActive = false;
+        comment.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Comments.Update(comment);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(true, "Comment removed successfully");
+    }
+
+    private static CommentDto ToDto(Comment comment)
+    {
+        return new CommentDto
+        {
+            Id = comment.Id,
+            CreatedAt = comment.CreatedAt,
+            UpdatedAt = comment.UpdatedAt,
+            UserId = comment.UserId,
+            UserName = comment.User?.Name ?? string.Empty,
+            BookId = comment.BookId,
+            Content = comment.Content,
+            Link = comment.Link
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IBookService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IBookService
+{
+    Task<ResponseDto<BookDto>> GetByIdAsync(Guid id);
+    Task<ResponseDto<List<BookDto>>> GetAllAsync();
+    Task<ResponseDto<List<BookDto>>> GetByUserIdAsync(Guid userId);
+    Task<ResponseDto<List<BookDto>>> GetByAuthorIdAsync(Guid authorId);
+    Task<ResponseDto<List<BookDto>>> SearchAsync(BookFilterDto filter);
+    Task<ResponseDto<PagedResultDto<BookDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize);
+    Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto);
+    Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto);
+    Task<ResponseDto<bool>> DeleteAsync(Guid id);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/ProfileService.cs
+==================================================
+// Bibliotheca.Application/Services/ProfileService.cs
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.Profile;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Application.Services;
+
+public class ProfileService : BaseService, IProfileService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public ProfileService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ResponseDto<ProfileDto>> GetByIdAsync(Guid id)
+    {
+        var profile = await _unitOfWork.Profiles.GetByIdAsync(id);
+
+        if (profile is null || !profile.IsActive)
+            return Failure<ProfileDto>("Profile not found", 404);
+
+        return Success(ToDto(profile));
+    }
+
+    public async Task<ResponseDto<ProfileDto>> GetByUserIdAsync(Guid userId)
+    {
+        var profile = await _unitOfWork.Profiles.GetByUserIdAsync(userId);
+
+        if (profile is null || !profile.IsActive)
+            return Failure<ProfileDto>("Profile not found", 404);
+
+        return Success(ToDto(profile));
+    }
+
+    public async Task<ResponseDto<ProfileDto>> CreateAsync(CreateProfileDto dto)
+    {
+        var userExists = await _unitOfWork.Users.ExistsAsync(u => u.Id == dto.UserId && u.IsActive);
+        if (!userExists)
+            return Failure<ProfileDto>("User not found", 404);
+
+        var existingProfile = await _unitOfWork.Profiles.GetByUserIdAsync(dto.UserId);
+        if (existingProfile is not null && existingProfile.IsActive)
+            return Failure<ProfileDto>("User already has a profile", 409);
+
+        var profile = new Profile
+        {
+            Id = Guid.NewGuid(),
+            UserId = dto.UserId,
+            Description = dto.Description,
+            Contact = dto.Contact,
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        await _unitOfWork.Profiles.AddAsync(profile);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(profile), "Profile created successfully", 201);
+    }
+
+    public async Task<ResponseDto<ProfileDto>> UpdateAsync(UpdateProfileDto dto)
+    {
+        var profile = await _unitOfWork.Profiles.GetByIdAsync(dto.Id);
+
+        if (profile is null || !profile.IsActive)
+            return Failure<ProfileDto>("Profile not found", 404);
+
+        profile.Description = dto.Description;
+        profile.Contact = dto.Contact;
+        profile.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Profiles.Update(profile);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(profile), "Profile updated successfully");
+    }
+
+    public async Task<ResponseDto<bool>> DeleteAsync(Guid id)
+    {
+        var profile = await _unitOfWork.Profiles.GetByIdAsync(id);
+
+        if (profile is null || !profile.IsActive)
+            return Failure<bool>("Profile not found", 404);
+
+        profile.IsActive = false;
+        profile.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Profiles.Update(profile);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(true, "Profile removed successfully");
+    }
+
+    private static ProfileDto ToDto(Profile profile)
+    {
+        return new ProfileDto
+        {
+            Id = profile.Id,
+            CreatedAt = profile.CreatedAt,
+            UpdatedAt = profile.UpdatedAt,
+            UserId = profile.UserId,
+            Description = profile.Description,
+            Contact = profile.Contact
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/ICommentService.cs
+==================================================
+// Bibliotheca.Application/Services/ICommentService.cs
+using Bibliotheca.Application.Dtos.Comment;
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Services;
+
+public interface ICommentService
+{
+    Task<ResponseDto<CommentDto>> GetByIdAsync(Guid id);
+    Task<ResponseDto<List<CommentDto>>> GetAllAsync();
+    Task<ResponseDto<List<CommentDto>>> GetByUserIdAsync(Guid userId);
+    Task<ResponseDto<List<CommentDto>>> GetByBookIdAsync(Guid bookId);
+    Task<ResponseDto<CommentDto>> CreateAsync(CreateCommentDto dto);
+    Task<ResponseDto<CommentDto>> UpdateAsync(UpdateCommentDto dto);
+    Task<ResponseDto<bool>> DeleteAsync(Guid id);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/AuthService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Auth;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.User;
+using Bibliotheca.Application.InfraServices;
+using Bibliotheca.Data.Uow;
+
+namespace Bibliotheca.Application.Services;
+
+public class AuthService : BaseService, IAuthService
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICrypto _crypto;
+    private readonly IUserService _userService;
+
+    public AuthService(IUnitOfWork unitOfWork, ICrypto crypto, IUserService userService)
+    {
+        _unitOfWork = unitOfWork;
+        _crypto = crypto;
+        _userService = userService;
+    }
+
+    public async Task<ResponseDto<UserDto>> LoginAsync(LoginDto dto)
+    {
+        var user = await _unitOfWork.Users.GetByEmailAsync(dto.Email);
+
+        if (user is null || !user.IsActive || !_crypto.VerifyPassword(dto.Password, user.Password))
+            return Failure<UserDto>("Invalid email or password", 401);
+
+        return Success(new UserDto
+        {
+            Id = user.Id,
+            CreatedAt = user.CreatedAt,
+            UpdatedAt = user.UpdatedAt,
+            Name = user.Name,
+            Email = user.Email
+        });
+    }
+
+    public Task<ResponseDto<UserDto>> RegisterAsync(CreateUserDto dto)
+        => _userService.CreateAsync(dto);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/AuthorService.cs
+==================================================
+// Bibliotheca.Application/Services/AuthorService.cs
+using Bibliotheca.Application.Dtos.Author;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Application.Services;
+
+public class AuthorService : BaseService, IAuthorService
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public AuthorService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ResponseDto<AuthorDto>> GetByIdAsync(Guid id)
+    {
+        var author = await _unitOfWork.Authors.GetByIdAsync(id);
+
+        if (author is null || !author.IsActive)
+            return Failure<AuthorDto>("Author not found", 404);
+
+        return Success(ToDto(author));
+    }
+
+    public async Task<ResponseDto<List<AuthorDto>>> GetAllAsync()
+    {
+        var authors = await _unitOfWork.Authors.FindAllAsync(x => x.IsActive);
+        return Success(authors.Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<AuthorDto>> CreateAsync(CreateAuthorDto dto)
+    {
+        var author = new Author
+        {
+            Id = Guid.NewGuid(),
+            Name = dto.Name,
+            Photo = dto.Photo,
+            BirthDay = dto.BirthDay,
+            DeathDay = dto.DeathDay,
+            Description = dto.Description,
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        await _unitOfWork.Authors.AddAsync(author);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(author), "Author created successfully", 201);
+    }
+
+    public async Task<ResponseDto<AuthorDto>> UpdateAsync(UpdateAuthorDto dto)
+    {
+        var author = await _unitOfWork.Authors.GetByIdAsync(dto.Id);
+
+        if (author is null || !author.IsActive)
+            return Failure<AuthorDto>("Author not found", 404);
+
+        author.Name = dto.Name;
+        author.Photo = dto.Photo;
+        author.BirthDay = dto.BirthDay;
+        author.DeathDay = dto.DeathDay;
+        author.Description = dto.Description;
+        author.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Authors.Update(author);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(ToDto(author), "Author updated successfully");
+    }
+
+    public async Task<ResponseDto<bool>> DeleteAsync(Guid id)
+    {
+        var author = await _unitOfWork.Authors.GetByIdAsync(id);
+
+        if (author is null || !author.IsActive)
+            return Failure<bool>("Author not found", 404);
+
+        author.IsActive = false;
+        author.UpdatedAt = DateTimeOffset.UtcNow;
+
+        _unitOfWork.Authors.Update(author);
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(true, "Author removed successfully");
+    }
+
+    private static AuthorDto ToDto(Author author)
+    {
+        return new AuthorDto
+        {
+            Id = author.Id,
+            CreatedAt = author.CreatedAt,
+            UpdatedAt = author.UpdatedAt,
+            Name = author.Name,
+            Photo = author.Photo,
+            BirthDay = author.BirthDay,
+            DeathDay = author.DeathDay,
+            Description = author.Description
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IUserService.cs
+==================================================
+// Bibliotheca.Application/Services/IUserService.cs
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.User;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IUserService
+{
+    Task<ResponseDto<UserDto>> GetByIdAsync(Guid id);
+    Task<ResponseDto<List<UserDto>>> GetAllAsync();
+    Task<ResponseDto<UserDto>> GetByEmailAsync(string email);
+    Task<ResponseDto<UserDto>> CreateAsync(CreateUserDto dto);
+    Task<ResponseDto<UserDto>> UpdateAsync(UpdateUserDto dto);
+    Task<ResponseDto<bool>> DeleteAsync(Guid id);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/InfraServices/Crypto.cs
+==================================================
+// Bibliotheca.Application/InfraServices/Crypto.cs
+namespace Bibliotheca.Application.InfraServices;
+
+public class Crypto : ICrypto
+{
+    public string HashPassword(string password)
+        => BCrypt.Net.BCrypt.HashPassword(password);
+
+    public bool VerifyPassword(string password, string hashedPassword)
+        => BCrypt.Net.BCrypt.Verify(password, hashedPassword);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/InfraServices/ICrypto.cs
+==================================================
+// Bibliotheca.Application/InfraServices/ICrypto.cs
+namespace Bibliotheca.Application.InfraServices;
+
+public interface ICrypto
+{
+    string HashPassword(string password);
+    bool VerifyPassword(string password, string hashedPassword);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Common/BaseDto.cs
+==================================================
+namespace Bibliotheca.Application.Dtos.Common;
+
+public abstract class BaseDto
+{
+    public Guid Id { get; set; }
+
+    public DateTimeOffset CreatedAt { get; set; }
+
+    public DateTimeOffset UpdatedAt { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Common/PagedResultDto.cs
+==================================================
+namespace Bibliotheca.Application.Dtos.Common;
+
+public class PagedResultDto<T>
+{
+    public List<T> Items { get; set; } = [];
+    public int PageNumber { get; set; }
+    public int PageSize { get; set; }
+    public int TotalCount { get; set; }
+
+    public int TotalPages => PageSize <= 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public bool HasPreviousPage => PageNumber > 1;
+    public bool HasNextPage => PageNumber < TotalPages;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Common/ResponseDto.cs
+==================================================
+namespace Bibliotheca.Application.Dtos.Common;
+
+public class ResponseDto<T>
+{
+    public int StatusCode { get; set; }
+
+    public bool IsSuccess { get; set; }
+
+    public string Message { get; set; } = string.Empty;
+
+    public T? Data { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Auth/LoginDto.cs
+==================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace Bibliotheca.Application.Dtos.Auth;
+
+public class LoginDto
+{
+    [Required(ErrorMessage = "Informe o e-mail")]
+    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    public string Email { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Informe a senha")]
+    public string Password { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Book/CreateBookDto.cs
+==================================================
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Application.Dtos.Book;
+
+public class CreateBookDto
+{
+    public Guid UserId { get; set; }
+    public List<Guid> AuthorIds { get; set; } = [];
+    public bool IsOwner { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
+    public string[] Photos { get; set; } = [];
+    public string Language { get; set; } = string.Empty;
+    public string Publisher { get; set; } = string.Empty;
+    public string ISBN { get; set; } = string.Empty;
+    public int Pages { get; set; }
+    public string Edition { get; set; } = string.Empty;
+    public decimal EstimatedValue { get; set; }
+    public BookCondition Condition { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Book/UpdateBookDto.cs
+==================================================
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Application.Dtos.Book;
+
+public class UpdateBookDto
+{
+    public Guid Id { get; set; }
+    public List<Guid> AuthorIds { get; set; } = [];
+    public bool IsOwner { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
+    public string[] Photos { get; set; } = [];
+    public string Language { get; set; } = string.Empty;
+    public string Publisher { get; set; } = string.Empty;
+    public string ISBN { get; set; } = string.Empty;
+    public int Pages { get; set; }
+    public string Edition { get; set; } = string.Empty;
+    public decimal EstimatedValue { get; set; }
+    public BookCondition Condition { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Book/BookDto.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Application.Dtos.Book;
+
+public class BookDto : BaseDto
+{
+    public Guid UserId { get; set; }
+    public List<Guid> AuthorIds { get; set; } = [];
+    public List<string> AuthorNames { get; set; } = [];
+    public bool IsOwner { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
+    public string[] Photos { get; set; } = [];
+    public string Language { get; set; } = string.Empty;
+    public string Publisher { get; set; } = string.Empty;
+    public string ISBN { get; set; } = string.Empty;
+    public int Pages { get; set; }
+    public string Edition { get; set; } = string.Empty;
+    public decimal EstimatedValue { get; set; }
+    public BookCondition Condition { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Book/BookFilterDto.cs
+==================================================
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Application.Dtos.Book;
+
+public class BookFilterDto
+{
+    public string? Name { get; set; }
+    public string? AuthorName { get; set; }
+    public string? Language { get; set; }
+    public string? Publisher { get; set; }
+    public BookCondition? Condition { get; set; }
+    public int? YearFrom { get; set; }
+    public int? YearTo { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Comment/CreateCommentDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/Comment/CreateCommentDto.cs
+namespace Bibliotheca.Application.Dtos.Comment;
+
+public class CreateCommentDto
+{
+    public Guid UserId { get; set; }
+    public Guid BookId { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public string Link { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Comment/CommentDto.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Dtos.Comment;
+
+public class CommentDto : BaseDto
+{
+    public Guid UserId { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public Guid BookId { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public string Link { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Comment/UpdateCommentDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/Comment/UpdateCommentDto.cs
+namespace Bibliotheca.Application.Dtos.Comment;
+
+public class UpdateCommentDto
+{
+    public Guid Id { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public string Link { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Author/CreateAuthorDto.cs
+==================================================
+namespace Bibliotheca.Application.Dtos.Author;
+
+public class CreateAuthorDto
+{
+    public string Photo { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public DateTime BirthDay { get; set; }
+
+    public DateTime? DeathDay { get; set; }
+
+    public string Description { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Author/UpdateAuthorDto.cs
+==================================================
+namespace Bibliotheca.Application.Dtos.Author;
+
+public class UpdateAuthorDto
+{
+    public Guid Id { get; set; }
+
+    public string Photo { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public DateTime BirthDay { get; set; }
+
+    public DateTime? DeathDay { get; set; }
+
+    public string Description { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Author/AuthorDto.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Dtos.Author;
+
+public class AuthorDto : BaseDto
+{
+    public string Photo { get; set; } = string.Empty;
+
+    public string Name { get; set; } = string.Empty;
+
+    public DateTime BirthDay { get; set; }
+
+    public DateTime? DeathDay { get; set; }
+
+    public string Description { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Profile/CreateProfileDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/Profile/CreateProfileDto.cs
+namespace Bibliotheca.Application.Dtos.Profile;
+
+public class CreateProfileDto
+{
+    public Guid UserId { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public string Contact { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Profile/ProfileDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/Profile/ProfileDto.cs
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Dtos.Profile;
+
+public class ProfileDto : BaseDto
+{
+    public Guid UserId { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public string Contact { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Profile/UpdateProfileDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/Profile/UpdateProfileDto.cs
+namespace Bibliotheca.Application.Dtos.Profile;
+
+public class UpdateProfileDto
+{
+    public Guid Id { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public string Contact { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/User/UpdateUserDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/User/UpdateUserDto.cs
+namespace Bibliotheca.Application.Dtos.User;
+
+public class UpdateUserDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+
+    // Troca de senha deveria ser um endpoint/DTO separado
+    // (ex: ChangePasswordDto com senha atual + nova), não esse Update genérico.
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/User/CreateUserDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/User/CreateUserDto.cs
+namespace Bibliotheca.Application.Dtos.User;
+
+public class CreateUserDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty; // texto puro, hash acontece no service
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/User/UserDto.cs
+==================================================
+// Bibliotheca.Application/Dtos/User/UserDto.cs
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Dtos.User;
+
+public class UserDto : BaseDto
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+
+    // Password NUNCA sai daqui de propósito.
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Bibliotheca.Application.csproj
+==================================================
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Bibliotheca.Domain\Bibliotheca.Domain.csproj" />
+      <ProjectReference Include="..\Bibliotheca.Data\Bibliotheca.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+    </ItemGroup>
+
+</Project>
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260628001318_InitialCreate.cs
+==================================================
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    /// <inheritdoc />
+    public partial class InitialCreate : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Authors",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Photo = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Name = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    BirthDay = table.Column<DateTime>(type: "date", nullable: false),
+                    DeathDay = table.Column<DateTime>(type: "date", nullable: true),
+                    Description = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Authors", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Name = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Password = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Books",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    IsOwner = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Name = table.Column<string>(type: "varchar(300)", maxLength: 300, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PublicationYear = table.Column<int>(type: "int", nullable: false),
+                    Photos = table.Column<string>(type: "json", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Language = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Publisher = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ISBN = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Pages = table.Column<int>(type: "int", nullable: false),
+                    Edition = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    EstimatedValue = table.Column<decimal>(type: "decimal(12,2)", nullable: false),
+                    Condition = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Books", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Books_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Profiles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Description = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Contact = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Profiles", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Profiles_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "BookAuthors",
+                columns: table => new
+                {
+                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    AuthorId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookAuthors", x => new { x.BookId, x.AuthorId });
+                    table.ForeignKey(
+                        name: "FK_BookAuthors_Authors_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "Authors",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookAuthors_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    UserId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Content = table.Column<string>(type: "text", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Link = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Comments_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Comments_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Authors_IsActive",
+                table: "Authors",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Authors_Name",
+                table: "Authors",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookAuthors_AuthorId",
+                table: "BookAuthors",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_IsActive",
+                table: "Books",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_ISBN",
+                table: "Books",
+                column: "ISBN",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_Name",
+                table: "Books",
+                column: "Name");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_UserId",
+                table: "Books",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_BookId",
+                table: "Comments",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_IsActive",
+                table: "Comments",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_UserId",
+                table: "Comments",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Profiles_IsActive",
+                table: "Profiles",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Profiles_UserId",
+                table: "Profiles",
+                column: "UserId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_IsActive",
+                table: "Users",
+                column: "IsActive");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "BookAuthors");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "Profiles");
+
+            migrationBuilder.DropTable(
+                name: "Authors");
+
+            migrationBuilder.DropTable(
+                name: "Books");
+
+            migrationBuilder.DropTable(
+                name: "Users");
+        }
+    }
+}
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/BibliothecaContextModelSnapshot.cs
+==================================================
+﻿// <auto-generated />
+using System;
+using Bibliotheca.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    [DbContext(typeof(BibliothecaContext))]
+    partial class BibliothecaContextModelSnapshot : ModelSnapshot
+    {
+        protected override void BuildModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.17")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Author", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("BirthDay")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeathDay")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Authors", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Edition")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("EstimatedValue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<int>("Pages")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Photos")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<int>("PublicationYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("BookAuthors", b =>
+                {
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("BookId", "AuthorId");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("BookAuthors", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Books")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", "Book")
+                        .WithMany("Comments")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.Profile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookAuthors", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Author", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Navigation("Books");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Profile");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260628001318_InitialCreate.Designer.cs
+==================================================
+﻿// <auto-generated />
+using System;
+using Bibliotheca.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    [DbContext(typeof(BibliothecaContext))]
+    [Migration("20260628001318_InitialCreate")]
+    partial class InitialCreate
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.17")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Author", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("BirthDay")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("DeathDay")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<string>("Photo")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name");
+
+                    b.ToTable("Authors", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Condition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Edition")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<decimal>("EstimatedValue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<int>("Pages")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Photos")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<int>("PublicationYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("BookAuthors", b =>
+                {
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("AuthorId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("BookId", "AuthorId");
+
+                    b.HasIndex("AuthorId");
+
+                    b.ToTable("BookAuthors", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Books")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", "Book")
+                        .WithMany("Comments")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.Profile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BookAuthors", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Author", null)
+                        .WithMany()
+                        .HasForeignKey("AuthorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Navigation("Books");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Profile");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Bibliotheca.Data.csproj
+==================================================
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+      <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Bibliotheca.Domain\Bibliotheca.Domain.csproj" />
+    </ItemGroup>
+
+</Project>
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Context/BibliothecaContext.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bibliotheca.Data.Context;
+
+public class BibliothecaContext : DbContext
+{
+    public BibliothecaContext(DbContextOptions<BibliothecaContext> options) : base(options)
+    {
+    }
+
+    public DbSet<Author> Authors => Set<Author>();
+    public DbSet<Book> Books => Set<Book>();
+    public DbSet<Comment> Comments => Set<Comment>();
+    public DbSet<Profile> Profiles => Set<Profile>();
+    public DbSet<User> Users => Set<User>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(BibliothecaContext).Assembly);
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Context/Mappings/AuthorTypeConfiguration.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Bibliotheca.Data.Context.Mappings;
+
+public class AuthorTypeConfiguration : IEntityTypeConfiguration<Author>
+{
+    public void Configure(EntityTypeBuilder<Author> builder)
+    {
+        builder.ToTable("Authors");
+
+        builder.HasKey(a => a.Id);
+
+        builder.Property(a => a.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        builder.Property(a => a.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(a => a.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(a => a.UpdatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(a => a.Name)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(a => a.Photo)
+            .HasMaxLength(500);
+
+        builder.Property(a => a.Description)
+            .HasColumnType("text");
+
+        builder.Property(a => a.BirthDay)
+            .IsRequired()
+            .HasColumnType("date");
+
+        builder.Property(a => a.DeathDay)
+            .HasColumnType("date");
+
+        builder.HasIndex(a => a.IsActive);
+        builder.HasIndex(a => a.Name);
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Context/Mappings/ProfileTypeConfiguration.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Bibliotheca.Data.Context.Mappings;
+
+public class ProfileTypeConfiguration : IEntityTypeConfiguration<Profile>
+{
+    public void Configure(EntityTypeBuilder<Profile> builder)
+    {
+        builder.ToTable("Profiles");
+
+        builder.HasKey(p => p.Id);
+
+        builder.Property(p => p.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        builder.Property(p => p.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(p => p.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(p => p.UpdatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(p => p.UserId)
+            .IsRequired()
+            .HasColumnType("char(36)");
+
+        builder.Property(p => p.Description)
+            .HasColumnType("text");
+
+        builder.Property(p => p.Contact)
+            .HasMaxLength(200);
+
+        builder.HasIndex(p => p.IsActive);
+        builder.HasIndex(p => p.UserId).IsUnique();
+
+        builder.HasOne(p => p.User)
+            .WithOne(u => u.Profile)
+            .HasForeignKey<Profile>(p => p.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Context/Mappings/UserTypeConfiguration.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Bibliotheca.Data.Context.Mappings;
+
+public class UserTypeConfiguration : IEntityTypeConfiguration<User>
+{
+    public void Configure(EntityTypeBuilder<User> builder)
+    {
+        builder.ToTable("Users");
+
+        builder.HasKey(u => u.Id);
+
+        builder.Property(u => u.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        builder.Property(u => u.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(u => u.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(u => u.UpdatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(u => u.Name)
+            .IsRequired()
+            .HasMaxLength(150);
+
+        builder.Property(u => u.Email)
+            .IsRequired()
+            .HasMaxLength(256);
+
+        builder.Property(u => u.Password)
+            .IsRequired()
+            .HasMaxLength(255);
+
+        builder.HasIndex(u => u.IsActive);
+        builder.HasIndex(u => u.Email).IsUnique();
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Context/Mappings/CommentTypeConfiguration.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Bibliotheca.Data.Context.Mappings;
+
+public class CommentTypeConfiguration : IEntityTypeConfiguration<Comment>
+{
+    public void Configure(EntityTypeBuilder<Comment> builder)
+    {
+        builder.ToTable("Comments");
+
+        builder.HasKey(c => c.Id);
+
+        builder.Property(c => c.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        builder.Property(c => c.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(c => c.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(c => c.UpdatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(c => c.UserId)
+            .IsRequired()
+            .HasColumnType("char(36)");
+
+        builder.Property(c => c.BookId)
+            .IsRequired()
+            .HasColumnType("char(36)");
+
+        builder.Property(c => c.Content)
+            .IsRequired()
+            .HasColumnType("text");
+
+        builder.Property(c => c.Link)
+            .HasMaxLength(500);
+
+        builder.HasIndex(c => c.IsActive);
+        builder.HasIndex(c => c.UserId);
+        builder.HasIndex(c => c.BookId);
+
+        builder.HasOne(c => c.Book)
+            .WithMany(b => b.Comments)
+            .HasForeignKey(c => c.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(c => c.User)
+            .WithMany(u => u.Comments)
+            .HasForeignKey(c => c.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Context/Mappings/BookTypeConfiguration.cs
+==================================================
+using System.Text.Json;
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Bibliotheca.Data.Context.Mappings;
+
+public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
+{
+    public void Configure(EntityTypeBuilder<Book> builder)
+    {
+        builder.ToTable("Books");
+
+        builder.HasKey(b => b.Id);
+
+        builder.Property(b => b.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        builder.Property(b => b.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(b => b.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(b => b.UpdatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(b => b.UserId)
+            .IsRequired()
+            .HasColumnType("char(36)");
+
+        builder.Property(b => b.IsOwner)
+            .IsRequired();
+
+        builder.Property(b => b.Name)
+            .IsRequired()
+            .HasMaxLength(300);
+
+        builder.Property(b => b.PublicationYear)
+            .IsRequired();
+
+        builder.Property(b => b.Language)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.Property(b => b.Publisher)
+            .HasMaxLength(200);
+
+        builder.Property(b => b.ISBN)
+            .IsRequired()
+            .HasMaxLength(20);
+
+        builder.Property(b => b.Pages)
+            .IsRequired();
+
+        builder.Property(b => b.Edition)
+            .HasMaxLength(50);
+
+        builder.Property(b => b.EstimatedValue)
+            .IsRequired()
+            .HasColumnType("decimal(12,2)");
+
+        builder.Property(b => b.Condition)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
+        builder.Property(b => b.Photos)
+            .HasConversion(
+                photos => JsonSerializer.Serialize(photos, (JsonSerializerOptions?)null),
+                json => JsonSerializer.Deserialize<string[]>(json, (JsonSerializerOptions?)null) ?? Array.Empty<string>())
+            .HasColumnType("json");
+
+        builder.HasIndex(b => b.IsActive);
+        builder.HasIndex(b => b.Name);
+        builder.HasIndex(b => b.ISBN).IsUnique();
+        builder.HasIndex(b => b.UserId);
+
+        builder.HasOne(b => b.User)
+            .WithMany(u => u.Books)
+            .HasForeignKey(b => b.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(b => b.Authors)
+            .WithMany(a => a.Books)
+            .UsingEntity<Dictionary<string, object>>(
+                "BookAuthors",
+                j => j.HasOne<Author>().WithMany()
+                    .HasForeignKey("AuthorId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j => j.HasOne<Book>().WithMany()
+                    .HasForeignKey("BookId")
+                    .OnDelete(DeleteBehavior.Cascade),
+                j =>
+                {
+                    j.ToTable("BookAuthors");
+                    j.HasKey("BookId", "AuthorId");
+                    j.Property<Guid>("BookId").HasColumnType("char(36)");
+                    j.Property<Guid>("AuthorId").HasColumnType("char(36)");
+                    j.HasIndex("AuthorId");
+                });
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/ICommentRepository.cs
+==================================================
+// Bibliotheca.Data/Repositories/Repositories/ICommentRepository.cs
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public interface ICommentRepository : IGenericRepository<Comment>
+{
+    Task<IEnumerable<Comment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<Comment>> GetByBookIdAsync(Guid bookId, CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/BookRepository.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Data.Repositories.Dto;
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bibliotheca.Data.Repositories;
+
+public class BookRepository : GenericRepository<Book>, IBookRepository
+{
+    public BookRepository(BibliothecaContext context) : base(context)
+    {
+    }
+
+    public Task<Book?> GetByIdWithAuthorsAsync(Guid id, CancellationToken cancellationToken = default)
+        => DbSet.Include(b => b.Authors).FirstOrDefaultAsync(b => b.Id == id, cancellationToken);
+
+    public Task<IEnumerable<Book>> GetAllWithAuthorsAsync(CancellationToken cancellationToken = default)
+        => DbSet.AsNoTracking().Include(b => b.Authors).ToListAsync()
+            .ContinueWith(t => (IEnumerable<Book>)t.Result, cancellationToken);
+
+    public async Task<IEnumerable<Book>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        => await DbSet.AsNoTracking().Include(b => b.Authors)
+            .Where(b => b.UserId == userId)
+            .ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<Book>> GetByAuthorIdAsync(Guid authorId, CancellationToken cancellationToken = default)
+        => await DbSet.AsNoTracking().Include(b => b.Authors)
+            .Where(b => b.Authors.Any(a => a.Id == authorId))
+            .ToListAsync(cancellationToken);
+
+    public async Task<IEnumerable<Book>> SearchAsync(BookSearchFilter filter, CancellationToken cancellationToken = default)
+    {
+        var query = DbSet.AsNoTracking()
+            .Include(b => b.Authors)
+            .Where(b => b.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(filter.Name))
+            query = query.Where(b => b.Name.Contains(filter.Name));
+
+        if (!string.IsNullOrWhiteSpace(filter.AuthorName))
+            query = query.Where(b => b.Authors.Any(a => a.Name.Contains(filter.AuthorName)));
+
+        if (!string.IsNullOrWhiteSpace(filter.Language))
+            query = query.Where(b => b.Language == filter.Language);
+
+        if (!string.IsNullOrWhiteSpace(filter.Publisher))
+            query = query.Where(b => b.Publisher.Contains(filter.Publisher));
+
+        if (filter.Condition.HasValue)
+            query = query.Where(b => b.Condition == filter.Condition.Value);
+
+        if (filter.YearFrom.HasValue)
+            query = query.Where(b => b.PublicationYear >= filter.YearFrom.Value);
+
+        if (filter.YearTo.HasValue)
+            query = query.Where(b => b.PublicationYear <= filter.YearTo.Value);
+
+        return await query
+            .OrderBy(b => b.Name)
+            .ToListAsync(cancellationToken);
+    }
+
+    // NOVO: paginação da listagem "meus livros" no Perfil.
+    // Já filtra por IsActive aqui (soft delete não deve aparecer na lista).
+    public async Task<PagedResult<Book>> GetByUserIdPagedAsync(
+        Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var query = DbSet.AsNoTracking()
+            .Include(b => b.Authors)
+            .Where(b => b.UserId == userId && b.IsActive)
+            .OrderByDescending(b => b.CreatedAt);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Book>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IBookRepository.cs
+==================================================
+using Bibliotheca.Data.Repositories.Dto;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public interface IBookRepository : IGenericRepository<Book>
+{
+    Task<Book?> GetByIdWithAuthorsAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Book>> GetAllWithAuthorsAsync(CancellationToken cancellationToken = default);
+    Task<IEnumerable<Book>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Book>> GetByAuthorIdAsync(Guid authorId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Book>> SearchAsync(BookSearchFilter filter, CancellationToken cancellationToken = default);
+    Task<PagedResult<Book>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IUserRepository.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public interface IUserRepository : IGenericRepository<User>
+{
+    Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+
+    Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IAuthorRepository.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public interface IAuthorRepository : IGenericRepository<Author>
+{
+    Task<IEnumerable<Author>> SearchByNameAsync(string name, CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/AuthorRepository.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public class AuthorRepository : GenericRepository<Author>, IAuthorRepository
+{
+    public AuthorRepository(BibliothecaContext context) : base(context)
+    {
+    }
+
+    public Task<IEnumerable<Author>> SearchByNameAsync(string name, CancellationToken cancellationToken = default)
+        => FindAllAsync(a => a.Name.Contains(name), cancellationToken);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/ProfileRepository.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public class ProfileRepository : GenericRepository<Profile>, IProfileRepository
+{
+    public ProfileRepository(BibliothecaContext context) : base(context)
+    {
+    }
+
+    public Task<Profile?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        => FindAsync(p => p.UserId == userId, cancellationToken);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/UserRepository.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public class UserRepository : GenericRepository<User>, IUserRepository
+{
+    public UserRepository(BibliothecaContext context) : base(context)
+    {
+    }
+
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
+        => FindAsync(u => u.Email == email, cancellationToken);
+
+    public Task<bool> EmailExistsAsync(string email, CancellationToken cancellationToken = default)
+        => ExistsAsync(u => u.Email == email, cancellationToken);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IProfileRepository.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public interface IProfileRepository : IGenericRepository<Profile>
+{
+    Task<Profile?> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/CommentRepository.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bibliotheca.Data.Repositories;
+
+public class CommentRepository : GenericRepository<Comment>, ICommentRepository
+{
+    public CommentRepository(BibliothecaContext context) : base(context)
+    {
+    }
+
+    public Task<IEnumerable<Comment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+        => FindAllAsync(c => c.UserId == userId, cancellationToken);
+
+    public Task<IEnumerable<Comment>> GetByBookIdAsync(Guid bookId, CancellationToken cancellationToken = default)
+        => DbSet.AsNoTracking()
+            .Include(c => c.User)
+            .Where(c => c.BookId == bookId)
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync(cancellationToken)
+            .ContinueWith(t => (IEnumerable<Comment>)t.Result, cancellationToken);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/GenericRepository/IGenericRepository.cs
+==================================================
+using System.Linq.Expressions;
+using Bibliotheca.Data.Repositories.Dto;
+
+namespace Bibliotheca.Data.Repositories;
+
+/// <summary>
+/// Contrato genérico de repositório. Qualquer repositório específico (ex.: IBookRepository)
+/// deve herdar desta interface para reaproveitar o CRUD básico e adicionar métodos próprios.
+/// </summary>
+public interface IGenericRepository<TEntity> where TEntity : class
+{
+    // ---- Consultas básicas ----
+    Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default);
+
+    // ---- Busca por predicado ----
+    Task<TEntity?> FindAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<TEntity>> FindAllAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+
+    // ---- Busca paginada ----
+    Task<PagedResult<TEntity>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? predicate = null,
+        Expression<Func<TEntity, object>>? orderBy = null,
+        bool ascending = true,
+        CancellationToken cancellationToken = default);
+
+    // ---- Verificações ----
+    Task<bool> ExistsAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default);
+
+    Task<int> CountAsync(
+        Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken cancellationToken = default);
+
+    // ---- Escrita (CRUD) ----
+    Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
+
+    Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default);
+
+    void Update(TEntity entity);
+
+    void Remove(TEntity entity);
+
+    void RemoveRange(IEnumerable<TEntity> entities);
+
+    // ---- Persistência ----
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/GenericRepository/GenericRepository.cs
+==================================================
+using System.Linq.Expressions;
+using Bibliotheca.Data.Repositories.Dto;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bibliotheca.Data.Repositories;
+
+/// <summary>
+/// Implementação genérica de repositório usando EF Core.
+/// Métodos são "virtual" para permitir sobrescrita em repositórios específicos, se necessário.
+/// </summary>
+public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : class
+{
+    protected readonly DbContext Context;
+    protected readonly DbSet<TEntity> DbSet;
+
+    public GenericRepository(DbContext context)
+    {
+        Context = context ?? throw new ArgumentNullException(nameof(context));
+        DbSet = context.Set<TEntity>();
+    }
+
+    public virtual async Task<TEntity?> GetByIdAsync(object id, CancellationToken cancellationToken = default)
+        => await DbSet.FindAsync(new[] { id }, cancellationToken);
+
+    public virtual async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
+        => await DbSet.AsNoTracking().ToListAsync(cancellationToken);
+
+    public virtual async Task<TEntity?> FindAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+        => await DbSet.AsNoTracking().FirstOrDefaultAsync(predicate, cancellationToken);
+
+    public virtual async Task<IEnumerable<TEntity>> FindAllAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+        => await DbSet.AsNoTracking().Where(predicate).ToListAsync(cancellationToken);
+
+    public virtual async Task<PagedResult<TEntity>> GetPagedAsync(
+        int pageNumber,
+        int pageSize,
+        Expression<Func<TEntity, bool>>? predicate = null,
+        Expression<Func<TEntity, object>>? orderBy = null,
+        bool ascending = true,
+        CancellationToken cancellationToken = default)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        IQueryable<TEntity> query = DbSet.AsNoTracking();
+
+        if (predicate is not null)
+            query = query.Where(predicate);
+
+        if (orderBy is not null)
+            query = ascending ? query.OrderBy(orderBy) : query.OrderByDescending(orderBy);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<TEntity>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
+
+    public virtual async Task<bool> ExistsAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
+        => await DbSet.AnyAsync(predicate, cancellationToken);
+
+    public virtual async Task<int> CountAsync(
+        Expression<Func<TEntity, bool>>? predicate = null,
+        CancellationToken cancellationToken = default)
+        => predicate is null
+            ? await DbSet.CountAsync(cancellationToken)
+            : await DbSet.CountAsync(predicate, cancellationToken);
+
+    public virtual async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
+        => await DbSet.AddAsync(entity, cancellationToken);
+
+    public virtual async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        => await DbSet.AddRangeAsync(entities, cancellationToken);
+
+    public virtual void Update(TEntity entity)
+        => DbSet.Update(entity);
+
+    public virtual void Remove(TEntity entity)
+        => DbSet.Remove(entity);
+
+    public virtual void RemoveRange(IEnumerable<TEntity> entities)
+        => DbSet.RemoveRange(entities);
+
+    public virtual async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        => await Context.SaveChangesAsync(cancellationToken);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Dto/PagedResult.cs
+==================================================
+namespace Bibliotheca.Data.Repositories.Dto;
+
+/// <summary>
+/// Representa o resultado de uma consulta paginada.
+/// </summary>
+public class PagedResult<TEntity>
+{
+    public IReadOnlyList<TEntity> Items { get; init; } = Array.Empty<TEntity>();
+    public int PageNumber { get; init; }
+    public int PageSize { get; init; }
+    public int TotalCount { get; init; }
+ 
+    public int TotalPages => PageSize <= 0 ? 0 : (int)Math.Ceiling(TotalCount / (double)PageSize);
+    public bool HasPreviousPage => PageNumber > 1;
+    public bool HasNextPage => PageNumber < TotalPages;
+}
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Dto/BookSearchFilter.cs
+==================================================
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Data.Repositories.Dto;
+
+public class BookSearchFilter
+{
+    public string? Name { get; set; }
+    public string? AuthorName { get; set; }
+    public string? Language { get; set; }
+    public string? Publisher { get; set; }
+    public BookCondition? Condition { get; set; }
+    public int? YearFrom { get; set; }
+    public int? YearTo { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Uow/UnitOfWork.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Data.Repositories;
+using Microsoft.EntityFrameworkCore.Storage;
+
+namespace Bibliotheca.Data.Uow;
+
+public class UnitOfWork : IUnitOfWork
+{
+    private readonly BibliothecaContext _context;
+    private IDbContextTransaction? _transaction;
+
+    private IAuthorRepository? _authors;
+    private IBookRepository? _books;
+    private ICommentRepository? _comments;
+    private IProfileRepository? _profiles;
+    private IUserRepository? _users;
+
+    public UnitOfWork(BibliothecaContext context)
+    {
+        _context = context ?? throw new ArgumentNullException(nameof(context));
+    }
+
+    // Repositórios são criados sob demanda (lazy) e compartilham o mesmo _context,
+    // garantindo que tudo participe da mesma transação/SaveChanges.
+    public IAuthorRepository Authors => _authors ??= new AuthorRepository(_context);
+    public IBookRepository Books => _books ??= new BookRepository(_context);
+    public ICommentRepository Comments => _comments ??= new CommentRepository(_context);
+    public IProfileRepository Profiles => _profiles ??= new ProfileRepository(_context);
+    public IUserRepository Users => _users ??= new UserRepository(_context);
+
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        => _context.SaveChangesAsync(cancellationToken);
+
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        => _transaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await SaveChangesAsync(cancellationToken);
+
+            if (_transaction is not null)
+                await _transaction.CommitAsync(cancellationToken);
+        }
+        finally
+        {
+            if (_transaction is not null)
+            {
+                await _transaction.DisposeAsync();
+                _transaction = null;
+            }
+        }
+    }
+
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (_transaction is null) return;
+
+        await _transaction.RollbackAsync(cancellationToken);
+        await _transaction.DisposeAsync();
+        _transaction = null;
+    }
+
+    public void Dispose()
+    {
+        _transaction?.Dispose();
+        _context.Dispose();
+        GC.SuppressFinalize(this);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_transaction is not null)
+            await _transaction.DisposeAsync();
+
+        await _context.DisposeAsync();
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Uow/IUnitOfWork.cs
+==================================================
+using Bibliotheca.Data.Repositories;
+
+namespace Bibliotheca.Data.Uow;
+
+/// <summary>
+/// Agrupa os repositórios que compartilham o mesmo DbContext, permitindo salvar
+/// (ou desfazer) as mudanças de vários repositórios em uma única transação.
+/// </summary>
+public interface IUnitOfWork : IDisposable, IAsyncDisposable
+{
+    IAuthorRepository Authors { get; }
+    IBookRepository Books { get; }
+    ICommentRepository Comments { get; }
+    IProfileRepository Profiles { get; }
+    IUserRepository Users { get; }
+
+    Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+    Task BeginTransactionAsync(CancellationToken cancellationToken = default);
+    Task CommitTransactionAsync(CancellationToken cancellationToken = default);
+    Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Prompt/Bibliotheca.Prompt.csproj
+==================================================
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+</Project>
+
+==================================================
+ARQUIVO: Bibliotheca.Domain/Domains/Profile.cs
+==================================================
+namespace Bibliotheca.Domain.Domains;
+
+public class Profile : AbstractBase
+{
+    public Guid UserId { get; set; }
+    public string Description { get; set; } = string.Empty;
+    public string Contact { get; set; } = string.Empty;
+
+    public User User { get; set; } = null!;
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Domains/User.cs
+==================================================
+namespace Bibliotheca.Domain.Domains;
+
+public class User : AbstractBase
+{
+    public string Name { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+
+    public Profile? Profile { get; set; }
+    public ICollection<Book> Books { get; set; } = new List<Book>();
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Domains/Book.cs
+==================================================
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Domain.Domains;
+
+public class Book : AbstractBase
+{
+    public Guid UserId { get; set; }
+    public bool IsOwner { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
+    public string[] Photos { get; set; } = [];
+    public string Language { get; set; } = string.Empty;
+    public string Publisher { get; set; } = string.Empty;
+    public string ISBN { get; set; } = string.Empty;
+    public int Pages { get; set; }
+    public string Edition { get; set; } = string.Empty;
+    public decimal EstimatedValue { get; set; }
+    public BookCondition Condition { get; set; }
+
+    public User User { get; set; } = null!;
+    public ICollection<Author> Authors { get; set; } = new List<Author>();
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Domains/Comment.cs
+==================================================
+namespace Bibliotheca.Domain.Domains;
+
+public class Comment : AbstractBase
+{
+    public Guid UserId { get; set; }
+    public Guid BookId { get; set; }
+    public string Content { get; set; } = string.Empty;
+    public string Link { get; set; } = string.Empty;
+
+    public User User { get; set; } = null!;
+    public Book Book { get; set; } = null!;
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Domains/AbstractBase.cs
+==================================================
+namespace Bibliotheca.Domain.Domains;
+
+public class AbstractBase
+{
+    public Guid Id { get; set; }
+    public bool IsActive { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset UpdatedAt { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Domains/Author.cs
+==================================================
+namespace Bibliotheca.Domain.Domains;
+
+public class Author : AbstractBase
+{
+    public string Photo { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public DateTime BirthDay { get; set; }
+    public DateTime? DeathDay { get; set; } 
+    public string Description { get; set; } = string.Empty;
+
+    public ICollection<Book> Books { get; set; } = new List<Book>();
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Bibliotheca.Domain.csproj
+==================================================
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+</Project>
+
+==================================================
+ARQUIVO: Bibliotheca.Domain/Enums/BookCondition.cs
+==================================================
+namespace Bibliotheca.Domain.Enums;
+
+public enum BookCondition
+{
+    Poor = 1,
+    Fair = 2,
+    Good = 3,
+    VeryGood = 4,
+    Excellent = 5,
+    Mint = 6
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/_ViewImports.cshtml
+==================================================
+﻿@using Bibliotheca.Web
+@namespace Bibliotheca.Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Feed/Details.cshtml
+==================================================
+@page "{id:guid}"
+@model Bibliotheca.Web.Pages.Feed.DetailsModel
+@{
+    ViewData["Title"] = Model.Book?.Name ?? "Livro";
+}
+
+@if (Model.Book is null)
+{
+    <p>Livro não encontrado.</p>
+}
+else
+{
+    <article>
+        <h1>@Model.Book.Name</h1>
+        <p class="text-muted">@string.Join(", ", Model.Book.AuthorNames) — @Model.Book.PublicationYear</p>
+
+        <table class="table table-sm w-auto">
+            <tbody>
+                <tr><th>Editora</th><td>@Model.Book.Publisher</td></tr>
+                <tr><th>Edição</th><td>@Model.Book.Edition</td></tr>
+                <tr><th>Idioma</th><td>@Model.Book.Language</td></tr>
+                <tr><th>Páginas</th><td>@Model.Book.Pages</td></tr>
+                <tr><th>ISBN</th><td>@Model.Book.ISBN</td></tr>
+                <tr><th>Condição</th><td>@Model.Book.Condition</td></tr>
+                <tr><th>Valor estimado</th><td>@Model.Book.EstimatedValue.ToString("C")</td></tr>
+            </tbody>
+        </table>
+    </article>
+
+    <hr/>
+
+    <h2>Comentários</h2>
+
+    @if (!Model.Comments.Any())
+    {
+        <p>Nenhum comentário ainda.</p>
+    }
+    else
+    {
+        <ul class="list-group mb-4">
+            @foreach (var comment in Model.Comments)
+            {
+                <li class="list-group-item">
+                    <strong>@comment.UserName</strong>
+                    <p class="mb-1">@comment.Content</p>
+                    @if (!string.IsNullOrWhiteSpace(comment.Link))
+                    {
+                        <a href="@comment.Link" target="_blank" rel="noopener">@comment.Link</a>
+                    }
+                </li>
+            }
+        </ul>
+    }
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @if (Model.ErrorMessage is not null)
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.Book.Id">
+            <div class="mb-3">
+                <label class="form-label">Comentário</label>
+                <textarea asp-for="NewCommentContent" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Link (opcional)</label>
+                <input asp-for="NewCommentLink" class="form-control"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Comentar</button>
+        </form>
+    }
+    else
+    {
+        <p><a asp-page="/Account/Login">Faça login</a> para comentar.</p>
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.Feed.IndexModel
+@{
+    ViewData["Title"] = "Feed";
+}
+
+<h1>Livros cadastrados</h1>
+
+<form method="get" class="row gx-2 gy-2 align-items-end mb-4">
+    <div class="col-md-3">
+        <label class="form-label">Título</label>
+        <input asp-for="Filter.Name" class="form-control"/>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Autor</label>
+        <input asp-for="Filter.AuthorName" class="form-control"/>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Idioma</label>
+        <input asp-for="Filter.Language" class="form-control"/>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Condição</label>
+        <select asp-for="Filter.Condition" asp-items="Model.ConditionOptions" class="form-select">
+            <option value="">Todas</option>
+        </select>
+    </div>
+    <div class="col-md-1">
+        <label class="form-label">Ano de</label>
+        <input asp-for="Filter.YearFrom" class="form-control"/>
+    </div>
+    <div class="col-md-1">
+        <label class="form-label">Ano até</label>
+        <input asp-for="Filter.YearTo" class="form-control"/>
+    </div>
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+        <a asp-page="/Feed/Index" class="btn btn-outline-secondary btn-sm">Limpar filtros</a>
+    </div>
+</form>
+
+@if (!Model.Books.Any())
+{
+    <p>Nenhum livro encontrado.</p>
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var book in Model.Books)
+        {
+            <li class="list-group-item">
+                <a asp-page="/Feed/Details" asp-route-id="@book.Id">
+                    <strong>@book.Name</strong>
+                </a>
+                <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
+            </li>
+        }
+    </ul>
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml.cs
+==================================================
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Services;
+using Bibliotheca.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Feed;
+
+[AllowAnonymous]
+public class IndexModel : PageModel
+{
+    private readonly IBookService _bookService;
+
+    public IndexModel(IBookService bookService)
+    {
+        _bookService = bookService;
+    }
+
+    // SupportsGet = true: o filtro fica na querystring, dá pra
+    // compartilhar o link já filtrado e o botão "voltar" funciona.
+    [BindProperty(SupportsGet = true)]
+    public BookFilterDto Filter { get; set; } = new();
+
+    public List<BookDto> Books { get; set; } = [];
+
+    public List<SelectListItem> ConditionOptions { get; } =
+        Enum.GetValues<BookCondition>()
+            .Select(c => new SelectListItem(c.ToString(), c.ToString()))
+            .ToList();
+
+    public async Task OnGetAsync()
+    {
+        var result = await _bookService.SearchAsync(Filter);
+        Books = result.Data ?? [];
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Feed/Details.cshtml.cs
+==================================================
+using System.Security.Claims;
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Comment;
+using Bibliotheca.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Feed;
+
+[AllowAnonymous]
+public class DetailsModel : PageModel
+{
+    private readonly IBookService _bookService;
+    private readonly ICommentService _commentService;
+
+    public DetailsModel(IBookService bookService, ICommentService commentService)
+    {
+        _bookService = bookService;
+        _commentService = commentService;
+    }
+
+    public BookDto? Book { get; set; }
+    public List<CommentDto> Comments { get; set; } = [];
+
+    [BindProperty]
+    public string NewCommentContent { get; set; } = string.Empty;
+
+    [BindProperty]
+    public string NewCommentLink { get; set; } = string.Empty;
+
+    public string? ErrorMessage { get; set; }
+
+    public async Task<IActionResult> OnGetAsync(Guid id)
+    {
+        var bookResult = await _bookService.GetByIdAsync(id);
+        if (!bookResult.IsSuccess || bookResult.Data is null)
+            return NotFound();
+
+        Book = bookResult.Data;
+
+        var commentsResult = await _commentService.GetByBookIdAsync(id);
+        Comments = commentsResult.Data ?? [];
+
+        return Page();
+    }
+
+    // Create de comentário exige usuário logado, validado pelo cookie de autenticação.
+    public async Task<IActionResult> OnPostAddCommentAsync(Guid id)
+    {
+        if (User.Identity?.IsAuthenticated != true)
+            return Challenge();
+
+        var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (!Guid.TryParse(userIdClaim, out var userId))
+            return Challenge();
+
+        if (string.IsNullOrWhiteSpace(NewCommentContent))
+        {
+            ErrorMessage = "Escreva um comentário antes de enviar.";
+            return await OnGetAsync(id);
+        }
+
+        var result = await _commentService.CreateAsync(new CreateCommentDto
+        {
+            UserId = userId,
+            BookId = id,
+            Content = NewCommentContent,
+            Link = NewCommentLink
+        });
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = result.Message;
+            return await OnGetAsync(id);
+        }
+
+        return RedirectToPage(new { id });
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Index.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.IndexModel
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/_ViewStart.cshtml
+==================================================
+﻿@{
+    Layout = "_Layout";
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Account/Logout.cshtml.cs
+==================================================
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Account;
+
+public class LogoutModel : PageModel
+{
+    public async Task<IActionResult> OnGetAsync()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return RedirectToPage("/Feed/Index");
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Account/Register.cshtml.cs
+==================================================
+using System.ComponentModel.DataAnnotations;
+using Bibliotheca.Application.Dtos.User;
+using Bibliotheca.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Account;
+
+[AllowAnonymous]
+public class RegisterModel : PageModel
+{
+    private readonly IAuthService _authService;
+
+    public RegisterModel(IAuthService authService)
+    {
+        _authService = authService;
+    }
+
+    [BindProperty]
+    public RegisterInputModel Input { get; set; } = new();
+
+    public string? ErrorMessage { get; set; }
+
+    public void OnGet()
+    {
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        if (!ModelState.IsValid)
+            return Page();
+
+        var result = await _authService.RegisterAsync(new CreateUserDto
+        {
+            Name = Input.Name,
+            Email = Input.Email,
+            Password = Input.Password
+        });
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = result.Message;
+            return Page();
+        }
+
+        return RedirectToPage("/Account/Login");
+    }
+}
+
+public class RegisterInputModel
+{
+    // Nome pode repetir, sem validação de unicidade.
+    [Required(ErrorMessage = "Informe o nome")]
+    [StringLength(150)]
+    public string Name { get; set; } = string.Empty;
+
+    // Unicidade de e-mail validada no UserService (EmailExistsAsync).
+    [Required(ErrorMessage = "Informe o e-mail")]
+    [EmailAddress(ErrorMessage = "E-mail inválido")]
+    public string Email { get; set; } = string.Empty;
+
+    // Senha pode repetir, sem validação de unicidade.
+    [Required(ErrorMessage = "Informe a senha")]
+    [StringLength(100, MinimumLength = 6, ErrorMessage = "A senha deve ter ao menos 6 caracteres")]
+    public string Password { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Confirme a senha")]
+    [Compare(nameof(Password), ErrorMessage = "As senhas não coincidem")]
+    public string ConfirmPassword { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Account/Register.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Cadastre-se";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <h1>Cadastre-se</h1>
+
+        @if (Model.ErrorMessage is not null)
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Input.Name" class="form-label">Nome</label>
+                <input asp-for="Input.Name" class="form-control"/>
+                <span asp-validation-for="Input.Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label">E-mail</label>
+                <input asp-for="Input.Email" class="form-control"/>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label">Senha</label>
+                <input asp-for="Input.Password" type="password" class="form-control"/>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.ConfirmPassword" class="form-label">Confirmar senha</label>
+                <input asp-for="Input.ConfirmPassword" type="password" class="form-control"/>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Cadastrar</button>
+        </form>
+
+        <p class="mt-3">
+            Já tem conta? <a asp-page="/Account/Login">Entrar</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Account/Login.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Entrar";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <h1>Entrar</h1>
+
+        @if (Model.ErrorMessage is not null)
+        {
+            <div class="alert alert-danger">@Model.ErrorMessage</div>
+        }
+
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label">E-mail</label>
+                <input asp-for="Input.Email" class="form-control"/>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Password" class="form-label">Senha</label>
+                <input asp-for="Input.Password" type="password" class="form-control"/>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+
+        <p class="mt-3">
+            Não tem conta? <a asp-page="/Account/Register">Cadastre-se</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Account/Logout.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.Account.LogoutModel
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Account/Login.cshtml.cs
+==================================================
+using System.Security.Claims;
+using Bibliotheca.Application.Dtos.Auth;
+using Bibliotheca.Application.Services;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Account;
+
+[AllowAnonymous]
+public class LoginModel : PageModel
+{
+    private readonly IAuthService _authService;
+
+    public LoginModel(IAuthService authService)
+    {
+        _authService = authService;
+    }
+
+    [BindProperty]
+    public LoginDto Input { get; set; } = new();
+
+    public string? ReturnUrl { get; set; }
+
+    public string? ErrorMessage { get; set; }
+
+    public void OnGet(string? returnUrl = null)
+    {
+        ReturnUrl = returnUrl;
+    }
+
+    public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
+    {
+        ReturnUrl = returnUrl;
+
+        if (!ModelState.IsValid)
+            return Page();
+
+        var result = await _authService.LoginAsync(Input);
+
+        if (!result.IsSuccess || result.Data is null)
+        {
+            ErrorMessage = result.Message;
+            return Page();
+        }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, result.Data.Id.ToString()),
+            new(ClaimTypes.Name, result.Data.Name),
+            new(ClaimTypes.Email, result.Data.Email)
+        };
+
+        var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+        var principal = new ClaimsPrincipal(identity);
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal,
+            new AuthenticationProperties { IsPersistent = true });
+
+        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+            return LocalRedirect(returnUrl);
+
+        return RedirectToPage("/Feed/Index");
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Profile/Books/Create.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.Profile.Books.CreateModel
+@{
+    ViewData["Title"] = "Cadastrar livro";
+}
+
+<h1>Cadastrar livro</h1>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+@if (!Model.AvailableAuthors.Any())
+{
+    <div class="alert alert-warning">
+        Nenhum autor cadastrado ainda. O cadastro de autores ainda não tem página própria
+        (pendência conhecida) — adicione um autor direto no banco antes de criar o livro.
+    </div>
+}
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label">Título</label>
+        <input asp-for="Input.Name" class="form-control"/>
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Autores</label>
+        <div class="border rounded p-2">
+            @foreach (var author in Model.AvailableAuthors)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="Input.AuthorIds" value="@author.Id"
+                           id="author_@author.Id"
+                           checked="@(Model.Input.AuthorIds.Contains(author.Id))"/>
+                    <label class="form-check-label" for="author_@author.Id">@author.Name</label>
+                </div>
+            }
+        </div>
+        <span asp-validation-for="Input.AuthorIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Input.IsOwner" class="form-check-input"/>
+        <label asp-for="Input.IsOwner" class="form-check-label">Você possui este livro</label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.PublicationYear" class="form-label">Ano de publicação</label>
+            <input asp-for="Input.PublicationYear" class="form-control"/>
+            <span asp-validation-for="Input.PublicationYear" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Language" class="form-label">Idioma</label>
+            <input asp-for="Input.Language" class="form-control"/>
+            <span asp-validation-for="Input.Language" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Publisher" class="form-label">Editora</label>
+            <input asp-for="Input.Publisher" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.ISBN" class="form-label">ISBN</label>
+            <input asp-for="Input.ISBN" class="form-control"/>
+            <span asp-validation-for="Input.ISBN" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Pages" class="form-label">Páginas</label>
+            <input asp-for="Input.Pages" class="form-control"/>
+            <span asp-validation-for="Input.Pages" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Edition" class="form-label">Edição</label>
+            <input asp-for="Input.Edition" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.EstimatedValue" class="form-label">Valor estimado</label>
+            <input asp-for="Input.EstimatedValue" class="form-control"/>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Condition" class="form-label">Condição</label>
+            <select asp-for="Input.Condition" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookCondition>())
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.PhotosText" class="form-label">Fotos (URLs separadas por vírgula)</label>
+        <textarea asp-for="Input.PhotosText" class="form-control" rows="2"
+                  placeholder="Upload de imagens ainda não implementado — por enquanto, cole URLs aqui."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-page="/Profile/Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Profile/Books/Create.cshtml.cs
+==================================================
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Bibliotheca.Application.Dtos.Author;
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Services;
+using Bibliotheca.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Profile.Books;
+
+[Authorize]
+public class CreateModel : PageModel
+{
+    private readonly IBookService _bookService;
+    private readonly IAuthorService _authorService;
+
+    public CreateModel(IBookService bookService, IAuthorService authorService)
+    {
+        _bookService = bookService;
+        _authorService = authorService;
+    }
+
+    [BindProperty]
+    public BookInputModel Input { get; set; } = new();
+
+    public List<AuthorDto> AvailableAuthors { get; set; } = [];
+
+    public string? ErrorMessage { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        await LoadAuthorsAsync();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        await LoadAuthorsAsync();
+
+        if (!ModelState.IsValid)
+            return Page();
+
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
+        var result = await _bookService.CreateAsync(new CreateBookDto
+        {
+            UserId = userId,
+            AuthorIds = Input.AuthorIds,
+            IsOwner = Input.IsOwner,
+            Name = Input.Name,
+            PublicationYear = Input.PublicationYear,
+            Photos = Input.ParsePhotos(),
+            Language = Input.Language,
+            Publisher = Input.Publisher,
+            ISBN = Input.ISBN,
+            Pages = Input.Pages,
+            Edition = Input.Edition,
+            EstimatedValue = Input.EstimatedValue,
+            Condition = Input.Condition
+        });
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = result.Message;
+            return Page();
+        }
+
+        return RedirectToPage("/Profile/Index");
+    }
+
+    private async Task LoadAuthorsAsync()
+    {
+        var authorsResult = await _authorService.GetAllAsync();
+        AvailableAuthors = authorsResult.Data ?? [];
+    }
+}
+
+// Compartilhado entre Create e Edit (mesmo namespace).
+public class BookInputModel
+{
+    [Required(ErrorMessage = "Informe o título")]
+    [StringLength(300)]
+    public string Name { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Selecione ao menos um autor")]
+    [MinLength(1, ErrorMessage = "Selecione ao menos um autor")]
+    public List<Guid> AuthorIds { get; set; } = [];
+
+    public bool IsOwner { get; set; } = true;
+
+    [Range(0, 9999, ErrorMessage = "Ano inválido")]
+    public int PublicationYear { get; set; } = DateTime.UtcNow.Year;
+
+    // Fotos guardadas só como texto/URLs por enquanto.
+    // Upload real (Cloudflare R2) fica para uma próxima sessão.
+    [Display(Name = "Fotos (URLs separadas por vírgula)")]
+    public string? PhotosText { get; set; }
+
+    [Required(ErrorMessage = "Informe o idioma")]
+    [StringLength(50)]
+    public string Language { get; set; } = string.Empty;
+
+    [StringLength(200)]
+    public string Publisher { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "Informe o ISBN")]
+    [StringLength(20)]
+    public string ISBN { get; set; } = string.Empty;
+
+    [Range(1, 100000, ErrorMessage = "Número de páginas inválido")]
+    public int Pages { get; set; }
+
+    [StringLength(50)]
+    public string Edition { get; set; } = string.Empty;
+
+    [Range(0, double.MaxValue, ErrorMessage = "Valor inválido")]
+    public decimal EstimatedValue { get; set; }
+
+    [Required]
+    public BookCondition Condition { get; set; } = BookCondition.Good;
+
+    public string[] ParsePhotos()
+        => string.IsNullOrWhiteSpace(PhotosText)
+            ? []
+            : PhotosText.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Profile/Books/Edit.cshtml
+==================================================
+@page "{id:guid}"
+@model Bibliotheca.Web.Pages.Profile.Books.EditModel
+@{
+    ViewData["Title"] = "Editar livro";
+}
+
+<h1>Editar livro</h1>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<form method="post" asp-route-id="@Model.Id">
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label">Título</label>
+        <input asp-for="Input.Name" class="form-control"/>
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Autores</label>
+        <div class="border rounded p-2">
+            @foreach (var author in Model.AvailableAuthors)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="Input.AuthorIds" value="@author.Id"
+                           id="author_@author.Id"
+                           checked="@(Model.Input.AuthorIds.Contains(author.Id))"/>
+                    <label class="form-check-label" for="author_@author.Id">@author.Name</label>
+                </div>
+            }
+        </div>
+        <span asp-validation-for="Input.AuthorIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Input.IsOwner" class="form-check-input"/>
+        <label asp-for="Input.IsOwner" class="form-check-label">Você possui este livro</label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.PublicationYear" class="form-label">Ano de publicação</label>
+            <input asp-for="Input.PublicationYear" class="form-control"/>
+            <span asp-validation-for="Input.PublicationYear" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Language" class="form-label">Idioma</label>
+            <input asp-for="Input.Language" class="form-control"/>
+            <span asp-validation-for="Input.Language" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Publisher" class="form-label">Editora</label>
+            <input asp-for="Input.Publisher" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.ISBN" class="form-label">ISBN</label>
+            <input asp-for="Input.ISBN" class="form-control"/>
+            <span asp-validation-for="Input.ISBN" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Pages" class="form-label">Páginas</label>
+            <input asp-for="Input.Pages" class="form-control"/>
+            <span asp-validation-for="Input.Pages" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Edition" class="form-label">Edição</label>
+            <input asp-for="Input.Edition" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.EstimatedValue" class="form-label">Valor estimado</label>
+            <input asp-for="Input.EstimatedValue" class="form-control"/>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Condition" class="form-label">Condição</label>
+            <select asp-for="Input.Condition" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookCondition>())
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.PhotosText" class="form-label">Fotos (URLs separadas por vírgula)</label>
+        <textarea asp-for="Input.PhotosText" class="form-control" rows="2"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-page="/Profile/Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Profile/Books/Edit.cshtml.cs
+==================================================
+using System.Security.Claims;
+using Bibliotheca.Application.Dtos.Author;
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Profile.Books;
+
+[Authorize]
+public class EditModel : PageModel
+{
+    private readonly IBookService _bookService;
+    private readonly IAuthorService _authorService;
+
+    public EditModel(IBookService bookService, IAuthorService authorService)
+    {
+        _bookService = bookService;
+        _authorService = authorService;
+    }
+
+    [BindProperty]
+    public BookInputModel Input { get; set; } = new();
+
+    [BindProperty(SupportsGet = true)]
+    public Guid Id { get; set; }
+
+    public List<AuthorDto> AvailableAuthors { get; set; } = [];
+
+    public string? ErrorMessage { get; set; }
+
+    public async Task<IActionResult> OnGetAsync()
+    {
+        var bookResult = await _bookService.GetByIdAsync(Id);
+
+        if (!bookResult.IsSuccess || bookResult.Data is null || bookResult.Data.UserId != CurrentUserId)
+            return NotFound();
+
+        var book = bookResult.Data;
+
+        Input = new BookInputModel
+        {
+            Name = book.Name,
+            AuthorIds = book.AuthorIds,
+            IsOwner = book.IsOwner,
+            PublicationYear = book.PublicationYear,
+            PhotosText = string.Join(", ", book.Photos),
+            Language = book.Language,
+            Publisher = book.Publisher,
+            ISBN = book.ISBN,
+            Pages = book.Pages,
+            Edition = book.Edition,
+            EstimatedValue = book.EstimatedValue,
+            Condition = book.Condition
+        };
+
+        await LoadAuthorsAsync();
+        return Page();
+    }
+
+    public async Task<IActionResult> OnPostAsync()
+    {
+        await LoadAuthorsAsync();
+
+        // Reconfirma a posse antes de aceitar qualquer alteração
+        // (evita editar livro de outro usuário trocando o id na URL).
+        var existing = await _bookService.GetByIdAsync(Id);
+        if (!existing.IsSuccess || existing.Data is null || existing.Data.UserId != CurrentUserId)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+            return Page();
+
+        var result = await _bookService.UpdateAsync(new UpdateBookDto
+        {
+            Id = Id,
+            AuthorIds = Input.AuthorIds,
+            IsOwner = Input.IsOwner,
+            Name = Input.Name,
+            PublicationYear = Input.PublicationYear,
+            Photos = Input.ParsePhotos(),
+            Language = Input.Language,
+            Publisher = Input.Publisher,
+            ISBN = Input.ISBN,
+            Pages = Input.Pages,
+            Edition = Input.Edition,
+            EstimatedValue = Input.EstimatedValue,
+            Condition = Input.Condition
+        });
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = result.Message;
+            return Page();
+        }
+
+        return RedirectToPage("/Profile/Index");
+    }
+
+    private async Task LoadAuthorsAsync()
+    {
+        var authorsResult = await _authorService.GetAllAsync();
+        AvailableAuthors = authorsResult.Data ?? [];
+    }
+
+    private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Profile/Index.cshtml
+==================================================
+@page
+@model Bibliotheca.Web.Pages.Profile.IndexModel
+@{
+    ViewData["Title"] = "Meu perfil";
+}
+
+<h1>Meu perfil</h1>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+@if (Model.SuccessMessage is not null)
+{
+    <div class="alert alert-success">@Model.SuccessMessage</div>
+}
+
+<h2>Dados pessoais</h2>
+
+<form method="post" asp-page-handler="UpdateName" class="row gx-2 align-items-end mb-2">
+    <div class="col-md-4">
+        <label asp-for="NameInput.Name" class="form-label">Nome</label>
+        <input asp-for="NameInput.Name" class="form-control"/>
+        <span asp-validation-for="NameInput.Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">E-mail</label>
+        <input value="@Model.Account?.Email" class="form-control" disabled/>
+        <div class="form-text">O e-mail não pode ser alterado.</div>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Salvar</button>
+    </div>
+</form>
+
+<hr/>
+
+<div class="d-flex justify-content-between align-items-center">
+    <h2>Meus livros</h2>
+    <a asp-page="/Profile/Books/Create" class="btn btn-primary btn-sm">Cadastrar novo livro</a>
+</div>
+
+@if (!Model.Books.Items.Any())
+{
+    <p>Você ainda não cadastrou nenhum livro.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var book in Model.Books.Items)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <a asp-page="/Feed/Details" asp-route-id="@book.Id">
+                        <strong>@book.Name</strong>
+                    </a>
+                    <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
+                </div>
+                <div>
+                    <a asp-page="/Profile/Books/Edit" asp-route-id="@book.Id" class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="DeleteBook" asp-route-id="@book.Id"
+                          asp-route-pageNumber="@Model.PageNumber" class="d-inline"
+                          onsubmit="return confirm('Tem certeza que deseja remover este livro?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+
+    @if (Model.Books.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(Model.Books.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Profile/Index" asp-route-pageNumber="@(Model.PageNumber - 1)">Anterior</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Página @Model.Books.PageNumber de @Model.Books.TotalPages</span>
+                </li>
+                <li class="page-item @(Model.Books.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Profile/Index" asp-route-pageNumber="@(Model.PageNumber + 1)">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Profile/Index.cshtml.cs
+==================================================
+using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.User;
+using Bibliotheca.Application.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Profile;
+
+[Authorize]
+public class IndexModel : PageModel
+{
+    private const int PageSize = 10;
+
+    private readonly IUserService _userService;
+    private readonly IBookService _bookService;
+
+    public IndexModel(IUserService userService, IBookService bookService)
+    {
+        _userService = userService;
+        _bookService = bookService;
+    }
+
+    public UserDto? Account { get; set; }
+    public PagedResultDto<BookDto> Books { get; set; } = new();
+
+    // Página atual da lista de livros. SupportsGet faz funcionar tanto
+    // em ?pageNumber=2 quanto em forms (delete) que mandam de volta a mesma página.
+    [BindProperty(SupportsGet = true)]
+    public int PageNumber { get; set; } = 1;
+
+    [BindProperty]
+    public ProfileNameInputModel NameInput { get; set; } = new();
+
+    public string? ErrorMessage { get; set; }
+    public string? SuccessMessage { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        await LoadAsync();
+    }
+
+    // Atualiza só o nome. Email nunca é aceito aqui de propósito — mesmo que
+    // alguém adultere o form no navegador, o valor enviado é ignorado: usamos
+    // o e-mail atual vindo do banco, não o que vier do POST.
+    public async Task<IActionResult> OnPostUpdateNameAsync()
+    {
+        if (!ModelState.IsValid)
+        {
+            await LoadAsync();
+            return Page();
+        }
+
+        var current = await _userService.GetByIdAsync(CurrentUserId);
+        if (!current.IsSuccess || current.Data is null)
+            return NotFound();
+
+        var result = await _userService.UpdateAsync(new UpdateUserDto
+        {
+            Id = CurrentUserId,
+            Name = NameInput.Name,
+            Email = current.Data.Email
+        });
+
+        if (!result.IsSuccess)
+        {
+            ErrorMessage = result.Message;
+            await LoadAsync();
+            return Page();
+        }
+
+        SuccessMessage = "Nome atualizado.";
+        return RedirectToPage(new { PageNumber });
+    }
+
+    // Exclusão (soft) de livro. Confirma posse antes de remover.
+    public async Task<IActionResult> OnPostDeleteBookAsync(Guid id)
+    {
+        var bookResult = await _bookService.GetByIdAsync(id);
+
+        if (!bookResult.IsSuccess || bookResult.Data is null || bookResult.Data.UserId != CurrentUserId)
+        {
+            ErrorMessage = "Livro não encontrado ou você não tem permissão para excluí-lo.";
+            await LoadAsync();
+            return Page();
+        }
+
+        await _bookService.DeleteAsync(id);
+        return RedirectToPage(new { PageNumber });
+    }
+
+    private async Task LoadAsync()
+    {
+        var userResult = await _userService.GetByIdAsync(CurrentUserId);
+        Account = userResult.Data;
+        NameInput.Name = Account?.Name ?? string.Empty;
+
+        var booksResult = await _bookService.GetByUserIdPagedAsync(CurrentUserId, PageNumber, PageSize);
+        Books = booksResult.Data ?? new PagedResultDto<BookDto>();
+    }
+
+    private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+}
+
+public class ProfileNameInputModel
+{
+    [Required(ErrorMessage = "Informe o nome")]
+    [StringLength(150)]
+    public string Name { get; set; } = string.Empty;
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Index.cshtml.cs
+==================================================
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages;
+
+public class IndexModel : PageModel
+{
+    public IActionResult OnGet()
+    {
+        return RedirectToPage("/Account/Login");
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Shared/_ValidationScriptsPartial.cshtml
+==================================================
+﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Shared/_Layout.cshtml
+==================================================
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] - Bibliotheca</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/Bibliotheca.Web.styles.css" asp-append-version="true"/>
+</head>
+<body>
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <div class="container">
+            <a class="navbar-brand" asp-page="/Feed/Index">Bibliotheca</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-page="/Feed/Index">Feed</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Profile/Index">@User.Identity!.Name</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Account/Logout">Sair</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Account/Login">Entrar</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-page="/Account/Register">Cadastre-se</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2026 - Bibliotheca
+    </div>
+</footer>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+==================================================
+ARQUIVO: Bibliotheca.Web/Program.cs
+==================================================
+using Bibliotheca.Application.InfraServices;
+using Bibliotheca.Application.Services;
+using Bibliotheca.Data.Context;
+using Bibliotheca.Data.Uow;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddRazorPages();
+
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                       ?? throw new InvalidOperationException("Connection string 'DefaultConnection' não encontrada em appsettings.json.");
+
+var serverVersion = new MySqlServerVersion(new Version(8, 0, 36));
+
+builder.Services.AddDbContext<BibliothecaContext>(options =>
+    options.UseMySql(connectionString, serverVersion));
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ICrypto, Crypto>();
+
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<ICommentService, CommentService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.Cookie.Name = "Bibliotheca.Auth";
+        options.LoginPath = "/Account/Login";
+        options.LogoutPath = "/Account/Logout";
+        options.AccessDeniedPath = "/Account/Login";
+        options.ExpireTimeSpan = TimeSpan.FromDays(7);
+        options.SlidingExpiration = true;
+    });
+
+builder.Services.AddAuthorization();
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
+}
+
+app.UseHttpsRedirection();
+app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapStaticAssets();
+app.MapRazorPages()
+    .WithStaticAssets();
+
+app.Run();
+==================================================
+ARQUIVO: Bibliotheca.Web/appsettings.json
+==================================================
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Port=3306;Database=bibliotheca;User=root;Password=SuaSenhaForte123!;"
+  }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/appsettings.Development.json
+==================================================
+{
+  "DetailedErrors": true,
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Port=3306;Database=bibliotheca;User=root;Password=SuaSenhaForte123!;"
+  }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Bibliotheca.Web.csproj
+==================================================
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <ItemGroup>
+      <ProjectReference Include="..\Bibliotheca.Application\Bibliotheca.Application.csproj" />
+      <ProjectReference Include="..\Bibliotheca.Data\Bibliotheca.Data.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.*">
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
+    </ItemGroup>
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+</Project>

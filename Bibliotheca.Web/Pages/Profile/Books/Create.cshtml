@@ -1,0 +1,113 @@
+@page
+@model Bibliotheca.Web.Pages.Profile.Books.CreateModel
+@{
+    ViewData["Title"] = "Cadastrar livro";
+}
+
+<h1>Cadastrar livro</h1>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+@if (!Model.AvailableAuthors.Any())
+{
+    <div class="alert alert-warning">
+        Nenhum autor cadastrado ainda. O cadastro de autores ainda não tem página própria
+        (pendência conhecida) — adicione um autor direto no banco antes de criar o livro.
+    </div>
+}
+
+<form method="post">
+    <div class="mb-3">
+        <label asp-for="Input.Name" class="form-label">Título</label>
+        <input asp-for="Input.Name" class="form-control"/>
+        <span asp-validation-for="Input.Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Autores</label>
+        <div class="border rounded p-2">
+            @foreach (var author in Model.AvailableAuthors)
+            {
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox"
+                           name="Input.AuthorIds" value="@author.Id"
+                           id="author_@author.Id"
+                           checked="@(Model.Input.AuthorIds.Contains(author.Id))"/>
+                    <label class="form-check-label" for="author_@author.Id">@author.Name</label>
+                </div>
+            }
+        </div>
+        <span asp-validation-for="Input.AuthorIds" class="text-danger"></span>
+    </div>
+
+    <div class="form-check mb-3">
+        <input asp-for="Input.IsOwner" class="form-check-input"/>
+        <label asp-for="Input.IsOwner" class="form-check-label">Você possui este livro</label>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.PublicationYear" class="form-label">Ano de publicação</label>
+            <input asp-for="Input.PublicationYear" class="form-control"/>
+            <span asp-validation-for="Input.PublicationYear" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Language" class="form-label">Idioma</label>
+            <input asp-for="Input.Language" class="form-control"/>
+            <span asp-validation-for="Input.Language" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Publisher" class="form-label">Editora</label>
+            <input asp-for="Input.Publisher" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.ISBN" class="form-label">ISBN</label>
+            <input asp-for="Input.ISBN" class="form-control"/>
+            <span asp-validation-for="Input.ISBN" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Pages" class="form-label">Páginas</label>
+            <input asp-for="Input.Pages" class="form-control"/>
+            <span asp-validation-for="Input.Pages" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Edition" class="form-label">Edição</label>
+            <input asp-for="Input.Edition" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.EstimatedValue" class="form-label">Valor estimado</label>
+            <input asp-for="Input.EstimatedValue" class="form-control"/>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Input.Condition" class="form-label">Condição</label>
+            <select asp-for="Input.Condition" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookCondition>())
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.PhotosText" class="form-label">Fotos (URLs separadas por vírgula)</label>
+        <textarea asp-for="Input.PhotosText" class="form-control" rows="2"
+                  placeholder="Upload de imagens ainda não implementado — por enquanto, cole URLs aqui."></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-page="/Profile/Index" class="btn btn-outline-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial"/>
+}
