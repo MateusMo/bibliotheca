@@ -1,6 +1,45 @@
 {
-    cat PromptBase.txt
     echo
+     echo "=================================================="
+     echo "Ideação do projeto"
+     echo "=================================================="
+
+    cat PromptBase.txt
+    
+    echo
+         echo "=================================================="
+         echo "Requisitos Funcionais"
+         echo "=================================================="
+    
+    cat requisitos_funcionais.txt
+    
+        echo
+             echo "=================================================="
+             echo "Requisitos Não Funcionais"
+             echo "=================================================="
+        
+    
+    cat requisitos_nao_funcionais.txt
+    echo
+    
+    
+    echo
+                 echo "=================================================="
+                 echo "FrontEnd Padrão"
+                 echo "=================================================="
+    
+    cat frontend_definitions.txt        
+    
+    echo
+     echo "=================================================="
+     echo "ESTRUTURA DO PROJETO"
+     echo "=================================================="
+    
+     tree .. \
+         -I "bin|obj|.git|node_modules|.vs" \
+         -P "*.cs|*.csproj|*.cshtml|*.razor|*.json|*.config|*.sln"
+    
+     echo
 
     find .. \
       \( -path "*/bin" -o -path "*/obj" -o -path "*/.git" \) -prune -o \

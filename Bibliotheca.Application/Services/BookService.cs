@@ -43,7 +43,7 @@ public class BookService : BaseService, IBookService
         return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
     }
 
-    public async Task<ResponseDto<List<BookDto>>> SearchAsync(BookFilterDto filter)
+    public async Task<ResponseDto<PagedResultDto<BookDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize)
     {
         var searchFilter = new BookSearchFilter
         {
@@ -56,8 +56,17 @@ public class BookService : BaseService, IBookService
             YearTo = filter.YearTo
         };
 
-        var books = await _unitOfWork.Books.SearchAsync(searchFilter);
-        return Success(books.Select(ToDto).ToList());
+        var paged = await _unitOfWork.Books.SearchPagedAsync(searchFilter, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<BookDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
     }
 
     // NOVO: "meus livros" paginado, pra usar na página de Perfil.

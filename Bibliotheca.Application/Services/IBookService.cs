@@ -9,7 +9,7 @@ public interface IBookService
     Task<ResponseDto<List<BookDto>>> GetAllAsync();
     Task<ResponseDto<List<BookDto>>> GetByUserIdAsync(Guid userId);
     Task<ResponseDto<List<BookDto>>> GetByAuthorIdAsync(Guid authorId);
-    Task<ResponseDto<List<BookDto>>> SearchAsync(BookFilterDto filter);
+    Task<ResponseDto<PagedResultDto<BookDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize);
     Task<ResponseDto<PagedResultDto<BookDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize);
     Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto);
     Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto);

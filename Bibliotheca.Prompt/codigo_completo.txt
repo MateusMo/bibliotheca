@@ -1,3 +1,7 @@
+
+==================================================
+Ideação do projeto
+==================================================
 Bibliotheca — Especificação Geral do Projeto
 1. Introdução
 1.1 Visão Geral
@@ -36,7 +40,97 @@ Sebos.
 Antiquários.
 Historiadores.
 Leitores de literatura clássica.
-2. Requisitos Funcionais
+
+
+4. Arquitetura do Sistema
+Stack
+ASP.NET Core 9
+Razor Pages
+Entity Framework Core
+MySQL
+Pomelo
+Bootstrap
+BCrypt
+Cookie Authentication
+Estrutura
+Bibliotheca.Domain
+│
+├── Entities
+├── Enums
+├── Interfaces
+└── ValueObjects
+
+Bibliotheca.Data
+│
+├── Context
+├── Mappings
+├── Repositories
+├── UnitOfWork
+└── Filters
+
+Bibliotheca.Application
+│
+├── DTOs
+├── Services
+├── Interfaces
+├── InfraServices
+└── Mappers
+
+Bibliotheca.Web
+│
+├── Razor Pages
+├── ViewModels
+├── Program.cs
+└── wwwroot
+Padrões Arquiteturais
+
+O projeto deverá utilizar:
+
+Clean Architecture
+Repository Pattern
+Generic Repository
+Unit of Work
+Dependency Injection
+DTO Pattern
+Service Layer
+SOLID
+Async/Await
+DataAnnotations
+Cookie Authentication
+5. Objetivos Arquiteturais
+Objetivo 1 — Suporte a múltiplos usuários
+
+Cada usuário possui sua própria biblioteca.
+
+Todo recurso pertence exclusivamente ao seu proprietário.
+
+Consultas deverão ser isoladas por UserId.
+
+Toda edição deverá validar a posse do recurso no servidor.
+
+Objetivo 2 — Segurança
+BCrypt
+Cookie Authentication
+DataAnnotations
+Soft Delete
+SQL parametrizado
+DTOs sem exposição de senha
+Verificação de autorização em todas as operações de escrita
+Objetivo 3 — Manutenibilidade
+Separação rigorosa entre camadas
+Repositories especializados
+Unit of Work
+Generic Repository
+DTOs
+Services
+Interfaces
+ResponseDto padronizado
+Convenção uniforme de nomenclatura
+Filtros encapsulados em objetos próprios
+==================================================
+Requisitos Funcionais
+==================================================
+Requisitos Funcionais
 RF-01 — Cadastro de Usuários
 
 O sistema deverá permitir que novos usuários realizem cadastro utilizando:
@@ -246,6 +340,9 @@ Moderar comentários
 Moderar usuários
 Moderar livros
 Moderar autores
+==================================================
+Requisitos Não Funcionais
+==================================================
 3. Requisitos Não Funcionais
 RNF-01 — Arquitetura
 
@@ -307,91 +404,184 @@ RNF-12 — Organização
 
 Nenhuma camada poderá violar as dependências da Clean Architecture.
 
-4. Arquitetura do Sistema
-Stack
-ASP.NET Core 9
-Razor Pages
-Entity Framework Core
-MySQL
-Pomelo
-Bootstrap
-BCrypt
-Cookie Authentication
-Estrutura
-Bibliotheca.Domain
-│
-├── Entities
-├── Enums
-├── Interfaces
-└── ValueObjects
 
-Bibliotheca.Data
-│
-├── Context
-├── Mappings
-├── Repositories
-├── UnitOfWork
-└── Filters
+==================================================
+FrontEnd Padrão
+==================================================
+- O frontend da aplicação está em razor pages e deve seguir o padrão de projeto da microsoft quanto a esse tipo de aplicação
+mantendo o código seguro e eficiente.
 
-Bibliotheca.Application
-│
-├── DTOs
-├── Services
-├── Interfaces
-├── InfraServices
-└── Mappers
+- Pensando na eficiência a ui/ux deve manter a spmplicidade característica da wikipédia mas com um toque de personalidade
+mantendo tudo de forma responsiva.
 
-Bibliotheca.Web
-│
-├── Razor Pages
-├── ViewModels
-├── Program.cs
-└── wwwroot
-Padrões Arquiteturais
+- Muitas agregações de elementos podem tornar a navegação confusa, então prefiro coisas simples com um longo scroll
 
-O projeto deverá utilizar:
+- URI - URL (IMPORTANTE)
 
-Clean Architecture
-Repository Pattern
-Generic Repository
-Unit of Work
-Dependency Injection
-DTO Pattern
-Service Layer
-SOLID
-Async/Await
-DataAnnotations
-Cookie Authentication
-5. Objetivos Arquiteturais
-Objetivo 1 — Suporte a múltiplos usuários
+É preciso garantir que nenhuma senha ou informação sensível vaze nas uris e urls e ao mesmo tempo garantir o melhor SEO
+para indexação de resultados se aproveitando de detalhes descritivos nas urls e uris.
 
-Cada usuário possui sua própria biblioteca.
+- Metatags:
 
-Todo recurso pertence exclusivamente ao seu proprietário.
+É preciso adicionar metatags dinâmicas para cada resultado garantindo um melhor reconhecimento dos motores de busca
 
-Consultas deverão ser isoladas por UserId.
+- Integração com o backend
 
-Toda edição deverá validar a posse do recurso no servidor.
+As paginas devem ser paginadas e os cruds dos dominios devem todos ser aplicados e para isso criar o numero de páginas, subpáginas e forms necessários
+==================================================
+ESTRUTURA DO PROJETO
+==================================================
+..
+├── Bibliotheca.Application
+│   ├── Bibliotheca.Application.csproj
+│   ├── Dtos
+│   │   ├── Auth
+│   │   │   └── LoginDto.cs
+│   │   ├── Author
+│   │   │   ├── AuthorDto.cs
+│   │   │   ├── CreateAuthorDto.cs
+│   │   │   └── UpdateAuthorDto.cs
+│   │   ├── Book
+│   │   │   ├── BookDto.cs
+│   │   │   ├── BookFilterDto.cs
+│   │   │   ├── CreateBookDto.cs
+│   │   │   └── UpdateBookDto.cs
+│   │   ├── Comment
+│   │   │   ├── CommentDto.cs
+│   │   │   ├── CreateCommentDto.cs
+│   │   │   └── UpdateCommentDto.cs
+│   │   ├── Common
+│   │   │   ├── BaseDto.cs
+│   │   │   ├── PagedResultDto.cs
+│   │   │   └── ResponseDto.cs
+│   │   ├── Profile
+│   │   │   ├── CreateProfileDto.cs
+│   │   │   ├── ProfileDto.cs
+│   │   │   └── UpdateProfileDto.cs
+│   │   └── User
+│   │       ├── CreateUserDto.cs
+│   │       ├── UpdateUserDto.cs
+│   │       └── UserDto.cs
+│   ├── InfraServices
+│   │   ├── Crypto.cs
+│   │   └── ICrypto.cs
+│   └── Services
+│       ├── AuthorService.cs
+│       ├── AuthService.cs
+│       ├── BookService.cs
+│       ├── CommentService.cs
+│       ├── Common
+│       │   └── BaseService.cs
+│       ├── IAuthorService.cs
+│       ├── IAuthService.cs
+│       ├── IBookService.cs
+│       ├── ICommentService.cs
+│       ├── IProfileService.cs
+│       ├── IUserService.cs
+│       ├── ProfileService.cs
+│       └── UserService.cs
+├── Bibliotheca.Data
+│   ├── Bibliotheca.Data.csproj
+│   ├── Context
+│   │   ├── BibliothecaContext.cs
+│   │   └── Mappings
+│   │       ├── AuthorTypeConfiguration.cs
+│   │       ├── BookTypeConfiguration.cs
+│   │       ├── CommentTypeConfiguration.cs
+│   │       ├── ProfileTypeConfiguration.cs
+│   │       └── UserTypeConfiguration.cs
+│   ├── Migrations
+│   │   ├── 20260628001318_InitialCreate.cs
+│   │   ├── 20260628001318_InitialCreate.Designer.cs
+│   │   └── BibliothecaContextModelSnapshot.cs
+│   ├── Repositories
+│   │   ├── Dto
+│   │   │   ├── BookSearchFilter.cs
+│   │   │   └── PagedResult.cs
+│   │   ├── GenericRepository
+│   │   │   ├── GenericRepository.cs
+│   │   │   └── IGenericRepository.cs
+│   │   └── Repositories
+│   │       ├── AuthorRepository.cs
+│   │       ├── BookRepository.cs
+│   │       ├── CommentRepository.cs
+│   │       ├── IAuthorRepository.cs
+│   │       ├── IBookRepository.cs
+│   │       ├── ICommentRepository.cs
+│   │       ├── IProfileRepository.cs
+│   │       ├── IUserRepository.cs
+│   │       ├── ProfileRepository.cs
+│   │       └── UserRepository.cs
+│   └── Uow
+│       ├── IUnitOfWork.cs
+│       └── UnitOfWork.cs
+├── Bibliotheca.Domain
+│   ├── Bibliotheca.Domain.csproj
+│   ├── Domains
+│   │   ├── AbstractBase.cs
+│   │   ├── Author.cs
+│   │   ├── Book.cs
+│   │   ├── Comment.cs
+│   │   ├── Profile.cs
+│   │   └── User.cs
+│   └── Enums
+│       └── BookCondition.cs
+├── Bibliotheca.Prompt
+│   └── Bibliotheca.Prompt.csproj
+├── Bibliotheca.Web
+│   ├── appsettings.Development.json
+│   ├── appsettings.json
+│   ├── Bibliotheca.Web.csproj
+│   ├── Pages
+│   │   ├── Account
+│   │   │   ├── Login.cshtml
+│   │   │   ├── Login.cshtml.cs
+│   │   │   ├── Logout.cshtml
+│   │   │   ├── Logout.cshtml.cs
+│   │   │   ├── Register.cshtml
+│   │   │   └── Register.cshtml.cs
+│   │   ├── Feed
+│   │   │   ├── Details.cshtml
+│   │   │   ├── Details.cshtml.cs
+│   │   │   ├── Index.cshtml
+│   │   │   └── Index.cshtml.cs
+│   │   ├── Index.cshtml
+│   │   ├── Index.cshtml.cs
+│   │   ├── Profile
+│   │   │   ├── Books
+│   │   │   │   ├── Create.cshtml
+│   │   │   │   ├── Create.cshtml.cs
+│   │   │   │   ├── Edit.cshtml
+│   │   │   │   └── Edit.cshtml.cs
+│   │   │   ├── Index.cshtml
+│   │   │   └── Index.cshtml.cs
+│   │   ├── Shared
+│   │   │   ├── _Layout.cshtml
+│   │   │   └── _ValidationScriptsPartial.cshtml
+│   │   ├── _ViewImports.cshtml
+│   │   └── _ViewStart.cshtml
+│   ├── Program.cs
+│   ├── Properties
+│   │   └── launchSettings.json
+│   └── wwwroot
+│       ├── css
+│       ├── js
+│       └── lib
+│           ├── bootstrap
+│           │   └── dist
+│           │       ├── css
+│           │       └── js
+│           ├── jquery
+│           │   └── dist
+│           ├── jquery-validation
+│           │   └── dist
+│           └── jquery-validation-unobtrusive
+│               └── dist
+├── Bibliotheca.Web.sln
+└── global.json
 
-Objetivo 2 — Segurança
-BCrypt
-Cookie Authentication
-DataAnnotations
-Soft Delete
-SQL parametrizado
-DTOs sem exposição de senha
-Verificação de autorização em todas as operações de escrita
-Objetivo 3 — Manutenibilidade
-Separação rigorosa entre camadas
-Repositories especializados
-Unit of Work
-Generic Repository
-DTOs
-Services
-Interfaces
-ResponseDto padronizado
-Convenção uniforme de nomenclatura
-Filtros encapsulados em objetos próprios
+48 directories, 100 files
+
 
 ==================================================
 ARQUIVO: Bibliotheca.Application/Services/Common/BaseService.cs

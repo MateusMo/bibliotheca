@@ -1,0 +1,210 @@
+Requisitos Funcionais
+RF-01 — Cadastro de Usuários
+
+O sistema deverá permitir que novos usuários realizem cadastro utilizando:
+
+Nome
+E-mail
+Senha
+
+Cada usuário possuirá um perfil público.
+
+RF-02 — Autenticação
+
+O sistema deverá permitir:
+
+Login.
+Logout.
+Recuperação futura de senha.
+Sessão autenticada via Cookie Authentication.
+RF-03 — Biblioteca Pessoal
+
+Cada usuário possuirá uma biblioteca própria.
+
+A biblioteca representa a coleção física daquele usuário.
+
+Cada livro pertence exclusivamente à biblioteca de um usuário.
+
+RF-04 — Cadastro de Exemplares
+
+O usuário poderá cadastrar exemplares contendo informações como:
+
+Livro
+Autor
+Editora
+Ano
+Local de publicação
+Idioma
+Número de páginas
+ISBN (quando existir)
+Estado de conservação
+Primeira edição
+Autografado
+Ex-líbris
+Dedicatórias
+Observações
+Fotos
+Data de aquisição
+RF-05 — Status da Coleção
+
+Cada exemplar poderá possuir um status.
+
+Exemplos:
+
+Possuo
+Lido
+Lendo
+Quero adquirir
+Emprestado
+Vendido
+Restaurando
+RF-06 — Cadastro de Autores
+
+O sistema deverá permitir cadastro e consulta de autores.
+
+Cada autor poderá possuir:
+
+Nome
+Nacionalidade
+Data de nascimento
+Data de falecimento
+Biografia
+Foto
+RF-07 — Cadastro de Obras
+
+Cada obra poderá possuir múltiplas edições.
+
+Uma obra representa o conteúdo intelectual.
+
+Uma edição representa uma publicação específica.
+
+RF-08 — Cadastro de Edições
+
+Cada edição poderá conter:
+
+Editora
+Ano
+Cidade
+País
+Idioma
+Número de páginas
+ISBN
+Tipo de capa
+Coleção
+Volume
+RF-09 — Biblioteca Pública
+
+Todo usuário poderá optar por tornar sua biblioteca pública.
+
+Visitantes poderão visualizar:
+
+Livros
+Estatísticas
+Autores
+Coleções
+Fotos
+Comentários
+RF-10 — Pesquisa
+
+O sistema deverá permitir pesquisa por:
+
+Livro
+Autor
+Editora
+Ano
+Idioma
+País
+Biblioteca
+Usuário
+Século
+Categoria
+RF-11 — Comentários
+
+Usuários autenticados poderão comentar:
+
+Livros
+Edições
+Bibliotecas
+RF-12 — Avaliações
+
+Usuários poderão avaliar:
+
+Obras
+Edições
+RF-13 — Perfil Público
+
+Cada perfil exibirá:
+
+Foto
+Descrição
+Biblioteca
+Estatísticas
+Índice Bibliotheca
+Comentários
+RF-14 — Estatísticas da Biblioteca
+
+O sistema deverá calcular automaticamente:
+
+Quantidade de livros
+Quantidade de autores
+Livro mais antigo
+Livro mais recente
+Média de idade da coleção
+Distribuição por século
+Distribuição por idioma
+Distribuição por editora
+Distribuição por país
+Percentual de primeiras edições
+Percentual de exemplares autografados
+Percentual de livros raros
+Evolução da coleção ao longo do tempo
+RF-15 — Índice Bibliotheca
+
+Cada biblioteca possuirá um índice calculado automaticamente.
+
+O índice considera fatores como:
+
+Quantidade de livros
+Diversidade de autores
+Antiguidade média da coleção
+Quantidade de primeiras edições
+Quantidade de exemplares raros
+Diversidade de idiomas
+Diversidade geográfica
+Conservação da coleção
+
+Exemplo:
+
+Biblioteca de Mateus
+
+438 livros
+
+217 autores
+
+Livro mais antigo: 1798
+
+Média da coleção: 83 anos
+
+37 primeiras edições
+
+12 exemplares autografados
+
+84% publicados antes de 1950
+
+Índice Bibliotheca: 91/100
+RF-16 — Feed Público
+
+Visitantes poderão navegar por:
+
+Novos livros cadastrados
+Novas bibliotecas
+Novos comentários
+Novas coleções
+RF-17 — Administração
+
+Administradores poderão:
+
+Moderar comentários
+Moderar usuários
+Moderar livros
+Moderar autores

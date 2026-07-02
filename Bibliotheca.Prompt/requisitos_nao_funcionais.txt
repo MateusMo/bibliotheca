@@ -1,0 +1,60 @@
+3. Requisitos Não Funcionais
+RNF-01 — Arquitetura
+
+O projeto deverá seguir Clean Architecture.
+
+RNF-02 — Escalabilidade
+
+O sistema deverá suportar milhares de usuários simultaneamente.
+
+Toda listagem deverá utilizar paginação.
+
+RNF-03 — Segurança
+
+As senhas deverão utilizar BCrypt.
+
+Jamais poderão ser armazenadas em texto puro.
+
+RNF-04 — Autorização
+
+Toda operação de escrita deverá validar o proprietário do recurso.
+
+RNF-05 — Performance
+
+Consultas deverão utilizar paginação.
+
+Operações assíncronas deverão utilizar async/await.
+
+RNF-06 — Persistência
+
+Banco MySQL utilizando EF Core.
+
+RNF-07 — Soft Delete
+
+Nenhuma entidade será removida fisicamente.
+
+Toda exclusão utilizará:
+
+IsActive = false
+RNF-08 — Concorrência
+
+Cada requisição utilizará seu próprio DbContext.
+
+RNF-09 — Padronização
+
+Todos os Services retornarão:
+
+ResponseDto<T>
+RNF-10 — Código
+
+Todo acesso ao banco ocorrerá exclusivamente através de Repositories.
+
+A camada Web nunca acessará diretamente o DbContext.
+
+RNF-11 — Testabilidade
+
+Toda dependência deverá possuir interface.
+
+RNF-12 — Organização
+
+Nenhuma camada poderá violar as dependências da Clean Architecture.

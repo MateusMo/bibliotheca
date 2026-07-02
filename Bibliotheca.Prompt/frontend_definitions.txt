@@ -1,0 +1,20 @@
+- O frontend da aplicação está em razor pages e deve seguir o padrão de projeto da microsoft quanto a esse tipo de aplicação
+mantendo o código seguro e eficiente.
+
+- Pensando na eficiência a ui/ux deve manter a spmplicidade característica da wikipédia mas com um toque de personalidade
+mantendo tudo de forma responsiva.
+
+- Muitas agregações de elementos podem tornar a navegação confusa, então prefiro coisas simples com um longo scroll
+
+- URI - URL (IMPORTANTE)
+
+É preciso garantir que nenhuma senha ou informação sensível vaze nas uris e urls e ao mesmo tempo garantir o melhor SEO
+para indexação de resultados se aproveitando de detalhes descritivos nas urls e uris.
+
+- Metatags:
+
+É preciso adicionar metatags dinâmicas para cada resultado garantindo um melhor reconhecimento dos motores de busca
+
+- Integração com o backend
+
+As paginas devem ser paginadas e os cruds dos dominios devem todos ser aplicados e para isso criar o numero de páginas, subpáginas e forms necessários
