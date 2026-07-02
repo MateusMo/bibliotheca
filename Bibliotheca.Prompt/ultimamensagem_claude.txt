@@ -1,0 +1,66 @@
+Ótimo! Aqui está o roadmap atualizado — o que falta, do mais fácil ao mais difícil:
+✅ Concluído
+
+Paginação do Feed (RNF-02)
+
+Próximas etapas
+2. Paginação de Autores e Comentários (fácil)
+
+AuthorRepository.SearchByNameAsync → retornar PagedResult<Author>
+CommentRepository.GetByUserIdAsync / GetByBookIdAsync → paginar
+Ajustar services e páginas correspondentes
+
+3. CollectionStatus (RF-05) (fácil-médio)
+
+Criar Enums/CollectionStatus.cs (Possuo, Lido, Lendo, QueroAdquirir, Emprestado, Vendido, Restaurando)
+Trocar Book.IsOwner (bool) por Book.Status (enum) — atinge Domain, Mapping, DTOs, Service, Views, Migration
+
+4. Campos que faltam no Book (RF-04) (médio)
+
+Adicionar: PlaceOfPublication, IsFirstEdition, IsAutographed, HasExLibris, Dedication, Notes, AcquisitionDate
+Atinge Domain, Mapping, DTOs, Service, Views, Migration
+
+5. CRUD de Autores no Web (médio)
+
+Hoje só existe Service/Repository — faltam as páginas Razor (Pages/Author/Index, Create, Edit)
+
+6. Biblioteca pública (RF-09) (médio)
+
+User.IsPublicLibrary (bool)
+Toggle na página de Perfil
+Nova página pública de biblioteca (com URL amigável/slug, não Guid — SEO)
+
+7. Recuperação de senha (RF-02) (médio)
+
+Pages/Account/ForgotPassword + ResetPassword
+Provavelmente precisa de token com expiração no User ou tabela própria
+
+8. Separar Work / Edition (RF-07, RF-08) (difícil — mudança estrutural)
+
+Quebrar o atual Book monolítico em Work (obra) + Edition (edição publicada) + o exemplar físico do usuário
+Reflete em quase todas as camadas: Domain, Mappings, Repositories, DTOs, Services, Views
+É a mudança mais invasiva do projeto — recomendo fazer por último e com migration cuidadosa (dados existentes precisam ser migrados, não só o schema)
+
+9. Avaliações / Ratings (RF-12) (médio, depende do #8)
+
+Nova entidade Rating ligada a Work/Edition
+
+10. Estatísticas e Índice Bibliotheca (RF-14, RF-15) (difícil — lógica de negócio nova)
+
+StatisticsService calculando: quantidade de livros/autores, livro mais antigo/recente, distribuição por século/idioma/editora/país, % primeiras edições, % autografados, evolução da coleção
+Índice Bibliotheca (fórmula de score 0-100) — precisa definir os pesos de cada fator
+Depende de #3, #4 e idealmente #8 estarem prontos primeiro
+
+11. Administração (RF-17) (difícil — nova área + segurança)
+
+User.IsAdmin + policy de autorização
+Área /Admin para moderar comentários, usuários, livros, autores
+
+12. Metatags dinâmicas e URLs amigáveis (SEO) (transversal, fazer aos poucos)
+
+Seção Meta no _Layout.cshtml
+Slugs em vez de Guid nas rotas de Feed/Details, perfil público, etc.
+
+13. Segurança de configuração (rápido, pode ser feito a qualquer momento)
+
+Mover a senha do MySQL de appsettings.json para dotnet user-secrets / variável de ambiente

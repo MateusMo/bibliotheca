@@ -1,5 +1,74 @@
 
 ==================================================
+Ultima mensagem claude
+==================================================
+Ótimo! Aqui está o roadmap atualizado — o que falta, do mais fácil ao mais difícil:
+✅ Concluído
+
+Paginação do Feed (RNF-02)
+
+Próximas etapas
+2. Paginação de Autores e Comentários (fácil)
+
+AuthorRepository.SearchByNameAsync → retornar PagedResult<Author>
+CommentRepository.GetByUserIdAsync / GetByBookIdAsync → paginar
+Ajustar services e páginas correspondentes
+
+3. CollectionStatus (RF-05) (fácil-médio)
+
+Criar Enums/CollectionStatus.cs (Possuo, Lido, Lendo, QueroAdquirir, Emprestado, Vendido, Restaurando)
+Trocar Book.IsOwner (bool) por Book.Status (enum) — atinge Domain, Mapping, DTOs, Service, Views, Migration
+
+4. Campos que faltam no Book (RF-04) (médio)
+
+Adicionar: PlaceOfPublication, IsFirstEdition, IsAutographed, HasExLibris, Dedication, Notes, AcquisitionDate
+Atinge Domain, Mapping, DTOs, Service, Views, Migration
+
+5. CRUD de Autores no Web (médio)
+
+Hoje só existe Service/Repository — faltam as páginas Razor (Pages/Author/Index, Create, Edit)
+
+6. Biblioteca pública (RF-09) (médio)
+
+User.IsPublicLibrary (bool)
+Toggle na página de Perfil
+Nova página pública de biblioteca (com URL amigável/slug, não Guid — SEO)
+
+7. Recuperação de senha (RF-02) (médio)
+
+Pages/Account/ForgotPassword + ResetPassword
+Provavelmente precisa de token com expiração no User ou tabela própria
+
+8. Separar Work / Edition (RF-07, RF-08) (difícil — mudança estrutural)
+
+Quebrar o atual Book monolítico em Work (obra) + Edition (edição publicada) + o exemplar físico do usuário
+Reflete em quase todas as camadas: Domain, Mappings, Repositories, DTOs, Services, Views
+É a mudança mais invasiva do projeto — recomendo fazer por último e com migration cuidadosa (dados existentes precisam ser migrados, não só o schema)
+
+9. Avaliações / Ratings (RF-12) (médio, depende do #8)
+
+Nova entidade Rating ligada a Work/Edition
+
+10. Estatísticas e Índice Bibliotheca (RF-14, RF-15) (difícil — lógica de negócio nova)
+
+StatisticsService calculando: quantidade de livros/autores, livro mais antigo/recente, distribuição por século/idioma/editora/país, % primeiras edições, % autografados, evolução da coleção
+Índice Bibliotheca (fórmula de score 0-100) — precisa definir os pesos de cada fator
+Depende de #3, #4 e idealmente #8 estarem prontos primeiro
+
+11. Administração (RF-17) (difícil — nova área + segurança)
+
+User.IsAdmin + policy de autorização
+Área /Admin para moderar comentários, usuários, livros, autores
+
+12. Metatags dinâmicas e URLs amigáveis (SEO) (transversal, fazer aos poucos)
+
+Seção Meta no _Layout.cshtml
+Slugs em vez de Guid nas rotas de Feed/Details, perfil público, etc.
+
+13. Segurança de configuração (rápido, pode ser feito a qualquer momento)
+
+Mover a senha do MySQL de appsettings.json para dotnet user-secrets / variável de ambiente
+==================================================
 Ideação do projeto
 ==================================================
 Bibliotheca — Especificação Geral do Projeto
@@ -666,7 +735,7 @@ public class BookService : BaseService, IBookService
         return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
     }
 
-    public async Task<ResponseDto<List<BookDto>>> SearchAsync(BookFilterDto filter)
+    public async Task<ResponseDto<PagedResultDto<BookDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize)
     {
         var searchFilter = new BookSearchFilter
         {
@@ -679,8 +748,17 @@ public class BookService : BaseService, IBookService
             YearTo = filter.YearTo
         };
 
-        var books = await _unitOfWork.Books.SearchAsync(searchFilter);
-        return Success(books.Select(ToDto).ToList());
+        var paged = await _unitOfWork.Books.SearchPagedAsync(searchFilter, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<BookDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
     }
 
     // NOVO: "meus livros" paginado, pra usar na página de Perfil.
@@ -1129,7 +1207,7 @@ public interface IBookService
     Task<ResponseDto<List<BookDto>>> GetAllAsync();
     Task<ResponseDto<List<BookDto>>> GetByUserIdAsync(Guid userId);
     Task<ResponseDto<List<BookDto>>> GetByAuthorIdAsync(Guid authorId);
-    Task<ResponseDto<List<BookDto>>> SearchAsync(BookFilterDto filter);
+    Task<ResponseDto<PagedResultDto<BookDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize);
     Task<ResponseDto<PagedResultDto<BookDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize);
     Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto);
     Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto);
@@ -3244,36 +3322,35 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
             .Where(b => b.Authors.Any(a => a.Id == authorId))
             .ToListAsync(cancellationToken);
 
-    public async Task<IEnumerable<Book>> SearchAsync(BookSearchFilter filter, CancellationToken cancellationToken = default)
+    public async Task<PagedResult<Book>> SearchPagedAsync(
+        BookSearchFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
-        var query = DbSet.AsNoTracking()
-            .Include(b => b.Authors)
-            .Where(b => b.IsActive);
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var query = DbSet.AsNoTracking().Include(b => b.Authors).Where(b => b.IsActive);
 
         if (!string.IsNullOrWhiteSpace(filter.Name))
             query = query.Where(b => b.Name.Contains(filter.Name));
-
         if (!string.IsNullOrWhiteSpace(filter.AuthorName))
             query = query.Where(b => b.Authors.Any(a => a.Name.Contains(filter.AuthorName)));
-
         if (!string.IsNullOrWhiteSpace(filter.Language))
             query = query.Where(b => b.Language == filter.Language);
-
         if (!string.IsNullOrWhiteSpace(filter.Publisher))
             query = query.Where(b => b.Publisher.Contains(filter.Publisher));
-
         if (filter.Condition.HasValue)
             query = query.Where(b => b.Condition == filter.Condition.Value);
-
         if (filter.YearFrom.HasValue)
             query = query.Where(b => b.PublicationYear >= filter.YearFrom.Value);
-
         if (filter.YearTo.HasValue)
             query = query.Where(b => b.PublicationYear <= filter.YearTo.Value);
 
-        return await query
-            .OrderBy(b => b.Name)
-            .ToListAsync(cancellationToken);
+        query = query.OrderBy(b => b.Name);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+
+        return new PagedResult<Book> { Items = items, PageNumber = pageNumber, PageSize = pageSize, TotalCount = totalCount };
     }
 
     // NOVO: paginação da listagem "meus livros" no Perfil.
@@ -3319,8 +3396,8 @@ public interface IBookRepository : IGenericRepository<Book>
     Task<IEnumerable<Book>> GetAllWithAuthorsAsync(CancellationToken cancellationToken = default);
     Task<IEnumerable<Book>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<IEnumerable<Book>> GetByAuthorIdAsync(Guid authorId, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Book>> SearchAsync(BookSearchFilter filter, CancellationToken cancellationToken = default);
     Task<PagedResult<Book>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<PagedResult<Book>> SearchPagedAsync(BookSearchFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IUserRepository.cs
@@ -3974,67 +4051,45 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
 ==================================================
 @page
 @model Bibliotheca.Web.Pages.Feed.IndexModel
-@{
-    ViewData["Title"] = "Feed";
-}
 
-<h1>Livros cadastrados</h1>
-
-<form method="get" class="row gx-2 gy-2 align-items-end mb-4">
-    <div class="col-md-3">
-        <label class="form-label">Título</label>
-        <input asp-for="Filter.Name" class="form-control"/>
-    </div>
-    <div class="col-md-3">
-        <label class="form-label">Autor</label>
-        <input asp-for="Filter.AuthorName" class="form-control"/>
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Idioma</label>
-        <input asp-for="Filter.Language" class="form-control"/>
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Condição</label>
-        <select asp-for="Filter.Condition" asp-items="Model.ConditionOptions" class="form-select">
-            <option value="">Todas</option>
-        </select>
-    </div>
-    <div class="col-md-1">
-        <label class="form-label">Ano de</label>
-        <input asp-for="Filter.YearFrom" class="form-control"/>
-    </div>
-    <div class="col-md-1">
-        <label class="form-label">Ano até</label>
-        <input asp-for="Filter.YearTo" class="form-control"/>
-    </div>
-    <div class="col-12">
-        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
-        <a asp-page="/Feed/Index" class="btn btn-outline-secondary btn-sm">Limpar filtros</a>
-    </div>
-</form>
-
-@if (!Model.Books.Any())
+@if (!Model.Books.Items.Any())
 {
     <p>Nenhum livro encontrado.</p>
 }
 else
 {
     <ul class="list-group">
-        @foreach (var book in Model.Books)
+        @foreach (var book in Model.Books.Items)
         {
             <li class="list-group-item">
-                <a asp-page="/Feed/Details" asp-route-id="@book.Id">
-                    <strong>@book.Name</strong>
-                </a>
+                <a asp-page="/Feed/Details" asp-route-id="@book.Id"><strong>@book.Name</strong></a>
                 <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
             </li>
         }
     </ul>
+
+    @if (Model.Books.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(Model.Books.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Feed/Index" asp-all-route-data="@Model.RouteValuesForPage(Model.PageNumber - 1)">Anterior</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Página @Model.Books.PageNumber de @Model.Books.TotalPages</span>
+                </li>
+                <li class="page-item @(Model.Books.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Feed/Index" asp-all-route-data="@Model.RouteValuesForPage(Model.PageNumber + 1)">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml.cs
 ==================================================
 using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Common;
 using Bibliotheca.Application.Services;
 using Bibliotheca.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -4047,29 +4102,38 @@ namespace Bibliotheca.Web.Pages.Feed;
 [AllowAnonymous]
 public class IndexModel : PageModel
 {
+    private const int PageSize = 20;
     private readonly IBookService _bookService;
 
-    public IndexModel(IBookService bookService)
-    {
-        _bookService = bookService;
-    }
+    public IndexModel(IBookService bookService) => _bookService = bookService;
 
-    // SupportsGet = true: o filtro fica na querystring, dá pra
-    // compartilhar o link já filtrado e o botão "voltar" funciona.
     [BindProperty(SupportsGet = true)]
     public BookFilterDto Filter { get; set; } = new();
 
-    public List<BookDto> Books { get; set; } = [];
+    [BindProperty(SupportsGet = true)]
+    public int PageNumber { get; set; } = 1;
+
+    public PagedResultDto<BookDto> Books { get; set; } = new();
 
     public List<SelectListItem> ConditionOptions { get; } =
         Enum.GetValues<BookCondition>()
             .Select(c => new SelectListItem(c.ToString(), c.ToString()))
             .ToList();
+    
+    public Dictionary<string, string> RouteValuesForPage(int page) => new()
+    {
+        ["PageNumber"] = page.ToString(),
+        ["Filter.Name"] = Filter.Name ?? "",
+        ["Filter.AuthorName"] = Filter.AuthorName ?? "",
+        ["Filter.Language"] = Filter.Language ?? "",
+        ["Filter.YearFrom"] = Filter.YearFrom?.ToString() ?? "",
+        ["Filter.YearTo"] = Filter.YearTo?.ToString() ?? ""
+    };
 
     public async Task OnGetAsync()
     {
-        var result = await _bookService.SearchAsync(Filter);
-        Books = result.Data ?? [];
+        var result = await _bookService.SearchAsync(Filter, PageNumber, PageSize);
+        Books = result.Data ?? new PagedResultDto<BookDto>();
     }
 }
 ==================================================
