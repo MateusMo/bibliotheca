@@ -19,20 +19,15 @@
     </div>
 
     <div class="mb-3">
-        <label class="form-label">Autores</label>
-        <div class="border rounded p-2">
-            @foreach (var author in Model.AvailableAuthors)
-            {
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox"
-                           name="Input.AuthorIds" value="@author.Id"
-                           id="author_@author.Id"
-                           checked="@(Model.Input.AuthorIds.Contains(author.Id))"/>
-                    <label class="form-check-label" for="author_@author.Id">@author.Name</label>
-                </div>
-            }
-        </div>
-        <span asp-validation-for="Input.AuthorIds" class="text-danger"></span>
+        <label asp-for="Input.Author" class="form-label">Autor</label>
+        <input asp-for="Input.Author" class="form-control"/>
+        <span asp-validation-for="Input.Author" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Input.Description" class="form-label">Descrição</label>
+        <textarea asp-for="Input.Description" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Input.Description" class="text-danger"></span>
     </div>
 
     <div class="form-check mb-3">
@@ -47,9 +42,14 @@
             <span asp-validation-for="Input.PublicationYear" class="text-danger"></span>
         </div>
         <div class="col-md-4 mb-3">
-            <label asp-for="Input.Language" class="form-label">Idioma</label>
-            <input asp-for="Input.Language" class="form-control"/>
-            <span asp-validation-for="Input.Language" class="text-danger"></span>
+            <label asp-for="Input.LanguageEnum" class="form-label">Idioma</label>
+            <select asp-for="Input.LanguageEnum" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.LanguageEnum>())
+                {
+                    <option value="@value">@value</option>
+                }
+            </select>
+            <span asp-validation-for="Input.LanguageEnum" class="text-danger"></span>
         </div>
         <div class="col-md-4 mb-3">
             <label asp-for="Input.Publisher" class="form-label">Editora</label>
@@ -58,31 +58,27 @@
     </div>
 
     <div class="row">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
             <label asp-for="Input.ISBN" class="form-label">ISBN</label>
             <input asp-for="Input.ISBN" class="form-control"/>
             <span asp-validation-for="Input.ISBN" class="text-danger"></span>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
             <label asp-for="Input.Pages" class="form-label">Páginas</label>
             <input asp-for="Input.Pages" class="form-control"/>
             <span asp-validation-for="Input.Pages" class="text-danger"></span>
         </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="Input.Edition" class="form-label">Edição</label>
-            <input asp-for="Input.Edition" class="form-control"/>
-        </div>
     </div>
 
     <div class="row">
-        <div class="col-md-4 mb-3">
+        <div class="col-md-6 mb-3">
             <label asp-for="Input.EstimatedValue" class="form-label">Valor estimado</label>
             <input asp-for="Input.EstimatedValue" class="form-control"/>
         </div>
-        <div class="col-md-4 mb-3">
-            <label asp-for="Input.Condition" class="form-label">Condição</label>
-            <select asp-for="Input.Condition" class="form-select">
-                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookCondition>())
+        <div class="col-md-6 mb-3">
+            <label asp-for="Input.ConditionEnum" class="form-label">Condição</label>
+            <select asp-for="Input.ConditionEnum" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookConditionEnum>())
                 {
                     <option value="@value">@value</option>
                 }

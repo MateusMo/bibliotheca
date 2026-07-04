@@ -17,7 +17,7 @@ public class BookService : BaseService, IBookService
 
     public async Task<ResponseDto<BookDto>> GetByIdAsync(Guid id)
     {
-        var book = await _unitOfWork.Books.GetByIdWithAuthorsAsync(id);
+        var book = await _unitOfWork.Books.GetByIdAsync(id);
 
         if (book is null || !book.IsActive)
             return Failure<BookDto>("Book not found", 404);
@@ -27,19 +27,13 @@ public class BookService : BaseService, IBookService
 
     public async Task<ResponseDto<List<BookDto>>> GetAllAsync()
     {
-        var books = await _unitOfWork.Books.GetAllWithAuthorsAsync();
+        var books = await _unitOfWork.Books.GetAllAsync();
         return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
     }
 
     public async Task<ResponseDto<List<BookDto>>> GetByUserIdAsync(Guid userId)
     {
         var books = await _unitOfWork.Books.GetByUserIdAsync(userId);
-        return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
-    }
-
-    public async Task<ResponseDto<List<BookDto>>> GetByAuthorIdAsync(Guid authorId)
-    {
-        var books = await _unitOfWork.Books.GetByAuthorIdAsync(authorId);
         return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
     }
 
@@ -69,8 +63,6 @@ public class BookService : BaseService, IBookService
         return Success(dto);
     }
 
-    // NOVO: "meus livros" paginado, pra usar na página de Perfil.
-    // Traduz o PagedResult<Book> do Data pro PagedResultDto<BookDto> da Application.
     public async Task<ResponseDto<PagedResultDto<BookDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize)
     {
         var paged = await _unitOfWork.Books.GetByUserIdPagedAsync(userId, pageNumber, pageSize);
@@ -88,31 +80,22 @@ public class BookService : BaseService, IBookService
 
     public async Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto)
     {
-        if (dto.AuthorIds.Count == 0)
-            return Failure<BookDto>("At least one author is required", 400);
-
-        var authorIds = dto.AuthorIds.Distinct().ToList();
-        var authors = (await _unitOfWork.Authors.FindAllAsync(a => authorIds.Contains(a.Id) && a.IsActive)).ToList();
-
-        if (authors.Count != authorIds.Count)
-            return Failure<BookDto>("One or more authors not found", 404);
-
         var book = new Book
         {
             Id = Guid.NewGuid(),
             UserId = dto.UserId,
             IsOwner = dto.IsOwner,
             Name = dto.Name,
+            Author = dto.Author,
+            Description = dto.Description,
             PublicationYear = dto.PublicationYear,
             Photos = dto.Photos,
-            Language = dto.Language,
+            LanguageEnum = dto.LanguageEnum,
             Publisher = dto.Publisher,
             ISBN = dto.ISBN,
             Pages = dto.Pages,
-            Edition = dto.Edition,
             EstimatedValue = dto.EstimatedValue,
-            Condition = dto.Condition,
-            Authors = authors,
+            ConditionEnum = dto.ConditionEnum,
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
             UpdatedAt = DateTimeOffset.UtcNow
@@ -126,36 +109,24 @@ public class BookService : BaseService, IBookService
 
     public async Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto)
     {
-        var book = await _unitOfWork.Books.GetByIdWithAuthorsAsync(dto.Id);
+        var book = await _unitOfWork.Books.GetByIdAsync(dto.Id);
 
         if (book is null || !book.IsActive)
             return Failure<BookDto>("Book not found", 404);
 
-        if (dto.AuthorIds.Count == 0)
-            return Failure<BookDto>("At least one author is required", 400);
-
-        var authorIds = dto.AuthorIds.Distinct().ToList();
-        var authors = (await _unitOfWork.Authors.FindAllAsync(a => authorIds.Contains(a.Id) && a.IsActive)).ToList();
-
-        if (authors.Count != authorIds.Count)
-            return Failure<BookDto>("One or more authors not found", 404);
-
         book.IsOwner = dto.IsOwner;
         book.Name = dto.Name;
+        book.Author = dto.Author;
+        book.Description = dto.Description;
         book.PublicationYear = dto.PublicationYear;
         book.Photos = dto.Photos;
-        book.Language = dto.Language;
+        book.LanguageEnum = dto.LanguageEnum;
         book.Publisher = dto.Publisher;
         book.ISBN = dto.ISBN;
         book.Pages = dto.Pages;
-        book.Edition = dto.Edition;
         book.EstimatedValue = dto.EstimatedValue;
-        book.Condition = dto.Condition;
+        book.ConditionEnum = dto.ConditionEnum;
         book.UpdatedAt = DateTimeOffset.UtcNow;
-
-        book.Authors.Clear();
-        foreach (var author in authors)
-            book.Authors.Add(author);
 
         _unitOfWork.Books.Update(book);
         await _unitOfWork.SaveChangesAsync();
@@ -163,7 +134,6 @@ public class BookService : BaseService, IBookService
         return Success(ToDto(book), "Book updated successfully");
     }
 
-    // Soft delete: só zera IsActive, não remove a linha (herdado de AbstractBase).
     public async Task<ResponseDto<bool>> DeleteAsync(Guid id)
     {
         var book = await _unitOfWork.Books.GetByIdAsync(id);
@@ -188,19 +158,18 @@ public class BookService : BaseService, IBookService
             CreatedAt = book.CreatedAt,
             UpdatedAt = book.UpdatedAt,
             UserId = book.UserId,
-            AuthorIds = book.Authors.Select(a => a.Id).ToList(),
-            AuthorNames = book.Authors.Select(a => a.Name).ToList(),
             IsOwner = book.IsOwner,
             Name = book.Name,
+            Author = book.Author,
+            Description = book.Description,
             PublicationYear = book.PublicationYear,
             Photos = book.Photos,
-            Language = book.Language,
+            LanguageEnum = book.LanguageEnum,
             Publisher = book.Publisher,
             ISBN = book.ISBN,
             Pages = book.Pages,
-            Edition = book.Edition,
             EstimatedValue = book.EstimatedValue,
-            Condition = book.Condition
+            ConditionEnum = book.ConditionEnum
         };
     }
 }

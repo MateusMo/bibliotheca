@@ -26,16 +26,21 @@ public class IndexModel : PageModel
     public PagedResultDto<BookDto> Books { get; set; } = new();
 
     public List<SelectListItem> ConditionOptions { get; } =
-        Enum.GetValues<BookCondition>()
+        Enum.GetValues<BookConditionEnum>()
             .Select(c => new SelectListItem(c.ToString(), c.ToString()))
             .ToList();
-    
+
+    public List<SelectListItem> LanguageOptions { get; } =
+        Enum.GetValues<LanguageEnum>()
+            .Select(l => new SelectListItem(l.ToString(), l.ToString()))
+            .ToList();
+
     public Dictionary<string, string> RouteValuesForPage(int page) => new()
     {
         ["PageNumber"] = page.ToString(),
         ["Filter.Name"] = Filter.Name ?? "",
         ["Filter.AuthorName"] = Filter.AuthorName ?? "",
-        ["Filter.Language"] = Filter.Language ?? "",
+        ["Filter.Language"] = Filter.Language?.ToString() ?? "",
         ["Filter.YearFrom"] = Filter.YearFrom?.ToString() ?? "",
         ["Filter.YearTo"] = Filter.YearTo?.ToString() ?? ""
     };

@@ -1,0 +1,12 @@
+#Foco Atual:
+Flag (Feito) -> Ignorar
+Sem Flag (Feito) -> Precisa fazer agora.
+
+- Melhorar Urls e Uris para melhor ranqueamento aproveitando prorpeidades do livro (FEITO)
+- Ajustar o serviço, repository e interfaces considerando o novo objeto de book (FEITO)
+- No Feed precisa listar mais informações como a data de criação do livro, o numero de fotos. 
+a paginação precisa ser mais amigável dando mais opções de navegação Anterior 1,2,3 ... 8,9,10 Proximo (algo assim).
+É preciso ainda adicoinar um filtro de livros no feed pensando sempre no maior desempenho possível. 
+Deve ser possível filtrar por texto (back vai procurar pelo autor, nome do livro, isbn), por ano de publicação, 
+pela data que foi adicionado na plafatorma, pelo numero de páginas, pelo enum de linguas, pelo enum de estado de conservação,
+pelo valor estimado (faça isso com a melhor ux/ui possível assim com o melhor desempenho possível)

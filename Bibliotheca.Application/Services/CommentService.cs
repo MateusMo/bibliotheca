@@ -42,6 +42,36 @@ public class CommentService : BaseService, ICommentService
         return Success(comments.Where(c => c.IsActive).Select(ToDto).ToList());
     }
 
+    public async Task<ResponseDto<PagedResultDto<CommentDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize)
+    {
+        var paged = await _unitOfWork.Comments.GetByUserIdPagedAsync(userId, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<CommentDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
+    }
+
+    public async Task<ResponseDto<PagedResultDto<CommentDto>>> GetByBookIdPagedAsync(Guid bookId, int pageNumber, int pageSize)
+    {
+        var paged = await _unitOfWork.Comments.GetByBookIdPagedAsync(bookId, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<CommentDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
+    }
+
     public async Task<ResponseDto<CommentDto>> CreateAsync(CreateCommentDto dto)
     {
         var userExists = await _unitOfWork.Users.ExistsAsync(u => u.Id == dto.UserId && u.IsActive);

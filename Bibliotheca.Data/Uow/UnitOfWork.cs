@@ -9,7 +9,6 @@ public class UnitOfWork : IUnitOfWork
     private readonly BibliothecaContext _context;
     private IDbContextTransaction? _transaction;
 
-    private IAuthorRepository? _authors;
     private IBookRepository? _books;
     private ICommentRepository? _comments;
     private IProfileRepository? _profiles;
@@ -20,9 +19,6 @@ public class UnitOfWork : IUnitOfWork
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    // Repositórios são criados sob demanda (lazy) e compartilham o mesmo _context,
-    // garantindo que tudo participe da mesma transação/SaveChanges.
-    public IAuthorRepository Authors => _authors ??= new AuthorRepository(_context);
     public IBookRepository Books => _books ??= new BookRepository(_context);
     public ICommentRepository Comments => _comments ??= new CommentRepository(_context);
     public IProfileRepository Profiles => _profiles ??= new ProfileRepository(_context);

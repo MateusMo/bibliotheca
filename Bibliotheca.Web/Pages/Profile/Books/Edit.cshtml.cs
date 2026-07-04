@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using Bibliotheca.Application.Dtos.Author;
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,12 +11,10 @@ namespace Bibliotheca.Web.Pages.Profile.Books;
 public class EditModel : PageModel
 {
     private readonly IBookService _bookService;
-    private readonly IAuthorService _authorService;
 
-    public EditModel(IBookService bookService, IAuthorService authorService)
+    public EditModel(IBookService bookService)
     {
         _bookService = bookService;
-        _authorService = authorService;
     }
 
     [BindProperty]
@@ -25,8 +22,6 @@ public class EditModel : PageModel
 
     [BindProperty(SupportsGet = true)]
     public Guid Id { get; set; }
-
-    public List<AuthorDto> AvailableAuthors { get; set; } = [];
 
     public string? ErrorMessage { get; set; }
 
@@ -42,29 +37,24 @@ public class EditModel : PageModel
         Input = new BookInputModel
         {
             Name = book.Name,
-            AuthorIds = book.AuthorIds,
+            Author = book.Author,
+            Description = book.Description,
             IsOwner = book.IsOwner,
             PublicationYear = book.PublicationYear,
             PhotosText = string.Join(", ", book.Photos),
-            Language = book.Language,
+            LanguageEnum = book.LanguageEnum,
             Publisher = book.Publisher,
             ISBN = book.ISBN,
             Pages = book.Pages,
-            Edition = book.Edition,
             EstimatedValue = book.EstimatedValue,
-            Condition = book.Condition
+            ConditionEnum = book.ConditionEnum
         };
 
-        await LoadAuthorsAsync();
         return Page();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
-        await LoadAuthorsAsync();
-
-        // Reconfirma a posse antes de aceitar qualquer alteração
-        // (evita editar livro de outro usuário trocando o id na URL).
         var existing = await _bookService.GetByIdAsync(Id);
         if (!existing.IsSuccess || existing.Data is null || existing.Data.UserId != CurrentUserId)
             return NotFound();
@@ -75,18 +65,18 @@ public class EditModel : PageModel
         var result = await _bookService.UpdateAsync(new UpdateBookDto
         {
             Id = Id,
-            AuthorIds = Input.AuthorIds,
             IsOwner = Input.IsOwner,
             Name = Input.Name,
+            Author = Input.Author,
+            Description = Input.Description ?? string.Empty,
             PublicationYear = Input.PublicationYear,
             Photos = Input.ParsePhotos(),
-            Language = Input.Language,
+            LanguageEnum = Input.LanguageEnum,
             Publisher = Input.Publisher,
             ISBN = Input.ISBN,
             Pages = Input.Pages,
-            Edition = Input.Edition,
             EstimatedValue = Input.EstimatedValue,
-            Condition = Input.Condition
+            ConditionEnum = Input.ConditionEnum
         });
 
         if (!result.IsSuccess)
@@ -96,12 +86,6 @@ public class EditModel : PageModel
         }
 
         return RedirectToPage("/Profile/Index");
-    }
-
-    private async Task LoadAuthorsAsync()
-    {
-        var authorsResult = await _authorService.GetAllAsync();
-        AvailableAuthors = authorsResult.Data ?? [];
     }
 
     private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

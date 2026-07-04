@@ -11,6 +11,13 @@ mantendo tudo de forma responsiva.
 É preciso garantir que nenhuma senha ou informação sensível vaze nas uris e urls e ao mesmo tempo garantir o melhor SEO
 para indexação de resultados se aproveitando de detalhes descritivos nas urls e uris.
 
+Padrão de url atual ao listar livros:
+http://localhost:5014/Feed/Details/746aba21-d395-46be-a61d-005cd25dcfaf
+Esse padrão é simples demais.
+olha quantas propriedades eu tenho no objeto de livro.
+poderia adicionar nome, autor, ano etc na url para ficar mais amigável para os motores de busca. 
+Considere sempre ter as urls mais verbosas para o ranqueamento.
+
 - Metatags:
 
 É preciso adicionar metatags dinâmicas para cada resultado garantindo um melhor reconhecimento dos motores de busca

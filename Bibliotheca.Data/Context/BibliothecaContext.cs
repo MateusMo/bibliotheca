@@ -9,7 +9,6 @@ public class BibliothecaContext : DbContext
     {
     }
 
-    public DbSet<Author> Authors => Set<Author>();
     public DbSet<Book> Books => Set<Book>();
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Profile> Profiles => Set<Profile>();

@@ -12,7 +12,7 @@ else
         {
             <li class="list-group-item">
                 <a asp-page="/Feed/Details" asp-route-id="@book.Id"><strong>@book.Name</strong></a>
-                <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
+                <span class="text-muted"> — @book.Author (@book.PublicationYear)</span>
             </li>
         }
     </ul>

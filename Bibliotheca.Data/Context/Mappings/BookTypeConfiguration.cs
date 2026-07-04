@@ -40,12 +40,23 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
             .IsRequired()
             .HasMaxLength(300);
 
+        // Autor agora é texto livre digitado pelo próprio usuário no cadastro do livro.
+        builder.Property(b => b.Author)
+            .IsRequired()
+            .HasMaxLength(300);
+
+        builder.Property(b => b.Description)
+            .HasColumnType("text");
+
         builder.Property(b => b.PublicationYear)
             .IsRequired();
 
-        builder.Property(b => b.Language)
+        // Mantém o nome de coluna "Language" pra não gerar rename desnecessário na migration.
+        builder.Property(b => b.LanguageEnum)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasConversion<string>()
+            .HasMaxLength(50)
+            .HasColumnName("Language");
 
         builder.Property(b => b.Publisher)
             .HasMaxLength(200);
@@ -57,14 +68,11 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
         builder.Property(b => b.Pages)
             .IsRequired();
 
-        builder.Property(b => b.Edition)
-            .HasMaxLength(50);
-
         builder.Property(b => b.EstimatedValue)
             .IsRequired()
             .HasColumnType("decimal(12,2)");
 
-        builder.Property(b => b.Condition)
+        builder.Property(b => b.ConditionEnum)
             .IsRequired()
             .HasConversion<string>()
             .HasMaxLength(20);
@@ -77,6 +85,7 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
 
         builder.HasIndex(b => b.IsActive);
         builder.HasIndex(b => b.Name);
+        builder.HasIndex(b => b.Author);
         builder.HasIndex(b => b.ISBN).IsUnique();
         builder.HasIndex(b => b.UserId);
 
@@ -85,23 +94,6 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(b => b.Authors)
-            .WithMany(a => a.Books)
-            .UsingEntity<Dictionary<string, object>>(
-                "BookAuthors",
-                j => j.HasOne<Author>().WithMany()
-                    .HasForeignKey("AuthorId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j => j.HasOne<Book>().WithMany()
-                    .HasForeignKey("BookId")
-                    .OnDelete(DeleteBehavior.Cascade),
-                j =>
-                {
-                    j.ToTable("BookAuthors");
-                    j.HasKey("BookId", "AuthorId");
-                    j.Property<Guid>("BookId").HasColumnType("char(36)");
-                    j.Property<Guid>("AuthorId").HasColumnType("char(36)");
-                    j.HasIndex("AuthorId");
-                });
+        // Sem mais HasMany/BookAuthors — a tabela de junção deixa de existir.
     }
 }

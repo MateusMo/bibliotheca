@@ -2,6 +2,7 @@ using Bibliotheca.Application.InfraServices;
 using Bibliotheca.Application.Services;
 using Bibliotheca.Data.Context;
 using Bibliotheca.Data.Uow;
+using Bibliotheca.Web.Seed;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,7 +21,6 @@ builder.Services.AddDbContext<BibliothecaContext>(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<ICrypto, Crypto>();
 
-builder.Services.AddScoped<IAuthorService, AuthorService>();
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
@@ -42,7 +42,17 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<BibliothecaContext>();
+        await context.Database.MigrateAsync();
+    }
+
+    await DbSeeder.SeedAsync(app.Services);
+}
+else
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();

@@ -1,7 +1,29 @@
-@page "{id:guid}"
+@page "{id:guid}/{slug?}"
 @model Bibliotheca.Web.Pages.Feed.DetailsModel
 @{
-    ViewData["Title"] = Model.Book?.Name ?? "Livro";
+    ViewData["Title"] = Model.Book is null
+        ? "Livro não encontrado"
+        : $"{Model.Book.Name} ({Model.Book.PublicationYear}) — {Model.Book.Author}";
+
+    if (Model.Book is not null)
+    {
+        ViewData["MetaDescription"] =
+            $"{Model.Book.Name}, de {Model.Book.Author}. " +
+            $"Publicado em {Model.Book.PublicationYear} pela {Model.Book.Publisher}. " +
+            $"Estado de conservação: {Model.Book.ConditionEnum}.";
+
+        ViewData["OgType"] = "book";
+        ViewData["CanonicalUrl"] = Url.PageLink("/Feed/Details", values: new
+        {
+            id = Model.Book.Id,
+            slug = Bibliotheca.Web.Utils.SlugHelper.BuildBookSlug(Model.Book.Name, Model.Book.Author, Model.Book.PublicationYear)
+        });
+
+        if (Model.Book.Photos.Length > 0)
+        {
+            ViewData["OgImage"] = Model.Book.Photos[0];
+        }
+    }
 }
 
 @if (Model.Book is null)
@@ -12,16 +34,20 @@ else
 {
     <article>
         <h1>@Model.Book.Name</h1>
-        <p class="text-muted">@string.Join(", ", Model.Book.AuthorNames) — @Model.Book.PublicationYear</p>
+        <p class="text-muted">@Model.Book.Author — @Model.Book.PublicationYear</p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Book.Description))
+        {
+            <p>@Model.Book.Description</p>
+        }
 
         <table class="table table-sm w-auto">
             <tbody>
                 <tr><th>Editora</th><td>@Model.Book.Publisher</td></tr>
-                <tr><th>Edição</th><td>@Model.Book.Edition</td></tr>
-                <tr><th>Idioma</th><td>@Model.Book.Language</td></tr>
+                <tr><th>Idioma</th><td>@Model.Book.LanguageEnum</td></tr>
                 <tr><th>Páginas</th><td>@Model.Book.Pages</td></tr>
                 <tr><th>ISBN</th><td>@Model.Book.ISBN</td></tr>
-                <tr><th>Condição</th><td>@Model.Book.Condition</td></tr>
+                <tr><th>Condição</th><td>@Model.Book.ConditionEnum</td></tr>
                 <tr><th>Valor estimado</th><td>@Model.Book.EstimatedValue.ToString("C")</td></tr>
             </tbody>
         </table>
@@ -31,14 +57,14 @@ else
 
     <h2>Comentários</h2>
 
-    @if (!Model.Comments.Any())
+    @if (!Model.Comments.Items.Any())
     {
         <p>Nenhum comentário ainda.</p>
     }
     else
     {
-        <ul class="list-group mb-4">
-            @foreach (var comment in Model.Comments)
+        <ul class="list-group mb-2">
+            @foreach (var comment in Model.Comments.Items)
             {
                 <li class="list-group-item">
                     <strong>@comment.UserName</strong>
@@ -50,6 +76,23 @@ else
                 </li>
             }
         </ul>
+
+        @if (Model.Comments.TotalPages > 1)
+        {
+            <nav class="mb-4">
+                <ul class="pagination">
+                    <li class="page-item @(Model.Comments.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link" asp-page="/Feed/Details" asp-route-id="@Model.Book.Id" asp-route-slug="@Model.CanonicalSlug" asp-route-pageNumber="@(Model.PageNumber - 1)">Anterior</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Página @Model.Comments.PageNumber de @Model.Comments.TotalPages</span>
+                    </li>
+                    <li class="page-item @(Model.Comments.HasNextPage ? "" : "disabled")">
+                        <a class="page-link" asp-page="/Feed/Details" asp-route-id="@Model.Book.Id" asp-route-slug="@Model.CanonicalSlug" asp-route-pageNumber="@(Model.PageNumber + 1)">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+        }
     }
 
     @if (User.Identity?.IsAuthenticated == true)
@@ -59,7 +102,7 @@ else
             <div class="alert alert-danger">@Model.ErrorMessage</div>
         }
 
-        <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.Book.Id">
+        <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.Book.Id" asp-route-slug="@Model.CanonicalSlug">
             <div class="mb-3">
                 <label class="form-label">Comentário</label>
                 <textarea asp-for="NewCommentContent" class="form-control" rows="3"></textarea>

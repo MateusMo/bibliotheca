@@ -1,10 +1,10 @@
 {
     echo
          echo "=================================================="
-         echo "Ultima mensagem claude"
+         echo "Foco atual"
          echo "=================================================="
     
-        cat ultimamensagem_claude.txt
+        cat foco_atual.txt
 
     echo
      echo "=================================================="

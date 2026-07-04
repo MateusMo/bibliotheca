@@ -1,73 +1,11 @@
 
 ==================================================
-Ultima mensagem claude
+Foco atual
 ==================================================
-Ótimo! Aqui está o roadmap atualizado — o que falta, do mais fácil ao mais difícil:
-✅ Concluído
+#Foco Atual:
 
-Paginação do Feed (RNF-02)
-
-Próximas etapas
-2. Paginação de Autores e Comentários (fácil)
-
-AuthorRepository.SearchByNameAsync → retornar PagedResult<Author>
-CommentRepository.GetByUserIdAsync / GetByBookIdAsync → paginar
-Ajustar services e páginas correspondentes
-
-3. CollectionStatus (RF-05) (fácil-médio)
-
-Criar Enums/CollectionStatus.cs (Possuo, Lido, Lendo, QueroAdquirir, Emprestado, Vendido, Restaurando)
-Trocar Book.IsOwner (bool) por Book.Status (enum) — atinge Domain, Mapping, DTOs, Service, Views, Migration
-
-4. Campos que faltam no Book (RF-04) (médio)
-
-Adicionar: PlaceOfPublication, IsFirstEdition, IsAutographed, HasExLibris, Dedication, Notes, AcquisitionDate
-Atinge Domain, Mapping, DTOs, Service, Views, Migration
-
-5. CRUD de Autores no Web (médio)
-
-Hoje só existe Service/Repository — faltam as páginas Razor (Pages/Author/Index, Create, Edit)
-
-6. Biblioteca pública (RF-09) (médio)
-
-User.IsPublicLibrary (bool)
-Toggle na página de Perfil
-Nova página pública de biblioteca (com URL amigável/slug, não Guid — SEO)
-
-7. Recuperação de senha (RF-02) (médio)
-
-Pages/Account/ForgotPassword + ResetPassword
-Provavelmente precisa de token com expiração no User ou tabela própria
-
-8. Separar Work / Edition (RF-07, RF-08) (difícil — mudança estrutural)
-
-Quebrar o atual Book monolítico em Work (obra) + Edition (edição publicada) + o exemplar físico do usuário
-Reflete em quase todas as camadas: Domain, Mappings, Repositories, DTOs, Services, Views
-É a mudança mais invasiva do projeto — recomendo fazer por último e com migration cuidadosa (dados existentes precisam ser migrados, não só o schema)
-
-9. Avaliações / Ratings (RF-12) (médio, depende do #8)
-
-Nova entidade Rating ligada a Work/Edition
-
-10. Estatísticas e Índice Bibliotheca (RF-14, RF-15) (difícil — lógica de negócio nova)
-
-StatisticsService calculando: quantidade de livros/autores, livro mais antigo/recente, distribuição por século/idioma/editora/país, % primeiras edições, % autografados, evolução da coleção
-Índice Bibliotheca (fórmula de score 0-100) — precisa definir os pesos de cada fator
-Depende de #3, #4 e idealmente #8 estarem prontos primeiro
-
-11. Administração (RF-17) (difícil — nova área + segurança)
-
-User.IsAdmin + policy de autorização
-Área /Admin para moderar comentários, usuários, livros, autores
-
-12. Metatags dinâmicas e URLs amigáveis (SEO) (transversal, fazer aos poucos)
-
-Seção Meta no _Layout.cshtml
-Slugs em vez de Guid nas rotas de Feed/Details, perfil público, etc.
-
-13. Segurança de configuração (rápido, pode ser feito a qualquer momento)
-
-Mover a senha do MySQL de appsettings.json para dotnet user-secrets / variável de ambiente
+- Melhorar Urls e Uris para melhor ranqueamento aproveitando prorpeidades do livro (FEITO)
+- Ajustar o serviço, repository e interfaces considerando o novo objeto de book
 ==================================================
 Ideação do projeto
 ==================================================
@@ -490,6 +428,13 @@ mantendo tudo de forma responsiva.
 É preciso garantir que nenhuma senha ou informação sensível vaze nas uris e urls e ao mesmo tempo garantir o melhor SEO
 para indexação de resultados se aproveitando de detalhes descritivos nas urls e uris.
 
+Padrão de url atual ao listar livros:
+http://localhost:5014/Feed/Details/746aba21-d395-46be-a61d-005cd25dcfaf
+Esse padrão é simples demais.
+olha quantas propriedades eu tenho no objeto de livro.
+poderia adicionar nome, autor, ano etc na url para ficar mais amigável para os motores de busca. 
+Considere sempre ter as urls mais verbosas para o ranqueamento.
+
 - Metatags:
 
 É preciso adicionar metatags dinâmicas para cada resultado garantindo um melhor reconhecimento dos motores de busca
@@ -588,13 +533,13 @@ ESTRUTURA DO PROJETO
 │   ├── Bibliotheca.Domain.csproj
 │   ├── Domains
 │   │   ├── AbstractBase.cs
-│   │   ├── Author.cs
 │   │   ├── Book.cs
 │   │   ├── Comment.cs
 │   │   ├── Profile.cs
 │   │   └── User.cs
 │   └── Enums
-│       └── BookCondition.cs
+│       ├── BookConditionEnum.cs
+│       └── LanguageEnum.cs
 ├── Bibliotheca.Prompt
 │   └── Bibliotheca.Prompt.csproj
 ├── Bibliotheca.Web
@@ -632,6 +577,10 @@ ESTRUTURA DO PROJETO
 │   ├── Program.cs
 │   ├── Properties
 │   │   └── launchSettings.json
+│   ├── Seed
+│   │   └── DbSeeder.cs
+│   ├── Utils
+│   │   └── SlugHelper.cs
 │   └── wwwroot
 │       ├── css
 │       ├── js
@@ -649,7 +598,7 @@ ESTRUTURA DO PROJETO
 ├── Bibliotheca.Web.sln
 └── global.json
 
-48 directories, 100 files
+50 directories, 102 files
 
 
 ==================================================
@@ -803,7 +752,7 @@ public class BookService : BaseService, IBookService
             Pages = dto.Pages,
             Edition = dto.Edition,
             EstimatedValue = dto.EstimatedValue,
-            Condition = dto.Condition,
+            ConditionEnum = dto.ConditionEnum,
             Authors = authors,
             IsActive = true,
             CreatedAt = DateTimeOffset.UtcNow,
@@ -842,7 +791,7 @@ public class BookService : BaseService, IBookService
         book.Pages = dto.Pages;
         book.Edition = dto.Edition;
         book.EstimatedValue = dto.EstimatedValue;
-        book.Condition = dto.Condition;
+        book.ConditionEnum = dto.ConditionEnum;
         book.UpdatedAt = DateTimeOffset.UtcNow;
 
         book.Authors.Clear();
@@ -892,7 +841,7 @@ public class BookService : BaseService, IBookService
             Pages = book.Pages,
             Edition = book.Edition,
             EstimatedValue = book.EstimatedValue,
-            Condition = book.Condition
+            ConditionEnum = book.ConditionEnum
         };
     }
 }
@@ -940,6 +889,8 @@ public interface IAuthorService
     Task<ResponseDto<AuthorDto>> GetByIdAsync(Guid id);
 
     Task<ResponseDto<List<AuthorDto>>> GetAllAsync();
+
+    Task<ResponseDto<PagedResultDto<AuthorDto>>> SearchByNameAsync(string? name, int pageNumber, int pageSize);
 
     Task<ResponseDto<AuthorDto>> CreateAsync(CreateAuthorDto dto);
 
@@ -1115,6 +1066,36 @@ public class CommentService : BaseService, ICommentService
     {
         var comments = await _unitOfWork.Comments.GetByBookIdAsync(bookId);
         return Success(comments.Where(c => c.IsActive).Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<PagedResultDto<CommentDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize)
+    {
+        var paged = await _unitOfWork.Comments.GetByUserIdPagedAsync(userId, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<CommentDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
+    }
+
+    public async Task<ResponseDto<PagedResultDto<CommentDto>>> GetByBookIdPagedAsync(Guid bookId, int pageNumber, int pageSize)
+    {
+        var paged = await _unitOfWork.Comments.GetByBookIdPagedAsync(bookId, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<CommentDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
     }
 
     public async Task<ResponseDto<CommentDto>> CreateAsync(CreateCommentDto dto)
@@ -1341,6 +1322,10 @@ public interface ICommentService
     Task<ResponseDto<List<CommentDto>>> GetAllAsync();
     Task<ResponseDto<List<CommentDto>>> GetByUserIdAsync(Guid userId);
     Task<ResponseDto<List<CommentDto>>> GetByBookIdAsync(Guid bookId);
+
+    Task<ResponseDto<PagedResultDto<CommentDto>>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize);
+    Task<ResponseDto<PagedResultDto<CommentDto>>> GetByBookIdPagedAsync(Guid bookId, int pageNumber, int pageSize);
+
     Task<ResponseDto<CommentDto>> CreateAsync(CreateCommentDto dto);
     Task<ResponseDto<CommentDto>> UpdateAsync(UpdateCommentDto dto);
     Task<ResponseDto<bool>> DeleteAsync(Guid id);
@@ -1423,6 +1408,21 @@ public class AuthorService : BaseService, IAuthorService
     {
         var authors = await _unitOfWork.Authors.FindAllAsync(x => x.IsActive);
         return Success(authors.Select(ToDto).ToList());
+    }
+
+    public async Task<ResponseDto<PagedResultDto<AuthorDto>>> SearchByNameAsync(string? name, int pageNumber, int pageSize)
+    {
+        var paged = await _unitOfWork.Authors.SearchByNameAsync(name, pageNumber, pageSize);
+
+        var dto = new PagedResultDto<AuthorDto>
+        {
+            Items = paged.Items.Select(ToDto).ToList(),
+            PageNumber = paged.PageNumber,
+            PageSize = paged.PageSize,
+            TotalCount = paged.TotalCount
+        };
+
+        return Success(dto);
     }
 
     public async Task<ResponseDto<AuthorDto>> CreateAsync(CreateAuthorDto dto)
@@ -1621,7 +1621,7 @@ public class CreateBookDto
     public int Pages { get; set; }
     public string Edition { get; set; } = string.Empty;
     public decimal EstimatedValue { get; set; }
-    public BookCondition Condition { get; set; }
+    public BookConditionEnum ConditionEnum { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Book/UpdateBookDto.cs
@@ -1644,7 +1644,7 @@ public class UpdateBookDto
     public int Pages { get; set; }
     public string Edition { get; set; } = string.Empty;
     public decimal EstimatedValue { get; set; }
-    public BookCondition Condition { get; set; }
+    public BookConditionEnum ConditionEnum { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Book/BookDto.cs
@@ -1669,7 +1669,7 @@ public class BookDto : BaseDto
     public int Pages { get; set; }
     public string Edition { get; set; } = string.Empty;
     public decimal EstimatedValue { get; set; }
-    public BookCondition Condition { get; set; }
+    public BookConditionEnum ConditionEnum { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Book/BookFilterDto.cs
@@ -1684,7 +1684,7 @@ public class BookFilterDto
     public string? AuthorName { get; set; }
     public string? Language { get; set; }
     public string? Publisher { get; set; }
-    public BookCondition? Condition { get; set; }
+    public BookConditionEnum? Condition { get; set; }
     public int? YearFrom { get; set; }
     public int? YearTo { get; set; }
 }
@@ -3234,7 +3234,7 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
             .IsRequired()
             .HasColumnType("decimal(12,2)");
 
-        builder.Property(b => b.Condition)
+        builder.Property(b => b.ConditionEnum)
             .IsRequired()
             .HasConversion<string>()
             .HasMaxLength(20);
@@ -3279,6 +3279,7 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/ICommentRepository.cs
 ==================================================
 // Bibliotheca.Data/Repositories/Repositories/ICommentRepository.cs
+using Bibliotheca.Data.Repositories.Dto;
 using Bibliotheca.Domain.Domains;
 
 namespace Bibliotheca.Data.Repositories;
@@ -3288,6 +3289,10 @@ public interface ICommentRepository : IGenericRepository<Comment>
     Task<IEnumerable<Comment>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Comment>> GetByBookIdAsync(Guid bookId, CancellationToken cancellationToken = default);
+
+    Task<PagedResult<Comment>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+
+    Task<PagedResult<Comment>> GetByBookIdPagedAsync(Guid bookId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/BookRepository.cs
@@ -3339,7 +3344,7 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         if (!string.IsNullOrWhiteSpace(filter.Publisher))
             query = query.Where(b => b.Publisher.Contains(filter.Publisher));
         if (filter.Condition.HasValue)
-            query = query.Where(b => b.Condition == filter.Condition.Value);
+            query = query.Where(b => b.ConditionEnum == filter.Condition.Value);
         if (filter.YearFrom.HasValue)
             query = query.Where(b => b.PublicationYear >= filter.YearFrom.Value);
         if (filter.YearTo.HasValue)
@@ -3415,19 +3420,22 @@ public interface IUserRepository : IGenericRepository<User>
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IAuthorRepository.cs
 ==================================================
+using Bibliotheca.Data.Repositories.Dto;
 using Bibliotheca.Domain.Domains;
 
 namespace Bibliotheca.Data.Repositories;
 
 public interface IAuthorRepository : IGenericRepository<Author>
 {
-    Task<IEnumerable<Author>> SearchByNameAsync(string name, CancellationToken cancellationToken = default);
+    Task<PagedResult<Author>> SearchByNameAsync(string? name, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/AuthorRepository.cs
 ==================================================
 using Bibliotheca.Data.Context;
+using Bibliotheca.Data.Repositories.Dto;
 using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bibliotheca.Data.Repositories;
 
@@ -3437,8 +3445,35 @@ public class AuthorRepository : GenericRepository<Author>, IAuthorRepository
     {
     }
 
-    public Task<IEnumerable<Author>> SearchByNameAsync(string name, CancellationToken cancellationToken = default)
-        => FindAllAsync(a => a.Name.Contains(name), cancellationToken);
+    // name nulo/vazio retorna todos os autores ativos, paginados.
+    public async Task<PagedResult<Author>> SearchByNameAsync(
+        string? name, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var query = DbSet.AsNoTracking().Where(a => a.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(name))
+            query = query.Where(a => a.Name.Contains(name));
+
+        query = query.OrderBy(a => a.Name);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Author>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/ProfileRepository.cs
@@ -3492,6 +3527,7 @@ public interface IProfileRepository : IGenericRepository<Profile>
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/CommentRepository.cs
 ==================================================
 using Bibliotheca.Data.Context;
+using Bibliotheca.Data.Repositories.Dto;
 using Bibliotheca.Domain.Domains;
 using Microsoft.EntityFrameworkCore;
 
@@ -3513,6 +3549,60 @@ public class CommentRepository : GenericRepository<Comment>, ICommentRepository
             .OrderByDescending(c => c.CreatedAt)
             .ToListAsync(cancellationToken)
             .ContinueWith(t => (IEnumerable<Comment>)t.Result, cancellationToken);
+
+    public async Task<PagedResult<Comment>> GetByUserIdPagedAsync(
+        Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var query = DbSet.AsNoTracking()
+            .Include(c => c.Book)
+            .Where(c => c.UserId == userId && c.IsActive)
+            .OrderByDescending(c => c.CreatedAt);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Comment>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
+
+    public async Task<PagedResult<Comment>> GetByBookIdPagedAsync(
+        Guid bookId, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var query = DbSet.AsNoTracking()
+            .Include(c => c.User)
+            .Where(c => c.BookId == bookId && c.IsActive)
+            .OrderByDescending(c => c.CreatedAt);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+
+        var items = await query
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResult<Comment>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
+    }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/GenericRepository/IGenericRepository.cs
@@ -3712,7 +3802,7 @@ public class BookSearchFilter
     public string? AuthorName { get; set; }
     public string? Language { get; set; }
     public string? Publisher { get; set; }
-    public BookCondition? Condition { get; set; }
+    public BookConditionEnum? Condition { get; set; }
     public int? YearFrom { get; set; }
     public int? YearTo { get; set; }
 }
@@ -3876,18 +3966,18 @@ public class Book : AbstractBase
     public Guid UserId { get; set; }
     public bool IsOwner { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string Author { get; set; } = string.Empty;
+    public string Description { get; set; }
     public int PublicationYear { get; set; }
     public string[] Photos { get; set; } = [];
-    public string Language { get; set; } = string.Empty;
+    public LanguageEnum LanguageEnum { get; set; }
     public string Publisher { get; set; } = string.Empty;
     public string ISBN { get; set; } = string.Empty;
     public int Pages { get; set; }
-    public string Edition { get; set; } = string.Empty;
     public decimal EstimatedValue { get; set; }
-    public BookCondition Condition { get; set; }
+    public BookConditionEnum ConditionEnum { get; set; }
 
     public User User { get; set; } = null!;
-    public ICollection<Author> Authors { get; set; } = new List<Author>();
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 }
 ==================================================
@@ -3918,21 +4008,6 @@ public class AbstractBase
     public DateTimeOffset UpdatedAt { get; set; }
 }
 ==================================================
-ARQUIVO: Bibliotheca.Domain/Domains/Author.cs
-==================================================
-namespace Bibliotheca.Domain.Domains;
-
-public class Author : AbstractBase
-{
-    public string Photo { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public DateTime BirthDay { get; set; }
-    public DateTime? DeathDay { get; set; } 
-    public string Description { get; set; } = string.Empty;
-
-    public ICollection<Book> Books { get; set; } = new List<Book>();
-}
-==================================================
 ARQUIVO: Bibliotheca.Domain/Bibliotheca.Domain.csproj
 ==================================================
 ﻿<Project Sdk="Microsoft.NET.Sdk">
@@ -3946,11 +4021,11 @@ ARQUIVO: Bibliotheca.Domain/Bibliotheca.Domain.csproj
 </Project>
 
 ==================================================
-ARQUIVO: Bibliotheca.Domain/Enums/BookCondition.cs
+ARQUIVO: Bibliotheca.Domain/Enums/BookConditionEnum.cs
 ==================================================
 namespace Bibliotheca.Domain.Enums;
 
-public enum BookCondition
+public enum BookConditionEnum
 {
     Poor = 1,
     Fair = 2,
@@ -3958,6 +4033,344 @@ public enum BookCondition
     VeryGood = 4,
     Excellent = 5,
     Mint = 6
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Enums/LanguageEnum.cs
+==================================================
+namespace Bibliotheca.Domain.Enums;
+
+public enum LanguageEnum
+{
+    English = 1,
+    French = 2,
+    Spanish = 3,
+    Italian = 4,
+    Dutch = 5,
+    Polish = 6,
+    Portuguese = 7,
+    Russian = 8,
+    German = 9,
+    Latin = 10,
+    Greek = 11,
+    AncientGreek = 12,
+    Hebrew = 13,
+    Arabic = 14,
+    Chinese = 15,
+    Japanese = 16,
+    Sanskrit = 17,
+    Syriac = 18,
+    Aramaic = 19,
+    Czech = 20,
+    Hungarian = 21,
+    Romanian = 22,
+    Swedish = 23,
+    Danish = 24,
+    Norwegian = 25,
+    Other = 26
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Seed/DbSeeder.cs
+==================================================
+using Bibliotheca.Application.InfraServices;
+using Bibliotheca.Data.Context;
+using Bibliotheca.Domain.Domains;
+using Bibliotheca.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
+
+namespace Bibliotheca.Web.Seed;
+
+/// <summary>
+/// Popula o banco com dados fake para desenvolvimento.
+/// Idempotente: só roda se a tabela Users estiver vazia.
+/// Chamar apenas em ambiente Development (ver Program.cs).
+/// </summary>
+public static class DbSeeder
+{
+    private static readonly Random Rnd = new(20260701);
+
+    public static async Task SeedAsync(IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<BibliothecaContext>();
+        var crypto = scope.ServiceProvider.GetRequiredService<ICrypto>();
+
+        // Idempotência: se já existe pelo menos um usuário, assume que o seed já rodou.
+        if (await context.Users.AnyAsync())
+            return;
+
+        var authors = BuildAuthors();
+        await context.Authors.AddRangeAsync(authors);
+
+        var users = BuildUsers(crypto, 25);
+        await context.Users.AddRangeAsync(users);
+
+        var profiles = BuildProfiles(users);
+        await context.Profiles.AddRangeAsync(profiles);
+
+        var books = BuildBooks(users, authors, 150);
+        await context.Books.AddRangeAsync(books);
+
+        var comments = BuildComments(users, books, 350);
+        await context.Comments.AddRangeAsync(comments);
+
+        await context.SaveChangesAsync();
+    }
+
+    // ---------------------------------------------------------------
+    // AUTHORS
+    // ---------------------------------------------------------------
+    private static List<Author> BuildAuthors()
+    {
+        // (Nome, AnoNascimento, AnoMorte-ou-null)
+        var raw = new (string Name, int Birth, int? Death)[]
+        {
+            ("Machado de Assis", 1839, 1908),
+            ("Clarice Lispector", 1920, 1977),
+            ("Jorge Amado", 1912, 2001),
+            ("João Guimarães Rosa", 1908, 1967),
+            ("Carlos Drummond de Andrade", 1902, 1987),
+            ("Cecília Meireles", 1901, 1964),
+            ("Graciliano Ramos", 1892, 1953),
+            ("José de Alencar", 1829, 1877),
+            ("Lima Barreto", 1881, 1922),
+            ("Euclides da Cunha", 1866, 1909),
+            ("Fernando Pessoa", 1888, 1935),
+            ("José Saramago", 1922, 2010),
+            ("Eça de Queirós", 1845, 1900),
+            ("Luís de Camões", 1524, 1580),
+            ("Miguel de Cervantes", 1547, 1616),
+            ("Gabriel García Márquez", 1927, 2014),
+            ("Jorge Luis Borges", 1899, 1986),
+            ("Pablo Neruda", 1904, 1973),
+            ("Julio Cortázar", 1914, 1984),
+            ("Victor Hugo", 1802, 1885),
+            ("Honoré de Balzac", 1799, 1850),
+            ("Gustave Flaubert", 1821, 1880),
+            ("Marcel Proust", 1871, 1922),
+            ("Charles Dickens", 1812, 1870),
+            ("Jane Austen", 1775, 1817),
+            ("Virginia Woolf", 1882, 1941),
+            ("Franz Kafka", 1883, 1924),
+            ("Fiódor Dostoiévski", 1821, 1881),
+            ("Liev Tolstói", 1828, 1910),
+            ("Anton Tchekhov", 1860, 1904),
+            ("Oscar Wilde", 1854, 1900),
+            ("Edgar Allan Poe", 1809, 1849),
+            ("Herman Melville", 1819, 1891),
+            ("Mark Twain", 1835, 1910),
+            ("Emily Dickinson", 1830, 1886),
+            ("Walt Whitman", 1819, 1892),
+            ("Dante Alighieri", 1265, 1321),
+            ("Johann Wolfgang von Goethe", 1749, 1832),
+            ("Friedrich Nietzsche", 1844, 1900),
+            ("Miguel Torga", 1907, 1995)
+        };
+
+        return raw.Select(a => new Author
+        {
+            Id = Guid.NewGuid(),
+            Name = a.Name,
+            Photo = string.Empty,
+            BirthDay = new DateTime(a.Birth, 1, 1),
+            DeathDay = a.Death.HasValue ? new DateTime(a.Death.Value, 1, 1) : null,
+            Description = $"{a.Name} é um autor(a) de referência na literatura, com obras amplamente estudadas e colecionadas.",
+            IsActive = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        }).ToList();
+    }
+
+    // ---------------------------------------------------------------
+    // USERS
+    // ---------------------------------------------------------------
+    private static readonly string[] FirstNames =
+    {
+        "Mateus", "Ana", "Pedro", "Beatriz", "Lucas", "Mariana", "Rafael", "Camila",
+        "Gabriel", "Larissa", "Thiago", "Fernanda", "Bruno", "Juliana", "Felipe",
+        "Patrícia", "André", "Carolina", "Diego", "Renata", "Vinícius", "Aline",
+        "Rodrigo", "Isabela", "Gustavo"
+    };
+
+    private static readonly string[] LastNames =
+    {
+        "Silva", "Souza", "Oliveira", "Santos", "Pereira", "Costa", "Rodrigues",
+        "Almeida", "Nascimento", "Carvalho", "Gomes", "Martins", "Araújo", "Melo",
+        "Barbosa", "Ribeiro", "Cardoso", "Teixeira", "Moreira", "Correia"
+    };
+
+    private static List<User> BuildUsers(ICrypto crypto, int count)
+    {
+        var passwordHash = crypto.HashPassword("Teste123!");
+        var users = new List<User>();
+
+        for (var i = 0; i < count; i++)
+        {
+            var first = FirstNames[i % FirstNames.Length];
+            var last = LastNames[Rnd.Next(LastNames.Length)];
+            var name = $"{first} {last}";
+
+            users.Add(new User
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Email = $"{first.ToLowerInvariant()}.{last.ToLowerInvariant()}{i}@bibliotheca.dev",
+                Password = passwordHash,
+                IsActive = true,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-Rnd.Next(1, 400)),
+                UpdatedAt = DateTimeOffset.UtcNow
+            });
+        }
+
+        return users;
+    }
+
+    // ---------------------------------------------------------------
+    // PROFILES
+    // ---------------------------------------------------------------
+    private static readonly string[] Bios =
+    {
+        "Colecionador apaixonado por primeiras edições.",
+        "Bibliófilo há mais de 20 anos, focado em literatura brasileira.",
+        "Pesquisador universitário interessado em edições raras.",
+        "Sebista aposentado, ainda garimpando exemplares antigos.",
+        "Leitor voraz e colecionador de clássicos da literatura mundial.",
+        "Guarda a biblioteca da família há três gerações."
+    };
+
+    private static List<Profile> BuildProfiles(List<User> users)
+    {
+        return users.Select(u => new Profile
+        {
+            Id = Guid.NewGuid(),
+            UserId = u.Id,
+            Description = Bios[Rnd.Next(Bios.Length)],
+            Contact = $"contato+{u.Name.Split(' ')[0].ToLowerInvariant()}@bibliotheca.dev",
+            IsActive = true,
+            CreatedAt = u.CreatedAt,
+            UpdatedAt = DateTimeOffset.UtcNow
+        }).ToList();
+    }
+
+    // ---------------------------------------------------------------
+    // BOOKS
+    // ---------------------------------------------------------------
+    private static readonly string[] TitlePrefix =
+    {
+        "A Sombra", "O Silêncio", "Cartas", "Memórias", "O Último Capítulo",
+        "A Casa", "O Jardim", "Confissões", "A Travessia", "O Enigma",
+        "Diário", "A Rosa", "O Espelho", "Sonhos", "A Viagem", "O Tempo",
+        "Fragmentos", "A Cidade", "O Labirinto", "Ecos"
+    };
+
+    private static readonly string[] TitleSuffix =
+    {
+        "do Vento", "da Noite", "de um Sonhador", "Perdidas", "do Mar",
+        "Esquecida", "Secreto", "de um Louco", "Interrompida", "Eterno",
+        "Íntimo", "Vermelha", "Quebrado", "Adiados", "ao Fim do Mundo",
+        "Suspenso", "do Passado", "Invisível", "sem Saída", "Distantes"
+    };
+
+    private static readonly string[] Publishers =
+    {
+        "Companhia das Letras", "Editora Globo", "Record", "Rocco",
+        "Nova Fronteira", "Martins Fontes", "Editora 34", "Cosac Naify",
+        "Penguin Companhia", "Todavia", "Autêntica", "Editora Zahar",
+        "Editora Ática", "Objetiva", "Alfaguara", "Bertrand Brasil"
+    };
+
+    private static readonly string[] Languages =
+        { "Português", "Inglês", "Espanhol", "Francês", "Italiano", "Alemão" };
+
+    private static readonly string[] Editions =
+        { "1ª edição", "2ª edição", "3ª edição", "Edição de bolso", "Edição comemorativa", "Edição fac-símile" };
+
+    private static List<Book> BuildBooks(List<User> users, List<Author> authors, int count)
+    {
+        var books = new List<Book>();
+
+        for (var i = 0; i < count; i++)
+        {
+            var name = $"{TitlePrefix[Rnd.Next(TitlePrefix.Length)]} {TitleSuffix[Rnd.Next(TitleSuffix.Length)]}";
+
+            var authorCount = Rnd.Next(1, 3); // 1 ou 2 autores
+            var bookAuthors = authors.OrderBy(_ => Rnd.Next()).Take(authorCount).ToList();
+
+            var book = new Book
+            {
+                Id = Guid.NewGuid(),
+                UserId = users[Rnd.Next(users.Count)].Id,
+                IsOwner = Rnd.Next(0, 10) > 1, // ~80% possui de fato
+                Name = name,
+                PublicationYear = Rnd.Next(1850, 2026),
+                Photos = Array.Empty<string>(),
+                Language = Languages[Rnd.Next(Languages.Length)],
+                Publisher = Publishers[Rnd.Next(Publishers.Length)],
+                ISBN = $"978-65-{i:D4}-{Rnd.Next(100, 999)}-{Rnd.Next(0, 9)}",
+                Pages = Rnd.Next(80, 900),
+                Edition = Editions[Rnd.Next(Editions.Length)],
+                EstimatedValue = Math.Round((decimal)(Rnd.NextDouble() * 980 + 20), 2),
+                ConditionEnum = (BookConditionEnum)Rnd.Next(1, 7),
+                IsActive = true,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-Rnd.Next(1, 400)),
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+
+            // UserId precisa bater com o User da lista, então buscamos a entidade de fato
+            // para popular User (evita null-ref caso algo dependa da navegação em memória).
+            book.User = users.First(u => u.Id == book.UserId);
+
+            foreach (var author in bookAuthors)
+                book.Authors.Add(author);
+
+            books.Add(book);
+        }
+
+        return books;
+    }
+
+    // ---------------------------------------------------------------
+    // COMMENTS
+    // ---------------------------------------------------------------
+    private static readonly string[] CommentTemplates =
+    {
+        "Exemplar impecável, adorei os detalhes da encadernação.",
+        "Tenho uma edição parecida, mas com a capa diferente. Muito bonito!",
+        "Já procuro essa edição há anos, que inveja boa!",
+        "A conservação está excelente para a idade do livro.",
+        "Você sabe se essa é realmente a primeira tiragem?",
+        "Parabéns pelo cuidado com o acervo!",
+        "Esse exemplar tem alguma dedicatória?",
+        "Comprei um parecido em um sebo ano passado.",
+        "Edição rara, poucos exemplares circulando hoje em dia.",
+        "Ótima aquisição, o valor de mercado só tende a subir."
+    };
+
+    private static List<Comment> BuildComments(List<User> users, List<Book> books, int count)
+    {
+        var comments = new List<Comment>();
+
+        for (var i = 0; i < count; i++)
+        {
+            var book = books[Rnd.Next(books.Count)];
+            var user = users[Rnd.Next(users.Count)];
+
+            comments.Add(new Comment
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                User = user,
+                BookId = book.Id,
+                Book = book,
+                Content = CommentTemplates[Rnd.Next(CommentTemplates.Length)],
+                Link = Rnd.Next(0, 5) == 0 ? "https://exemplo.com/referencia" : string.Empty,
+                IsActive = true,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(-Rnd.Next(1, 300)),
+                UpdatedAt = DateTimeOffset.UtcNow
+            });
+        }
+
+        return comments;
+    }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Web/Pages/_ViewImports.cshtml
@@ -3968,10 +4381,32 @@ ARQUIVO: Bibliotheca.Web/Pages/_ViewImports.cshtml
 ==================================================
 ARQUIVO: Bibliotheca.Web/Pages/Feed/Details.cshtml
 ==================================================
-@page "{id:guid}"
+@page "{id:guid}/{slug?}"
 @model Bibliotheca.Web.Pages.Feed.DetailsModel
 @{
-    ViewData["Title"] = Model.Book?.Name ?? "Livro";
+    ViewData["Title"] = Model.Book is null
+        ? "Livro não encontrado"
+        : $"{Model.Book.Name} ({Model.Book.PublicationYear}) — {string.Join(", ", Model.Book.AuthorNames)}";
+
+    if (Model.Book is not null)
+    {
+        ViewData["MetaDescription"] =
+            $"{Model.Book.Name}, de {string.Join(", ", Model.Book.AuthorNames)}. " +
+            $"Edição {Model.Book.Edition}, publicado em {Model.Book.PublicationYear} pela {Model.Book.Publisher}. " +
+            $"Estado de conservação: {Model.Book.ConditionEnum}.";
+
+        ViewData["OgType"] = "book";
+        ViewData["CanonicalUrl"] = Url.PageLink("/Feed/Details", values: new
+        {
+            id = Model.Book.Id,
+            slug = Bibliotheca.Web.Utils.SlugHelper.BuildBookSlug(Model.Book.Name, Model.Book.AuthorNames, Model.Book.PublicationYear)
+        });
+
+        if (Model.Book.Photos.Length > 0)
+        {
+            ViewData["OgImage"] = Model.Book.Photos[0];
+        }
+    }
 }
 
 @if (Model.Book is null)
@@ -3991,7 +4426,7 @@ else
                 <tr><th>Idioma</th><td>@Model.Book.Language</td></tr>
                 <tr><th>Páginas</th><td>@Model.Book.Pages</td></tr>
                 <tr><th>ISBN</th><td>@Model.Book.ISBN</td></tr>
-                <tr><th>Condição</th><td>@Model.Book.Condition</td></tr>
+                <tr><th>Condição</th><td>@Model.Book.ConditionEnum</td></tr>
                 <tr><th>Valor estimado</th><td>@Model.Book.EstimatedValue.ToString("C")</td></tr>
             </tbody>
         </table>
@@ -4001,14 +4436,14 @@ else
 
     <h2>Comentários</h2>
 
-    @if (!Model.Comments.Any())
+    @if (!Model.Comments.Items.Any())
     {
         <p>Nenhum comentário ainda.</p>
     }
     else
     {
-        <ul class="list-group mb-4">
-            @foreach (var comment in Model.Comments)
+        <ul class="list-group mb-2">
+            @foreach (var comment in Model.Comments.Items)
             {
                 <li class="list-group-item">
                     <strong>@comment.UserName</strong>
@@ -4020,6 +4455,23 @@ else
                 </li>
             }
         </ul>
+
+        @if (Model.Comments.TotalPages > 1)
+        {
+            <nav class="mb-4">
+                <ul class="pagination">
+                    <li class="page-item @(Model.Comments.HasPreviousPage ? "" : "disabled")">
+                        <a class="page-link" asp-page="/Feed/Details" asp-route-id="@Model.Book.Id" asp-route-slug="@Model.CanonicalSlug" asp-route-pageNumber="@(Model.PageNumber - 1)">Anterior</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Página @Model.Comments.PageNumber de @Model.Comments.TotalPages</span>
+                    </li>
+                    <li class="page-item @(Model.Comments.HasNextPage ? "" : "disabled")">
+                        <a class="page-link" asp-page="/Feed/Details" asp-route-id="@Model.Book.Id" asp-route-slug="@Model.CanonicalSlug" asp-route-pageNumber="@(Model.PageNumber + 1)">Próxima</a>
+                    </li>
+                </ul>
+            </nav>
+        }
     }
 
     @if (User.Identity?.IsAuthenticated == true)
@@ -4029,7 +4481,7 @@ else
             <div class="alert alert-danger">@Model.ErrorMessage</div>
         }
 
-        <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.Book.Id">
+        <form method="post" asp-page-handler="AddComment" asp-route-id="@Model.Book.Id" asp-route-slug="@Model.CanonicalSlug">
             <div class="mb-3">
                 <label class="form-label">Comentário</label>
                 <textarea asp-for="NewCommentContent" class="form-control" rows="3"></textarea>
@@ -4116,7 +4568,7 @@ public class IndexModel : PageModel
     public PagedResultDto<BookDto> Books { get; set; } = new();
 
     public List<SelectListItem> ConditionOptions { get; } =
-        Enum.GetValues<BookCondition>()
+        Enum.GetValues<BookConditionEnum>()
             .Select(c => new SelectListItem(c.ToString(), c.ToString()))
             .ToList();
     
@@ -4142,7 +4594,9 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Details.cshtml.cs
 using System.Security.Claims;
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Dtos.Comment;
+using Bibliotheca.Application.Dtos.Common;
 using Bibliotheca.Application.Services;
+using Bibliotheca.Web.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -4152,6 +4606,8 @@ namespace Bibliotheca.Web.Pages.Feed;
 [AllowAnonymous]
 public class DetailsModel : PageModel
 {
+    private const int CommentsPageSize = 10;
+
     private readonly IBookService _bookService;
     private readonly ICommentService _commentService;
 
@@ -4162,7 +4618,14 @@ public class DetailsModel : PageModel
     }
 
     public BookDto? Book { get; set; }
-    public List<CommentDto> Comments { get; set; } = [];
+    public PagedResultDto<CommentDto> Comments { get; set; } = new();
+
+    // Slug canônico do livro carregado, usado nos links da view (paginação, form de comentário)
+    // para já sair apontando pra URL certa e evitar um redirect extra.
+    public string CanonicalSlug { get; set; } = string.Empty;
+
+    [BindProperty(SupportsGet = true)]
+    public int PageNumber { get; set; } = 1;
 
     [BindProperty]
     public string NewCommentContent { get; set; } = string.Empty;
@@ -4172,22 +4635,32 @@ public class DetailsModel : PageModel
 
     public string? ErrorMessage { get; set; }
 
-    public async Task<IActionResult> OnGetAsync(Guid id)
+    public async Task<IActionResult> OnGetAsync(Guid id, string? slug)
     {
         var bookResult = await _bookService.GetByIdAsync(id);
         if (!bookResult.IsSuccess || bookResult.Data is null)
             return NotFound();
 
         Book = bookResult.Data;
+        CanonicalSlug = SlugHelper.BuildBookSlug(Book.Name, Book.AuthorNames, Book.PublicationYear);
 
-        var commentsResult = await _commentService.GetByBookIdAsync(id);
-        Comments = commentsResult.Data ?? [];
+        // Slug ausente ou desatualizado -> 301 para a URL canônica (bom para SEO,
+        // evita conteúdo duplicado e mantém links antigos funcionando).
+        if (!string.Equals(slug, CanonicalSlug, StringComparison.Ordinal))
+        {
+            return RedirectToPagePermanent(
+                pageName: "/Feed/Details",
+                routeValues: new { id, slug = CanonicalSlug });
+        }
+
+        var commentsResult = await _commentService.GetByBookIdPagedAsync(id, PageNumber, CommentsPageSize);
+        Comments = commentsResult.Data ?? new PagedResultDto<CommentDto>();
 
         return Page();
     }
 
     // Create de comentário exige usuário logado, validado pelo cookie de autenticação.
-    public async Task<IActionResult> OnPostAddCommentAsync(Guid id)
+    public async Task<IActionResult> OnPostAddCommentAsync(Guid id, string? slug)
     {
         if (User.Identity?.IsAuthenticated != true)
             return Challenge();
@@ -4199,7 +4672,7 @@ public class DetailsModel : PageModel
         if (string.IsNullOrWhiteSpace(NewCommentContent))
         {
             ErrorMessage = "Escreva um comentário antes de enviar.";
-            return await OnGetAsync(id);
+            return await OnGetAsync(id, slug);
         }
 
         var result = await _commentService.CreateAsync(new CreateCommentDto
@@ -4213,10 +4686,13 @@ public class DetailsModel : PageModel
         if (!result.IsSuccess)
         {
             ErrorMessage = result.Message;
-            return await OnGetAsync(id);
+            return await OnGetAsync(id, slug);
         }
 
-        return RedirectToPage(new { id });
+        // Comentários são ordenados do mais novo pro mais antigo, então o comentário
+        // recém-criado sempre aparece na página 1. Reaproveita o slug já resolvido
+        // pelo form (via asp-route-slug) pra não gerar um redirect 301 extra.
+        return RedirectToPage(new { id, slug });
     }
 }
 ==================================================
@@ -4584,9 +5060,9 @@ ARQUIVO: Bibliotheca.Web/Pages/Profile/Books/Create.cshtml
             <input asp-for="Input.EstimatedValue" class="form-control"/>
         </div>
         <div class="col-md-4 mb-3">
-            <label asp-for="Input.Condition" class="form-label">Condição</label>
-            <select asp-for="Input.Condition" class="form-select">
-                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookCondition>())
+            <label asp-for="Input.ConditionEnum" class="form-label">Condição</label>
+            <select asp-for="Input.ConditionEnum" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookConditionEnum>())
                 {
                     <option value="@value">@value</option>
                 }
@@ -4669,7 +5145,7 @@ public class CreateModel : PageModel
             Pages = Input.Pages,
             Edition = Input.Edition,
             EstimatedValue = Input.EstimatedValue,
-            Condition = Input.Condition
+            ConditionEnum = Input.ConditionEnum
         });
 
         if (!result.IsSuccess)
@@ -4730,7 +5206,7 @@ public class BookInputModel
     public decimal EstimatedValue { get; set; }
 
     [Required]
-    public BookCondition Condition { get; set; } = BookCondition.Good;
+    public BookConditionEnum ConditionEnum { get; set; } = BookConditionEnum.Good;
 
     public string[] ParsePhotos()
         => string.IsNullOrWhiteSpace(PhotosText)
@@ -4822,9 +5298,9 @@ ARQUIVO: Bibliotheca.Web/Pages/Profile/Books/Edit.cshtml
             <input asp-for="Input.EstimatedValue" class="form-control"/>
         </div>
         <div class="col-md-4 mb-3">
-            <label asp-for="Input.Condition" class="form-label">Condição</label>
-            <select asp-for="Input.Condition" class="form-select">
-                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookCondition>())
+            <label asp-for="Input.ConditionEnum" class="form-label">Condição</label>
+            <select asp-for="Input.ConditionEnum" class="form-select">
+                @foreach (var value in Enum.GetValues<Bibliotheca.Domain.Enums.BookConditionEnum>())
                 {
                     <option value="@value">@value</option>
                 }
@@ -4901,7 +5377,7 @@ public class EditModel : PageModel
             Pages = book.Pages,
             Edition = book.Edition,
             EstimatedValue = book.EstimatedValue,
-            Condition = book.Condition
+            ConditionEnum = book.ConditionEnum
         };
 
         await LoadAuthorsAsync();
@@ -4935,7 +5411,7 @@ public class EditModel : PageModel
             Pages = Input.Pages,
             Edition = Input.Edition,
             EstimatedValue = Input.EstimatedValue,
-            Condition = Input.Condition
+            ConditionEnum = Input.ConditionEnum
         });
 
         if (!result.IsSuccess)
@@ -5264,6 +5740,7 @@ using Bibliotheca.Application.InfraServices;
 using Bibliotheca.Application.Services;
 using Bibliotheca.Data.Context;
 using Bibliotheca.Data.Uow;
+using Bibliotheca.Web.Seed;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -5304,7 +5781,19 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+// Em desenvolvimento: aplica migrations pendentes e popula o banco com dados
+// fake (só roda se a tabela Users estiver vazia — ver DbSeeder.SeedAsync).
+if (app.Environment.IsDevelopment())
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<BibliothecaContext>();
+        await context.Database.MigrateAsync();
+    }
+
+    await DbSeeder.SeedAsync(app.Services);
+}
+else
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
@@ -5321,6 +5810,75 @@ app.MapRazorPages()
     .WithStaticAssets();
 
 app.Run();
+==================================================
+ARQUIVO: Bibliotheca.Web/Utils/SlugHelper.cs
+==================================================
+// Bibliotheca.Web/Utils/SlugHelper.cs
+using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Bibliotheca.Web.Utils;
+
+public static class SlugHelper
+{
+    public static string GenerateSlug(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return string.Empty;
+
+        // Remove acentos
+        var normalized = input.Normalize(NormalizationForm.FormD);
+        var sb = new StringBuilder();
+        foreach (var c in normalized)
+        {
+            if (CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                sb.Append(c);
+        }
+
+        var slug = sb.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant();
+        slug = Regex.Replace(slug, @"[^a-z0-9\s-]", "");
+        slug = Regex.Replace(slug, @"\s+", "-").Trim('-');
+        slug = Regex.Replace(slug, @"-+", "-");
+
+        // Evita URLs gigantes
+        return slug.Length > 80 ? slug[..80].TrimEnd('-') : slug;
+    }
+
+    /// <summary>
+    /// Slug canônico do livro: título + primeiro autor + ano + ISBN (quando existir).
+    /// Ex.: "a-sombra-do-vento-machado-de-assis-1899-978651234567"
+    /// ISBN entra por último e sem hífens/pontuação própria, pra não conflitar
+    /// com a normalização do slug nem virar um número "quebrado" na URL.
+    /// </summary>
+    public static string BuildBookSlug(
+        string name,
+        IEnumerable<string> authorNames,
+        int publicationYear,
+        string? isbn = null)
+    {
+        var firstAuthor = authorNames.FirstOrDefault();
+        var parts = new List<string> { name };
+
+        if (!string.IsNullOrWhiteSpace(firstAuthor))
+            parts.Add(firstAuthor);
+
+        if (publicationYear > 0)
+            parts.Add(publicationYear.ToString());
+
+        var slug = GenerateSlug(string.Join(" ", parts));
+
+        if (!string.IsNullOrWhiteSpace(isbn))
+        {
+            // Mantém só dígitos do ISBN (remove hífens/traços que ele já tem por padrão)
+            var isbnDigits = Regex.Replace(isbn, @"[^0-9Xx]", "");
+            if (!string.IsNullOrEmpty(isbnDigits))
+                slug = $"{slug}-{isbnDigits}";
+        }
+
+        return slug;
+    }
+}
 ==================================================
 ARQUIVO: Bibliotheca.Web/appsettings.json
 ==================================================

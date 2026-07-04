@@ -54,7 +54,7 @@ else
                     <a asp-page="/Feed/Details" asp-route-id="@book.Id">
                         <strong>@book.Name</strong>
                     </a>
-                    <span class="text-muted"> — @string.Join(", ", book.AuthorNames) (@book.PublicationYear)</span>
+                    <span class="text-muted"> — @book.Author (@book.PublicationYear)</span>
                 </div>
                 <div>
                     <a asp-page="/Profile/Books/Edit" asp-route-id="@book.Id" class="btn btn-outline-secondary btn-sm">Editar</a>
