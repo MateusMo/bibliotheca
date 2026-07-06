@@ -32,10 +32,10 @@
     
     echo
                  echo "=================================================="
-                 echo "FrontEnd Padrão"
+                 echo "Padrão de projeto"
                  echo "=================================================="
     
-    cat frontend_definitions.txt        
+    cat padrao_projeto.txt        
     
     echo
      echo "=================================================="

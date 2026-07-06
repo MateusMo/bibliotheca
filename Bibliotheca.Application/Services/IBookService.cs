@@ -13,4 +13,5 @@ public interface IBookService
     Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto);
     Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto);
     Task<ResponseDto<bool>> DeleteAsync(Guid id);
+    Task<ResponseDto<bool>> RegisterViewAsync(Guid id);
 }

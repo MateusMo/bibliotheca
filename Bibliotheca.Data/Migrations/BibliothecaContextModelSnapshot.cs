@@ -92,18 +92,37 @@ namespace Bibliotheca.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
+                    b.Property<long>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
                     b.HasKey("Id");
 
                     b.HasIndex("Author");
+
+                    b.HasIndex("ConditionEnum");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("EstimatedValue");
 
                     b.HasIndex("ISBN")
                         .IsUnique();
 
                     b.HasIndex("IsActive");
 
+                    b.HasIndex("LanguageEnum");
+
                     b.HasIndex("Name");
 
+                    b.HasIndex("Pages");
+
+                    b.HasIndex("PublicationYear");
+
                     b.HasIndex("UserId");
+
+                    b.HasIndex("ViewCount");
 
                     b.ToTable("Books", (string)null);
                 });

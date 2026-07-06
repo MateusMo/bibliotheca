@@ -5,8 +5,26 @@ Sem Flag (Feito) -> Precisa fazer agora.
 - Melhorar Urls e Uris para melhor ranqueamento aproveitando prorpeidades do livro (FEITO)
 - Ajustar o serviço, repository e interfaces considerando o novo objeto de book (FEITO)
 - No Feed precisa listar mais informações como a data de criação do livro, o numero de fotos. 
-a paginação precisa ser mais amigável dando mais opções de navegação Anterior 1,2,3 ... 8,9,10 Proximo (algo assim).
-É preciso ainda adicoinar um filtro de livros no feed pensando sempre no maior desempenho possível. 
-Deve ser possível filtrar por texto (back vai procurar pelo autor, nome do livro, isbn), por ano de publicação, 
-pela data que foi adicionado na plafatorma, pelo numero de páginas, pelo enum de linguas, pelo enum de estado de conservação,
-pelo valor estimado (faça isso com a melhor ux/ui possível assim com o melhor desempenho possível)
+    a paginação precisa ser mais amigável dando mais opções de navegação Anterior 1,2,3 ... 8,9,10 Proximo (algo assim).
+    É preciso ainda adicoinar um filtro de livros no feed pensando sempre no maior desempenho possível. 
+    Deve ser possível filtrar por texto (back vai procurar pelo autor, nome do livro, isbn), por ano de publicação, 
+    pela data que foi adicionado na plafatorma, pelo numero de páginas, pelo enum de linguas, pelo enum de estado de conservação,
+    pelo valor estimado (faça isso com a melhor ux/ui possível assim com o melhor desempenho possível) (FEITO)
+    
+- Adicionar contagem de visualizações por livro (nova propriedade long (ViewCount), adicionar no filtro a opção de ordenar pelos mais vistos. (FEITO)
+- Novo dominio adicionado (ProfileScore) 1 perfil tem 1 profile score e 1 profile score tem 1 perfil. O profile score é a base que o algoritmo de busca
+vai carregar o feed. 
+
+public int TotalBooksAverageYear { get; set; } --Soma a idade de todos os livros do usuário e tira a média dos anos dos livros
+    public int TotalViews { get; set; } -- total de visualizações de todos os livros
+    public int TotalYearsOnline { get; set; } -- ano atual - data que a conta foi criada
+    public int TotalScore { get; set; } -- pontuação total do perfil
+    (preciso criar uma forma de ponderar esses valores para que os perfis mais pontuados sejam exibidos primeiro)
+    O calculo vale apenas para os livros marcado como public bool IsOwner { get; set; } no author.
+    (Não vi essa opção para marcar na hora de adicionar um livro) (FAZER)
+  
+  - Classe library criada, um usuário pode ter muitas libraries porém uma librarie pode ter apenas um usuário.
+    precisa fazer serviço, repositório, adicionar no uow etc.
+    Precisa ainda fazer o front. A tela onde uma library é criada é no profile, então deve haver um crud lá com a opção de adicionar o titulo da librarie, a descrição 
+    e associar os livros. Uma library pode ter apenas os livros do próprio usuário.
+    O Feed deve ter a uma opção de listar books ou librarie

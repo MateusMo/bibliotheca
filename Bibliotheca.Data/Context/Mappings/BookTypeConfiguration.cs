@@ -40,7 +40,6 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
             .IsRequired()
             .HasMaxLength(300);
 
-        // Autor agora é texto livre digitado pelo próprio usuário no cadastro do livro.
         builder.Property(b => b.Author)
             .IsRequired()
             .HasMaxLength(300);
@@ -51,7 +50,6 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
         builder.Property(b => b.PublicationYear)
             .IsRequired();
 
-        // Mantém o nome de coluna "Language" pra não gerar rename desnecessário na migration.
         builder.Property(b => b.LanguageEnum)
             .IsRequired()
             .HasConversion<string>()
@@ -82,18 +80,31 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
                 photos => JsonSerializer.Serialize(photos, (JsonSerializerOptions?)null),
                 json => JsonSerializer.Deserialize<string[]>(json, (JsonSerializerOptions?)null) ?? Array.Empty<string>())
             .HasColumnType("json");
+        
+        builder.Property(b => b.ViewCount)
+            .IsRequired()
+            .HasDefaultValue(0L);
 
         builder.HasIndex(b => b.IsActive);
         builder.HasIndex(b => b.Name);
         builder.HasIndex(b => b.Author);
         builder.HasIndex(b => b.ISBN).IsUnique();
         builder.HasIndex(b => b.UserId);
+        builder.HasIndex(b => b.ViewCount);
+
+        // Índices para os filtros do Feed (ano, data de cadastro, páginas,
+        // valor, idioma e condição são todos comparações exatas/faixa,
+        // que se beneficiam de índice — diferente da busca textual por Contains).
+        builder.HasIndex(b => b.PublicationYear);
+        builder.HasIndex(b => b.CreatedAt);
+        builder.HasIndex(b => b.Pages);
+        builder.HasIndex(b => b.EstimatedValue);
+        builder.HasIndex(b => b.LanguageEnum);
+        builder.HasIndex(b => b.ConditionEnum);
 
         builder.HasOne(b => b.User)
             .WithMany(u => u.Books)
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Restrict);
-
-        // Sem mais HasMany/BookAuthors — a tabela de junção deixa de existir.
     }
 }

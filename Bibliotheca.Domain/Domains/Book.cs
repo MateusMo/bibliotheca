@@ -17,6 +17,7 @@ public class Book : AbstractBase
     public int Pages { get; set; }
     public decimal EstimatedValue { get; set; }
     public BookConditionEnum ConditionEnum { get; set; }
+    public long ViewCount { get; set; }
 
     public User User { get; set; } = null!;
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();

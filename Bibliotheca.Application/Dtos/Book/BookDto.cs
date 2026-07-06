@@ -18,4 +18,5 @@ public class BookDto : BaseDto
     public int Pages { get; set; }
     public decimal EstimatedValue { get; set; }
     public BookConditionEnum ConditionEnum { get; set; }
+    public long ViewCount { get; set; }
 }

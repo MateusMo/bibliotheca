@@ -1,35 +1,166 @@
 @page
 @model Bibliotheca.Web.Pages.Feed.IndexModel
+@{
+    ViewData["Title"] = "Feed — Bibliotheca";
+}
+
+<h1 class="mb-3">Feed</h1>
+
+<form method="get" class="row g-3 mb-4 border rounded p-3">
+    <div class="col-md-4">
+        <label asp-for="Filter.SearchText" class="form-label">Buscar</label>
+        <input asp-for="Filter.SearchText" class="form-control" placeholder="Título, autor ou ISBN"/>
+    </div>
+
+    <div class="col-6 col-md-2">
+        <label asp-for="Filter.Language" class="form-label">Idioma</label>
+        <select asp-for="Filter.Language" asp-items="Model.LanguageOptions" class="form-select">
+            <option value="">Todos</option>
+        </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+        <label asp-for="Filter.Condition" class="form-label">Condição</label>
+        <select asp-for="Filter.Condition" asp-items="Model.ConditionOptions" class="form-select">
+            <option value="">Todas</option>
+        </select>
+    </div>
+
+    <div class="col-6 col-md-2">
+        <label asp-for="Filter.YearFrom" class="form-label">Ano de</label>
+        <input asp-for="Filter.YearFrom" class="form-control"/>
+    </div>
+    <div class="col-6 col-md-2">
+        <label asp-for="Filter.YearTo" class="form-label">Ano até</label>
+        <input asp-for="Filter.YearTo" class="form-control"/>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <label asp-for="Filter.AddedFrom" class="form-label">Adicionado de</label>
+        <input asp-for="Filter.AddedFrom" type="date" class="form-control"/>
+    </div>
+    <div class="col-6 col-md-3">
+        <label asp-for="Filter.AddedTo" class="form-label">Adicionado até</label>
+        <input asp-for="Filter.AddedTo" type="date" class="form-control"/>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <label asp-for="Filter.PagesFrom" class="form-label">Páginas de</label>
+        <input asp-for="Filter.PagesFrom" class="form-control"/>
+    </div>
+    <div class="col-6 col-md-3">
+        <label asp-for="Filter.PagesTo" class="form-label">Páginas até</label>
+        <input asp-for="Filter.PagesTo" class="form-control"/>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <label asp-for="Filter.ValueFrom" class="form-label">Valor de</label>
+        <input asp-for="Filter.ValueFrom" class="form-control"/>
+    </div>
+    <div class="col-6 col-md-3">
+        <label asp-for="Filter.ValueTo" class="form-label">Valor até</label>
+        <input asp-for="Filter.ValueTo" class="form-control"/>
+    </div>
+    
+    <div class="col-6 col-md-2">
+        <label asp-for="Filter.SortBy" class="form-label">Ordenar por</label>
+        <select asp-for="Filter.SortBy" asp-items="Model.SortOptions" class="form-select"></select>
+    </div>
+
+    <div class="col-12 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a asp-page="/Feed/Index" class="btn btn-outline-secondary">Limpar filtros</a>
+    </div>
+</form>
+
+<p class="text-muted">@Model.Books.TotalCount livro(s) encontrado(s)</p>
 
 @if (!Model.Books.Items.Any())
 {
-    <p>Nenhum livro encontrado.</p>
+    <p>Nenhum livro encontrado com esses filtros.</p>
 }
 else
 {
-    <ul class="list-group">
+    <ul class="list-group mb-3">
         @foreach (var book in Model.Books.Items)
         {
             <li class="list-group-item">
-                <a asp-page="/Feed/Details" asp-route-id="@book.Id"><strong>@book.Name</strong></a>
-                <span class="text-muted"> — @book.Author (@book.PublicationYear)</span>
+                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
+                    <div>
+                        <a asp-page="/Feed/Details" asp-route-id="@book.Id"><strong>@book.Name</strong></a>
+                        <div class="text-muted">@book.Author — @book.PublicationYear</div>
+                    </div>
+                    <div class="text-muted small text-md-end">
+                        <div>Adicionado em @book.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
+                        <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum</div>
+                    </div>
+                    <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum · @book.ViewCount visualizaç@(book.ViewCount == 1 ? "ão" : "ões")</div>
+                </div>
             </li>
         }
     </ul>
 
     @if (Model.Books.TotalPages > 1)
     {
-        <nav>
-            <ul class="pagination">
-                <li class="page-item @(Model.Books.HasPreviousPage ? "" : "disabled")">
-                    <a class="page-link" asp-page="/Feed/Index" asp-all-route-data="@Model.RouteValuesForPage(Model.PageNumber - 1)">Anterior</a>
-                </li>
-                <li class="page-item disabled">
-                    <span class="page-link">Página @Model.Books.PageNumber de @Model.Books.TotalPages</span>
-                </li>
-                <li class="page-item @(Model.Books.HasNextPage ? "" : "disabled")">
-                    <a class="page-link" asp-page="/Feed/Index" asp-all-route-data="@Model.RouteValuesForPage(Model.PageNumber + 1)">Próxima</a>
-                </li>
+        <nav aria-label="Paginação de livros">
+            <ul class="pagination flex-wrap">
+
+                @if (Model.Books.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-page="/Feed/Index"
+                           asp-all-route-data="@(Model.RouteValuesForPage(Model.PageNumber - 1))">
+                            « Anterior
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">« Anterior</span>
+                    </li>
+                }
+
+                @foreach (var page in Model.GetPageNumbers())
+                {
+                    if (!page.HasValue)
+                    {
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+
+                        continue;
+                    }
+
+                    var isActive = page.Value == Model.Books.PageNumber;
+
+                    <li class="page-item @(isActive ? "active" : null)">
+                        <a class="page-link"
+                           asp-page="/Feed/Index"
+                           asp-all-route-data="@(Model.RouteValuesForPage(page.Value))">
+                            @(page).Value
+                        </a>
+                    </li>
+                }
+
+                @if (Model.Books.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link"
+                           asp-page="/Feed/Index"
+                           asp-all-route-data="@(Model.RouteValuesForPage(Model.PageNumber + 1))">
+                            Próxima »
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li class="page-item disabled">
+                        <span class="page-link">Próxima »</span>
+                    </li>
+                }
+
             </ul>
         </nav>
     }

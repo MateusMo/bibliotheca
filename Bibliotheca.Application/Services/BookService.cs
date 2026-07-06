@@ -36,18 +36,34 @@ public class BookService : BaseService, IBookService
         var books = await _unitOfWork.Books.GetByUserIdAsync(userId);
         return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
     }
+    
+    public async Task<ResponseDto<bool>> RegisterViewAsync(Guid id)
+    {
+        var exists = await _unitOfWork.Books.ExistsAsync(b => b.Id == id && b.IsActive);
+        if (!exists)
+            return Failure<bool>("Book not found", 404);
 
+        await _unitOfWork.Books.IncrementViewCountAsync(id);
+
+        return Success(true);
+    }
+    
     public async Task<ResponseDto<PagedResultDto<BookDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize)
     {
         var searchFilter = new BookSearchFilter
         {
-            Name = filter.Name,
-            AuthorName = filter.AuthorName,
-            Language = filter.Language,
-            Publisher = filter.Publisher,
-            Condition = filter.Condition,
+            SearchText = filter.SearchText,
             YearFrom = filter.YearFrom,
-            YearTo = filter.YearTo
+            YearTo = filter.YearTo,
+            AddedFrom = filter.AddedFrom,
+            AddedTo = filter.AddedTo,
+            PagesFrom = filter.PagesFrom,
+            PagesTo = filter.PagesTo,
+            Language = filter.Language,
+            Condition = filter.Condition,
+            ValueFrom = filter.ValueFrom,
+            ValueTo = filter.ValueTo,
+            SortBy = filter.SortBy
         };
 
         var paged = await _unitOfWork.Books.SearchPagedAsync(searchFilter, pageNumber, pageSize);

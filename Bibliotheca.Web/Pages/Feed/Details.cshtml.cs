@@ -47,7 +47,17 @@ public class DetailsModel : PageModel
             return NotFound();
 
         Book = bookResult.Data;
+        
         CanonicalSlug = SlugHelper.BuildBookSlug(Book.Name, Book.Author, Book.PublicationYear);
+
+        if (!string.Equals(slug, CanonicalSlug, StringComparison.Ordinal))
+        {
+            return RedirectToPagePermanent(
+                pageName: "/Feed/Details",
+                routeValues: new { id, slug = CanonicalSlug });
+        }
+
+        await _bookService.RegisterViewAsync(id);
 
         if (!string.Equals(slug, CanonicalSlug, StringComparison.Ordinal))
         {
