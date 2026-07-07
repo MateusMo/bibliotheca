@@ -9,10 +9,12 @@ namespace Bibliotheca.Application.Services;
 public class BookService : BaseService, IBookService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IProfileScoreService _profileScoreService;
 
-    public BookService(IUnitOfWork unitOfWork)
+    public BookService(IUnitOfWork unitOfWork,IProfileScoreService profileScoreService)
     {
         _unitOfWork = unitOfWork;
+        _profileScoreService = profileScoreService;
     }
 
     public async Task<ResponseDto<BookDto>> GetByIdAsync(Guid id)
@@ -39,11 +41,18 @@ public class BookService : BaseService, IBookService
     
     public async Task<ResponseDto<bool>> RegisterViewAsync(Guid id)
     {
-        var exists = await _unitOfWork.Books.ExistsAsync(b => b.Id == id && b.IsActive);
-        if (!exists)
+        var book = await _unitOfWork.Books.GetByIdAsync(id);
+        if (book is null || !book.IsActive)
             return Failure<bool>("Book not found", 404);
 
         await _unitOfWork.Books.IncrementViewCountAsync(id);
+
+        // Recalcula a pontuação do dono do livro a cada view. Trade-off ciente:
+        // isso adiciona uma consulta agregada por visualização. Se o tráfego do
+        // Feed crescer muito, mover este recálculo para um job assíncrono/fila
+        // é o próximo passo natural, em vez de rodar de forma síncrona aqui.
+        if (book.IsOwner)
+            await _profileScoreService.RecalculateAsync(book.UserId);
 
         return Success(true);
     }
@@ -63,7 +72,7 @@ public class BookService : BaseService, IBookService
             Condition = filter.Condition,
             ValueFrom = filter.ValueFrom,
             ValueTo = filter.ValueTo,
-            SortBy = filter.SortBy
+            SortBy = filter.SortBy,
         };
 
         var paged = await _unitOfWork.Books.SearchPagedAsync(searchFilter, pageNumber, pageSize);
@@ -119,7 +128,9 @@ public class BookService : BaseService, IBookService
 
         await _unitOfWork.Books.AddAsync(book);
         await _unitOfWork.SaveChangesAsync();
-
+        await _profileScoreService.RecalculateAsync(book.UserId);
+        
+        
         return Success(ToDto(book), "Book created successfully", 201);
     }
 
@@ -145,7 +156,10 @@ public class BookService : BaseService, IBookService
         book.UpdatedAt = DateTimeOffset.UtcNow;
 
         _unitOfWork.Books.Update(book);
+        await _profileScoreService.RecalculateAsync(book.UserId);
         await _unitOfWork.SaveChangesAsync();
+        await _profileScoreService.RecalculateAsync(book.UserId);
+        
 
         return Success(ToDto(book), "Book updated successfully");
     }
@@ -162,6 +176,8 @@ public class BookService : BaseService, IBookService
 
         _unitOfWork.Books.Update(book);
         await _unitOfWork.SaveChangesAsync();
+        await _profileScoreService.RecalculateAsync(book.UserId);
+        
 
         return Success(true, "Book removed successfully");
     }
@@ -185,7 +201,10 @@ public class BookService : BaseService, IBookService
             ISBN = book.ISBN,
             Pages = book.Pages,
             EstimatedValue = book.EstimatedValue,
-            ConditionEnum = book.ConditionEnum
+            ConditionEnum = book.ConditionEnum,
+            ViewCount = book.ViewCount,
+            UserName = book.User?.Name ?? string.Empty,
+            ProfileScore = book.User?.Profile?.ProfileScore?.TotalScore ?? 0
         };
     }
 }

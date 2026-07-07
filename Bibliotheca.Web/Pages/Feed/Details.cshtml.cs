@@ -47,7 +47,6 @@ public class DetailsModel : PageModel
             return NotFound();
 
         Book = bookResult.Data;
-        
         CanonicalSlug = SlugHelper.BuildBookSlug(Book.Name, Book.Author, Book.PublicationYear);
 
         if (!string.Equals(slug, CanonicalSlug, StringComparison.Ordinal))
@@ -58,13 +57,6 @@ public class DetailsModel : PageModel
         }
 
         await _bookService.RegisterViewAsync(id);
-
-        if (!string.Equals(slug, CanonicalSlug, StringComparison.Ordinal))
-        {
-            return RedirectToPagePermanent(
-                pageName: "/Feed/Details",
-                routeValues: new { id, slug = CanonicalSlug });
-        }
 
         var commentsResult = await _commentService.GetByBookIdPagedAsync(id, PageNumber, CommentsPageSize);
         Comments = commentsResult.Data ?? new PagedResultDto<CommentDto>();

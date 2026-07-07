@@ -13,6 +13,7 @@ public class BibliothecaContext : DbContext
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<ProfileScore> ProfileScores => Set<ProfileScore>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

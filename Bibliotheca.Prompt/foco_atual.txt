@@ -21,10 +21,13 @@ public int TotalBooksAverageYear { get; set; } --Soma a idade de todos os livros
     public int TotalScore { get; set; } -- pontuação total do perfil
     (preciso criar uma forma de ponderar esses valores para que os perfis mais pontuados sejam exibidos primeiro)
     O calculo vale apenas para os livros marcado como public bool IsOwner { get; set; } no author.
-    (Não vi essa opção para marcar na hora de adicionar um livro) (FAZER)
+    (Não vi essa opção para marcar na hora de adicionar um livro) (FEITO)
+    
+    -Exibir o profile score na listagem do feed de livros de cada usuário assim como adicionar o nome do usuário na listagem
+     Exibir o profile score também na area de dados pessoais do profile (FEITO)
   
   - Classe library criada, um usuário pode ter muitas libraries porém uma librarie pode ter apenas um usuário.
     precisa fazer serviço, repositório, adicionar no uow etc.
     Precisa ainda fazer o front. A tela onde uma library é criada é no profile, então deve haver um crud lá com a opção de adicionar o titulo da librarie, a descrição 
     e associar os livros. Uma library pode ter apenas os livros do próprio usuário.
-    O Feed deve ter a uma opção de listar books ou librarie
+    O Feed deve ter a uma opção de listar books ou librarie (FAZER)

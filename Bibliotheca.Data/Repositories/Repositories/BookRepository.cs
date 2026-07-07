@@ -25,18 +25,24 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
                 setters => setters.SetProperty(b => b.ViewCount, b => b.ViewCount + 1),
                 cancellationToken);
     }
-    
+
+    // Include de User -> Profile -> ProfileScore: uma única query com JOINs,
+    // necessária pra exibir nome do dono e pontuação do perfil na listagem
+    // sem cair em N+1 (uma consulta de perfil por livro).
+    private IQueryable<Book> QueryWithOwnerInfo()
+        => DbSet.AsNoTracking()
+            .Include(b => b.User)
+                .ThenInclude(u => u.Profile)
+                    .ThenInclude(p => p!.ProfileScore);
+
     public async Task<PagedResult<Book>> SearchPagedAsync(
         BookSearchFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
         if (pageNumber < 1) pageNumber = 1;
         if (pageSize < 1) pageSize = 10;
 
-        var query = DbSet.AsNoTracking().Where(b => b.IsActive);
+        var query = QueryWithOwnerInfo().Where(b => b.IsActive);
 
-        // Busca livre: título, autor ou ISBN. Contains vira LIKE '%texto%' —
-        // não usa índice B-Tree por causa do wildcard à esquerda, mas é o
-        // trade-off aceitável para busca textual sem infra de full-text ainda.
         if (!string.IsNullOrWhiteSpace(filter.SearchText))
         {
             var text = filter.SearchText.Trim();
@@ -51,8 +57,6 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         if (filter.YearTo.HasValue)
             query = query.Where(b => b.PublicationYear <= filter.YearTo.Value);
 
-        // Faixa de data de cadastro. Normaliza para o início/fim do dia em UTC
-        // pra "Adicionado até 04/07/2026" incluir o dia inteiro, não só 00:00.
         if (filter.AddedFrom.HasValue)
         {
             var from = new DateTimeOffset(DateTime.SpecifyKind(filter.AddedFrom.Value.Date, DateTimeKind.Utc));
@@ -81,7 +85,6 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         if (filter.ValueTo.HasValue)
             query = query.Where(b => b.EstimatedValue <= filter.ValueTo.Value);
 
-        // Feed mostra os mais recentes primeiro.
         query = filter.SortBy switch
         {
             BookSortOptionEnum.MostViewed => query.OrderByDescending(b => b.ViewCount),
@@ -100,7 +103,7 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         if (pageNumber < 1) pageNumber = 1;
         if (pageSize < 1) pageSize = 10;
 
-        var query = DbSet.AsNoTracking()
+        var query = QueryWithOwnerInfo()
             .Where(b => b.UserId == userId && b.IsActive)
             .OrderByDescending(b => b.CreatedAt);
 
@@ -118,5 +121,21 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
             PageSize = pageSize,
             TotalCount = totalCount
         };
+    }
+
+    public async Task<BookOwnershipStats> GetOwnershipStatsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var stats = await DbSet.AsNoTracking()
+            .Where(b => b.UserId == userId && b.IsActive && b.IsOwner)
+            .GroupBy(b => 1)
+            .Select(g => new BookOwnershipStats
+            {
+                OwnedBooksCount = g.Count(),
+                AveragePublicationYear = (int)g.Average(b => b.PublicationYear),
+                TotalViews = g.Sum(b => b.ViewCount)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return stats ?? new BookOwnershipStats();
     }
 }

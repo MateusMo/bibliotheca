@@ -89,12 +89,14 @@ else
                     <div>
                         <a asp-page="/Feed/Details" asp-route-id="@book.Id"><strong>@book.Name</strong></a>
                         <div class="text-muted">@book.Author — @book.PublicationYear</div>
+                        <div class="text-muted small">
+                            por <strong>@book.UserName</strong> · pontuação do perfil: @book.ProfileScore
+                        </div>
                     </div>
                     <div class="text-muted small text-md-end">
                         <div>Adicionado em @book.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
-                        <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum</div>
+                        <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum · @book.ViewCount visualizaç@(book.ViewCount == 1 ? "ão" : "ões")</div>
                     </div>
-                    <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum · @book.ViewCount visualizaç@(book.ViewCount == 1 ? "ão" : "ões")</div>
                 </div>
             </li>
         }

@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.ProfileScore;
 using Bibliotheca.Application.Dtos.User;
 using Bibliotheca.Application.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -17,18 +18,19 @@ public class IndexModel : PageModel
 
     private readonly IUserService _userService;
     private readonly IBookService _bookService;
+    private readonly IProfileScoreService _profileScoreService;
 
-    public IndexModel(IUserService userService, IBookService bookService)
+    public IndexModel(IUserService userService, IBookService bookService, IProfileScoreService profileScoreService)
     {
         _userService = userService;
         _bookService = bookService;
+        _profileScoreService = profileScoreService;
     }
 
     public UserDto? Account { get; set; }
     public PagedResultDto<BookDto> Books { get; set; } = new();
+    public ProfileScoreDto? Score { get; set; }
 
-    // Página atual da lista de livros. SupportsGet faz funcionar tanto
-    // em ?pageNumber=2 quanto em forms (delete) que mandam de volta a mesma página.
     [BindProperty(SupportsGet = true)]
     public int PageNumber { get; set; } = 1;
 
@@ -43,9 +45,6 @@ public class IndexModel : PageModel
         await LoadAsync();
     }
 
-    // Atualiza só o nome. Email nunca é aceito aqui de propósito — mesmo que
-    // alguém adultere o form no navegador, o valor enviado é ignorado: usamos
-    // o e-mail atual vindo do banco, não o que vier do POST.
     public async Task<IActionResult> OnPostUpdateNameAsync()
     {
         if (!ModelState.IsValid)
@@ -76,7 +75,6 @@ public class IndexModel : PageModel
         return RedirectToPage(new { PageNumber });
     }
 
-    // Exclusão (soft) de livro. Confirma posse antes de remover.
     public async Task<IActionResult> OnPostDeleteBookAsync(Guid id)
     {
         var bookResult = await _bookService.GetByIdAsync(id);
@@ -100,6 +98,9 @@ public class IndexModel : PageModel
 
         var booksResult = await _bookService.GetByUserIdPagedAsync(CurrentUserId, PageNumber, PageSize);
         Books = booksResult.Data ?? new PagedResultDto<BookDto>();
+
+        var scoreResult = await _profileScoreService.GetByUserIdAsync(CurrentUserId);
+        Score = scoreResult.Data;
     }
 
     private Guid CurrentUserId => Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);

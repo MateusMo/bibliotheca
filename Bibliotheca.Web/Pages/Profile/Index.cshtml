@@ -33,6 +33,21 @@
     </div>
 </form>
 
+@if (Model.Score is not null)
+{
+    <p class="mb-3">
+        <strong>Pontuação do perfil:</strong> @Model.Score.TotalScore/100
+        <span class="text-muted">
+            (média de @Model.Score.TotalBooksAverageYear · @Model.Score.TotalViews visualizaç@(Model.Score.TotalViews == 1 ? "ão" : "ões") ·
+            @Model.Score.TotalYearsOnline ano@(Model.Score.TotalYearsOnline == 1 ? "" : "s") na plataforma)
+        </span>
+    </p>
+}
+else
+{
+    <p class="text-muted mb-3">Pontuação do perfil ainda não calculada — cadastre um livro marcado como "Você possui este livro" para gerar a primeira nota.</p>
+}
+
 <hr/>
 
 <div class="d-flex justify-content-between align-items-center">

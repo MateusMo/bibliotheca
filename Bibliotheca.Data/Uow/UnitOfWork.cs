@@ -13,12 +13,14 @@ public class UnitOfWork : IUnitOfWork
     private ICommentRepository? _comments;
     private IProfileRepository? _profiles;
     private IUserRepository? _users;
+    private IProfileScoreRepository? _profileScores;
+    
 
     public UnitOfWork(BibliothecaContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
-
+    public IProfileScoreRepository ProfileScores => _profileScores ??= new ProfileScoreRepository(_context);
     public IBookRepository Books => _books ??= new BookRepository(_context);
     public ICommentRepository Comments => _comments ??= new CommentRepository(_context);
     public IProfileRepository Profiles => _profiles ??= new ProfileRepository(_context);

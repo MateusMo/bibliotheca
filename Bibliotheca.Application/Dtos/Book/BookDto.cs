@@ -19,4 +19,6 @@ public class BookDto : BaseDto
     public decimal EstimatedValue { get; set; }
     public BookConditionEnum ConditionEnum { get; set; }
     public long ViewCount { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public int ProfileScore { get; set; }
 }

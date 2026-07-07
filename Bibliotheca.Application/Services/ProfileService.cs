@@ -9,7 +9,6 @@ namespace Bibliotheca.Application.Services;
 public class ProfileService : BaseService, IProfileService
 {
     private readonly IUnitOfWork _unitOfWork;
-
     public ProfileService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;

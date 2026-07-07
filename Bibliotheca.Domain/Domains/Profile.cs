@@ -7,4 +7,5 @@ public class Profile : AbstractBase
     public string Contact { get; set; } = string.Empty;
 
     public User User { get; set; } = null!;
+    public ProfileScore? ProfileScore { get; set; }
 }

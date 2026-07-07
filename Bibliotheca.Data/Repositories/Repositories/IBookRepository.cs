@@ -9,4 +9,5 @@ public interface IBookRepository : IGenericRepository<Book>
     Task<PagedResult<Book>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<PagedResult<Book>> SearchPagedAsync(BookSearchFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task IncrementViewCountAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<BookOwnershipStats> GetOwnershipStatsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 }

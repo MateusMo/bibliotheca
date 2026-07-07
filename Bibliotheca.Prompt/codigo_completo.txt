@@ -15,7 +15,7 @@ Sem Flag (Feito) -> Precisa fazer agora.
     pela data que foi adicionado na plafatorma, pelo numero de páginas, pelo enum de linguas, pelo enum de estado de conservação,
     pelo valor estimado (faça isso com a melhor ux/ui possível assim com o melhor desempenho possível) (FEITO)
     
-- Adicionar contagem de visualizações por livro (nova propriedade long (ViewCount), adicionar no filtro a opção de ordenar pelos mais vistos. (FAZER)
+- Adicionar contagem de visualizações por livro (nova propriedade long (ViewCount), adicionar no filtro a opção de ordenar pelos mais vistos. (FEITO)
 - Novo dominio adicionado (ProfileScore) 1 perfil tem 1 profile score e 1 profile score tem 1 perfil. O profile score é a base que o algoritmo de busca
 vai carregar o feed. 
 
@@ -25,7 +25,10 @@ public int TotalBooksAverageYear { get; set; } --Soma a idade de todos os livros
     public int TotalScore { get; set; } -- pontuação total do perfil
     (preciso criar uma forma de ponderar esses valores para que os perfis mais pontuados sejam exibidos primeiro)
     O calculo vale apenas para os livros marcado como public bool IsOwner { get; set; } no author.
-    (Não vi essa opção para marcar na hora de adicionar um livro) (FAZER)
+    (Não vi essa opção para marcar na hora de adicionar um livro) (FEITO)
+    
+    -Exibir o profile score na listagem do feed de livros de cada usuário assim como adicionar o nome do usuário na listagem
+     Exibir o profile score também na area de dados pessoais do profile (FAZER)
   
   - Classe library criada, um usuário pode ter muitas libraries porém uma librarie pode ter apenas um usuário.
     precisa fazer serviço, repositório, adicionar no uow etc.
@@ -504,6 +507,8 @@ ESTRUTURA DO PROJETO
 │   │   │   ├── CreateProfileDto.cs
 │   │   │   ├── ProfileDto.cs
 │   │   │   └── UpdateProfileDto.cs
+│   │   ├── ProfileScore
+│   │   │   └── ProfileScoreDto.cs
 │   │   └── User
 │   │       ├── CreateUserDto.cs
 │   │       ├── UpdateUserDto.cs
@@ -520,8 +525,10 @@ ESTRUTURA DO PROJETO
 │       ├── IAuthService.cs
 │       ├── IBookService.cs
 │       ├── ICommentService.cs
+│       ├── IProfileScoreService.cs
 │       ├── IProfileService.cs
 │       ├── IUserService.cs
+│       ├── ProfileScoreService.cs
 │       ├── ProfileService.cs
 │       └── UserService.cs
 ├── Bibliotheca.Data
@@ -531,6 +538,7 @@ ESTRUTURA DO PROJETO
 │   │   └── Mappings
 │   │       ├── BookTypeConfiguration.cs
 │   │       ├── CommentTypeConfiguration.cs
+│   │       ├── ProfileScoreTypeConfiguration.cs
 │   │       ├── ProfileTypeConfiguration.cs
 │   │       └── UserTypeConfiguration.cs
 │   ├── Migrations
@@ -540,9 +548,14 @@ ESTRUTURA DO PROJETO
 │   │   ├── 20260704195743_RemoveAuthorEntityAdjustBookFields.Designer.cs
 │   │   ├── 20260704202653_AddBookFilterIndexes.cs
 │   │   ├── 20260704202653_AddBookFilterIndexes.Designer.cs
+│   │   ├── 20260706194008_AddBookViewCount.cs
+│   │   ├── 20260706194008_AddBookViewCount.Designer.cs
+│   │   ├── 20260706235513_AddProfileScore.cs
+│   │   ├── 20260706235513_AddProfileScore.Designer.cs
 │   │   └── BibliothecaContextModelSnapshot.cs
 │   ├── Repositories
 │   │   ├── Dto
+│   │   │   ├── BookOwnershipStats.cs
 │   │   │   ├── BookSearchFilter.cs
 │   │   │   └── PagedResult.cs
 │   │   ├── GenericRepository
@@ -554,8 +567,10 @@ ESTRUTURA DO PROJETO
 │   │       ├── IBookRepository.cs
 │   │       ├── ICommentRepository.cs
 │   │       ├── IProfileRepository.cs
+│   │       ├── IProfileScoreRepository.cs
 │   │       ├── IUserRepository.cs
 │   │       ├── ProfileRepository.cs
+│   │       ├── ProfileScoreRepository.cs
 │   │       └── UserRepository.cs
 │   └── Uow
 │       ├── IUnitOfWork.cs
@@ -572,6 +587,7 @@ ESTRUTURA DO PROJETO
 │   │   └── User.cs
 │   └── Enums
 │       ├── BookConditionEnum.cs
+│       ├── BookSortOptionEnum.cs
 │       └── LanguageEnum.cs
 ├── Bibliotheca.Prompt
 │   └── Bibliotheca.Prompt.csproj
@@ -631,7 +647,7 @@ ESTRUTURA DO PROJETO
 ├── Bibliotheca.Web.sln
 └── global.json
 
-49 directories, 100 files
+50 directories, 112 files
 
 
 ==================================================
@@ -683,10 +699,12 @@ namespace Bibliotheca.Application.Services;
 public class BookService : BaseService, IBookService
 {
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IProfileScoreService _profileScoreService;
 
-    public BookService(IUnitOfWork unitOfWork)
+    public BookService(IUnitOfWork unitOfWork,IProfileScoreService profileScoreService)
     {
         _unitOfWork = unitOfWork;
+        _profileScoreService = profileScoreService;
     }
 
     public async Task<ResponseDto<BookDto>> GetByIdAsync(Guid id)
@@ -710,7 +728,25 @@ public class BookService : BaseService, IBookService
         var books = await _unitOfWork.Books.GetByUserIdAsync(userId);
         return Success(books.Where(b => b.IsActive).Select(ToDto).ToList());
     }
+    
+    public async Task<ResponseDto<bool>> RegisterViewAsync(Guid id)
+    {
+        var book = await _unitOfWork.Books.GetByIdAsync(id);
+        if (book is null || !book.IsActive)
+            return Failure<bool>("Book not found", 404);
 
+        await _unitOfWork.Books.IncrementViewCountAsync(id);
+
+        // Recalcula a pontuação do dono do livro a cada view. Trade-off ciente:
+        // isso adiciona uma consulta agregada por visualização. Se o tráfego do
+        // Feed crescer muito, mover este recálculo para um job assíncrono/fila
+        // é o próximo passo natural, em vez de rodar de forma síncrona aqui.
+        if (book.IsOwner)
+            await _profileScoreService.RecalculateAsync(book.UserId);
+
+        return Success(true);
+    }
+    
     public async Task<ResponseDto<PagedResultDto<BookDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize)
     {
         var searchFilter = new BookSearchFilter
@@ -725,7 +761,8 @@ public class BookService : BaseService, IBookService
             Language = filter.Language,
             Condition = filter.Condition,
             ValueFrom = filter.ValueFrom,
-            ValueTo = filter.ValueTo
+            ValueTo = filter.ValueTo,
+            SortBy = filter.SortBy,
         };
 
         var paged = await _unitOfWork.Books.SearchPagedAsync(searchFilter, pageNumber, pageSize);
@@ -781,7 +818,9 @@ public class BookService : BaseService, IBookService
 
         await _unitOfWork.Books.AddAsync(book);
         await _unitOfWork.SaveChangesAsync();
-
+        await _profileScoreService.RecalculateAsync(book.UserId);
+        
+        
         return Success(ToDto(book), "Book created successfully", 201);
     }
 
@@ -807,7 +846,10 @@ public class BookService : BaseService, IBookService
         book.UpdatedAt = DateTimeOffset.UtcNow;
 
         _unitOfWork.Books.Update(book);
+        await _profileScoreService.RecalculateAsync(book.UserId);
         await _unitOfWork.SaveChangesAsync();
+        await _profileScoreService.RecalculateAsync(book.UserId);
+        
 
         return Success(ToDto(book), "Book updated successfully");
     }
@@ -824,6 +866,8 @@ public class BookService : BaseService, IBookService
 
         _unitOfWork.Books.Update(book);
         await _unitOfWork.SaveChangesAsync();
+        await _profileScoreService.RecalculateAsync(book.UserId);
+        
 
         return Success(true, "Book removed successfully");
     }
@@ -847,7 +891,147 @@ public class BookService : BaseService, IBookService
             ISBN = book.ISBN,
             Pages = book.Pages,
             EstimatedValue = book.EstimatedValue,
-            ConditionEnum = book.ConditionEnum
+            ConditionEnum = book.ConditionEnum,
+            ViewCount = book.ViewCount
+        };
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/ProfileScoreService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.ProfileScore;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Application.Services;
+
+public class ProfileScoreService : BaseService, IProfileScoreService
+{
+    // Pesos e tetos de normalização do algoritmo de pontuação de perfil.
+    // Cada componente é normalizado para uma escala de 0 a 100 antes de
+    // entrar na média ponderada, para que nenhuma métrica domine as outras
+    // apenas por ter uma ordem de grandeza maior (ex.: views vs. anos).
+    //
+    // Regra de negócio (ProfileScore):
+    // - Antiguidade da coleção (peso 35%): quanto mais antiga a média de
+    //   publicação dos livros IsOwner=true do usuário, maior a pontuação.
+    //   Teto: 200 anos de "idade média" já vale nota máxima (100).
+    // - Visualizações (peso 25%): soma do ViewCount dos livros IsOwner=true,
+    //   em escala logarítmica (log10), para que perfis muito virais não
+    //   dominem o ranking de forma desproporcional. Teto: 100.000 views
+    //   somadas já vale nota máxima (100).
+    // - Tempo de conta (peso 15%): anos desde a criação da conta. Teto: 10
+    //   anos já vale nota máxima (100).
+    // - Quantidade de livros IsOwner=true (peso 25%): tamanho da coleção
+    //   "de posse comprovada". Teto: 300 livros já vale nota máxima (100).
+    // O cálculo considera exclusivamente livros com IsOwner=true — livros
+    // apenas desejados ou não confirmados como posse não contam para a nota.
+    private const double AntiquityWeight = 0.35;
+    private const double ViewsWeight = 0.25;
+    private const double YearsOnlineWeight = 0.15;
+    private const double BookCountWeight = 0.25;
+
+    private const int AntiquityCapYears = 200;
+    private const double ViewsCapLog = 5; // log10(100_000)
+    private const int YearsOnlineCap = 10;
+    private const int BookCountCap = 300;
+
+    private readonly IUnitOfWork _unitOfWork;
+
+    public ProfileScoreService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ResponseDto<ProfileScoreDto>> GetByUserIdAsync(Guid userId)
+    {
+        var profile = await _unitOfWork.Profiles.GetByUserIdAsync(userId);
+        if (profile is null || !profile.IsActive)
+            return Failure<ProfileScoreDto>("Profile not found", 404);
+
+        var score = await _unitOfWork.ProfileScores.GetByProfileIdAsync(profile.Id);
+        if (score is null)
+            return Failure<ProfileScoreDto>("Profile score not calculated yet", 404);
+
+        return Success(ToDto(score));
+    }
+
+    public async Task<ResponseDto<bool>> RecalculateAsync(Guid userId)
+    {
+        var user = await _unitOfWork.Users.GetByIdAsync(userId);
+        if (user is null || !user.IsActive)
+            return Failure<bool>("User not found", 404);
+
+        var profile = await _unitOfWork.Profiles.GetByUserIdAsync(userId);
+        if (profile is null || !profile.IsActive)
+            return Failure<bool>("Profile not found", 404);
+
+        var stats = await _unitOfWork.Books.GetOwnershipStatsByUserIdAsync(userId);
+
+        var currentYear = DateTimeOffset.UtcNow.Year;
+        var yearsOnline = Math.Max(0, currentYear - user.CreatedAt.Year);
+        var antiquityYears = stats.OwnedBooksCount > 0 ? Math.Max(0, currentYear - stats.AveragePublicationYear) : 0;
+
+        var antiquityScore = Math.Min(100d, antiquityYears / (double)AntiquityCapYears * 100d);
+        var viewsScore = Math.Min(100d, Math.Log10(stats.TotalViews + 1) / ViewsCapLog * 100d);
+        var yearsOnlineScore = Math.Min(100d, yearsOnline / (double)YearsOnlineCap * 100d);
+        var bookCountScore = Math.Min(100d, stats.OwnedBooksCount / (double)BookCountCap * 100d);
+
+        var totalScore = (antiquityScore * AntiquityWeight)
+            + (viewsScore * ViewsWeight)
+            + (yearsOnlineScore * YearsOnlineWeight)
+            + (bookCountScore * BookCountWeight);
+
+        var existing = await _unitOfWork.ProfileScores.GetByProfileIdAsync(profile.Id);
+        var averageYear = stats.OwnedBooksCount > 0 ? stats.AveragePublicationYear : 0;
+        var totalViews = (int)Math.Min(stats.TotalViews, int.MaxValue);
+
+        if (existing is null)
+        {
+            var profileScore = new ProfileScore
+            {
+                Id = Guid.NewGuid(),
+                ProfileId = profile.Id,
+                TotalBooksAverageYear = averageYear,
+                TotalViews = totalViews,
+                TotalYearsOnline = yearsOnline,
+                TotalScore = (int)Math.Round(totalScore),
+                IsActive = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+
+            await _unitOfWork.ProfileScores.AddAsync(profileScore);
+        }
+        else
+        {
+            existing.TotalBooksAverageYear = averageYear;
+            existing.TotalViews = totalViews;
+            existing.TotalYearsOnline = yearsOnline;
+            existing.TotalScore = (int)Math.Round(totalScore);
+            existing.UpdatedAt = DateTimeOffset.UtcNow;
+
+            _unitOfWork.ProfileScores.Update(existing);
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+
+        return Success(true, "Profile score recalculated successfully");
+    }
+
+    private static ProfileScoreDto ToDto(ProfileScore score)
+    {
+        return new ProfileScoreDto
+        {
+            Id = score.Id,
+            CreatedAt = score.CreatedAt,
+            UpdatedAt = score.UpdatedAt,
+            ProfileId = score.ProfileId,
+            TotalBooksAverageYear = score.TotalBooksAverageYear,
+            TotalViews = score.TotalViews,
+            TotalYearsOnline = score.TotalYearsOnline,
+            TotalScore = score.TotalScore
         };
     }
 }
@@ -864,6 +1048,19 @@ public interface IAuthService
 {
     Task<ResponseDto<UserDto>> LoginAsync(LoginDto dto);
     Task<ResponseDto<UserDto>> RegisterAsync(CreateUserDto dto);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IProfileScoreService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.ProfileScore;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IProfileScoreService
+{
+    Task<ResponseDto<ProfileScoreDto>> GetByUserIdAsync(Guid userId);
+    Task<ResponseDto<bool>> RecalculateAsync(Guid userId);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Services/IProfileService.cs
@@ -1176,6 +1373,7 @@ public interface IBookService
     Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto);
     Task<ResponseDto<BookDto>> UpdateAsync(UpdateBookDto dto);
     Task<ResponseDto<bool>> DeleteAsync(Guid id);
+    Task<ResponseDto<bool>> RegisterViewAsync(Guid id);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Services/ProfileService.cs
@@ -1191,7 +1389,6 @@ namespace Bibliotheca.Application.Services;
 public class ProfileService : BaseService, IProfileService
 {
     private readonly IUnitOfWork _unitOfWork;
-
     public ProfileService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
@@ -1445,6 +1642,21 @@ public class ResponseDto<T>
     public T? Data { get; set; }
 }
 ==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/ProfileScore/ProfileScoreDto.cs
+==================================================
+using Bibliotheca.Application.Dtos.Common;
+
+namespace Bibliotheca.Application.Dtos.ProfileScore;
+
+public class ProfileScoreDto : BaseDto
+{
+    public Guid ProfileId { get; set; }
+    public int TotalBooksAverageYear { get; set; }
+    public int TotalViews { get; set; }
+    public int TotalYearsOnline { get; set; }
+    public int TotalScore { get; set; }
+}
+==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Auth/LoginDto.cs
 ==================================================
 using System.ComponentModel.DataAnnotations;
@@ -1529,6 +1741,7 @@ public class BookDto : BaseDto
     public int Pages { get; set; }
     public decimal EstimatedValue { get; set; }
     public BookConditionEnum ConditionEnum { get; set; }
+    public long ViewCount { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Book/BookFilterDto.cs
@@ -1557,6 +1770,7 @@ public class BookFilterDto
 
     public decimal? ValueFrom { get; set; }
     public decimal? ValueTo { get; set; }
+    public BookSortOptionEnum SortBy { get; set; } = BookSortOptionEnum.RecentlyAdded;
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Comment/CreateCommentDto.cs
@@ -1812,6 +2026,321 @@ namespace Bibliotheca.Data.Migrations
                     b.HasIndex("Name");
 
                     b.HasIndex("UserId");
+
+                    b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Books")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", "Book")
+                        .WithMany("Comments")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.Profile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Navigation("Books");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Profile");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260706194008_AddBookViewCount.Designer.cs
+==================================================
+﻿// <auto-generated />
+using System;
+using Bibliotheca.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    [DbContext(typeof(BibliothecaContext))]
+    [Migration("20260706194008_AddBookViewCount")]
+    partial class AddBookViewCount
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.17")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("ConditionEnum")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("EstimatedValue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LanguageEnum")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Language");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<int>("Pages")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Photos")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<int>("PublicationYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<long>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Author");
+
+                    b.HasIndex("ConditionEnum");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("EstimatedValue");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("LanguageEnum");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("Pages");
+
+                    b.HasIndex("PublicationYear");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ViewCount");
 
                     b.ToTable("Books", (string)null);
                 });
@@ -2282,6 +2811,69 @@ namespace Bibliotheca.Data.Migrations
 }
 
 ==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260706235513_AddProfileScore.cs
+==================================================
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddProfileScore : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateTable(
+                name: "ProfileScores",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    ProfileId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    TotalBooksAverageYear = table.Column<int>(type: "int", nullable: false),
+                    TotalViews = table.Column<int>(type: "int", nullable: false),
+                    TotalYearsOnline = table.Column<int>(type: "int", nullable: false),
+                    TotalScore = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProfileScores", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ProfileScores_Profiles_ProfileId",
+                        column: x => x.ProfileId,
+                        principalTable: "Profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfileScores_ProfileId",
+                table: "ProfileScores",
+                column: "ProfileId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProfileScores_TotalScore",
+                table: "ProfileScores",
+                column: "TotalScore");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropTable(
+                name: "ProfileScores");
+        }
+    }
+}
+
+==================================================
 ARQUIVO: Bibliotheca.Data/Migrations/BibliothecaContextModelSnapshot.cs
 ==================================================
 ﻿// <auto-generated />
@@ -2378,6 +2970,11 @@ namespace Bibliotheca.Data.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
 
+                    b.Property<long>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
                     b.HasKey("Id");
 
                     b.HasIndex("Author");
@@ -2402,6 +2999,8 @@ namespace Bibliotheca.Data.Migrations
                     b.HasIndex("PublicationYear");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("ViewCount");
 
                     b.ToTable("Books", (string)null);
                 });
@@ -2486,6 +3085,47 @@ namespace Bibliotheca.Data.Migrations
                     b.ToTable("Profiles", (string)null);
                 });
 
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.ProfileScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("TotalBooksAverageYear")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalViews")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalYearsOnline")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique();
+
+                    b.HasIndex("TotalScore");
+
+                    b.ToTable("ProfileScores", (string)null);
+                });
+
             modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2568,9 +3208,25 @@ namespace Bibliotheca.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.ProfileScore", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Profile", "Profile")
+                        .WithOne("ProfileScore")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.ProfileScore", "ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
             modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Navigation("ProfileScore");
                 });
 
             modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
@@ -2951,6 +3607,48 @@ namespace Bibliotheca.Data.Migrations
 }
 
 ==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260706194008_AddBookViewCount.cs
+==================================================
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddBookViewCount : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<long>(
+                name: "ViewCount",
+                table: "Books",
+                type: "bigint",
+                nullable: false,
+                defaultValue: 0L);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Books_ViewCount",
+                table: "Books",
+                column: "ViewCount");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropIndex(
+                name: "IX_Books_ViewCount",
+                table: "Books");
+
+            migrationBuilder.DropColumn(
+                name: "ViewCount",
+                table: "Books");
+        }
+    }
+}
+
+==================================================
 ARQUIVO: Bibliotheca.Data/Migrations/20260704202653_AddBookFilterIndexes.cs
 ==================================================
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
@@ -3022,6 +3720,378 @@ namespace Bibliotheca.Data.Migrations
             migrationBuilder.DropIndex(
                 name: "IX_Books_PublicationYear",
                 table: "Books");
+        }
+    }
+}
+
+==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260706235513_AddProfileScore.Designer.cs
+==================================================
+﻿// <auto-generated />
+using System;
+using Bibliotheca.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    [DbContext(typeof(BibliothecaContext))]
+    [Migration("20260706235513_AddProfileScore")]
+    partial class AddProfileScore
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.17")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("ConditionEnum")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("EstimatedValue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LanguageEnum")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Language");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<int>("Pages")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Photos")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<int>("PublicationYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<long>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Author");
+
+                    b.HasIndex("ConditionEnum");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("EstimatedValue");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("LanguageEnum");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("Pages");
+
+                    b.HasIndex("PublicationYear");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ViewCount");
+
+                    b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.ProfileScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("TotalBooksAverageYear")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalViews")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalYearsOnline")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique();
+
+                    b.HasIndex("TotalScore");
+
+                    b.ToTable("ProfileScores", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Books")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", "Book")
+                        .WithMany("Comments")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.Profile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.ProfileScore", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Profile", "Profile")
+                        .WithOne("ProfileScore")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.ProfileScore", "ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Navigation("ProfileScore");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Navigation("Books");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Profile");
+                });
+#pragma warning restore 612, 618
         }
     }
 }
@@ -3525,6 +4595,7 @@ public class BibliothecaContext : DbContext
     public DbSet<Comment> Comments => Set<Comment>();
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<ProfileScore> ProfileScores => Set<ProfileScore>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -3698,6 +4769,59 @@ public class CommentTypeConfiguration : IEntityTypeConfiguration<Comment>
     }
 }
 ==================================================
+ARQUIVO: Bibliotheca.Data/Context/Mappings/ProfileScoreTypeConfiguration.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Bibliotheca.Data.Context.Mappings;
+
+public class ProfileScoreTypeConfiguration : IEntityTypeConfiguration<ProfileScore>
+{
+    public void Configure(EntityTypeBuilder<ProfileScore> builder)
+    {
+        builder.ToTable("ProfileScores");
+
+        builder.HasKey(p => p.Id);
+
+        builder.Property(p => p.Id)
+            .HasColumnType("char(36)")
+            .ValueGeneratedNever();
+
+        builder.Property(p => p.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(p => p.CreatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(p => p.UpdatedAt)
+            .IsRequired()
+            .HasColumnType("datetime(6)");
+
+        builder.Property(p => p.ProfileId)
+            .IsRequired()
+            .HasColumnType("char(36)");
+
+        builder.Property(p => p.TotalBooksAverageYear).IsRequired();
+        builder.Property(p => p.TotalViews).IsRequired();
+        builder.Property(p => p.TotalYearsOnline).IsRequired();
+        builder.Property(p => p.TotalScore).IsRequired();
+
+        builder.HasIndex(p => p.ProfileId).IsUnique();
+
+        // Índice para quando o Feed passar a ordenar perfis pela pontuação.
+        builder.HasIndex(p => p.TotalScore);
+
+        builder.HasOne(p => p.Profile)
+            .WithOne(pr => pr.ProfileScore)
+            .HasForeignKey<ProfileScore>(p => p.ProfileId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+==================================================
 ARQUIVO: Bibliotheca.Data/Context/Mappings/BookTypeConfiguration.cs
 ==================================================
 using System.Text.Json;
@@ -3782,12 +4906,17 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
                 photos => JsonSerializer.Serialize(photos, (JsonSerializerOptions?)null),
                 json => JsonSerializer.Deserialize<string[]>(json, (JsonSerializerOptions?)null) ?? Array.Empty<string>())
             .HasColumnType("json");
+        
+        builder.Property(b => b.ViewCount)
+            .IsRequired()
+            .HasDefaultValue(0L);
 
         builder.HasIndex(b => b.IsActive);
         builder.HasIndex(b => b.Name);
         builder.HasIndex(b => b.Author);
         builder.HasIndex(b => b.ISBN).IsUnique();
         builder.HasIndex(b => b.UserId);
+        builder.HasIndex(b => b.ViewCount);
 
         // Índices para os filtros do Feed (ano, data de cadastro, páginas,
         // valor, idioma e condição são todos comparações exatas/faixa,
@@ -3804,6 +4933,34 @@ public class BookTypeConfiguration : IEntityTypeConfiguration<Book>
             .HasForeignKey(b => b.UserId)
             .OnDelete(DeleteBehavior.Restrict);
     }
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IProfileScoreRepository.cs
+==================================================
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public interface IProfileScoreRepository : IGenericRepository<ProfileScore>
+{
+    Task<ProfileScore?> GetByProfileIdAsync(Guid profileId, CancellationToken cancellationToken = default);
+}
+==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Repositories/ProfileScoreRepository.cs
+==================================================
+using Bibliotheca.Data.Context;
+using Bibliotheca.Domain.Domains;
+
+namespace Bibliotheca.Data.Repositories;
+
+public class ProfileScoreRepository : GenericRepository<ProfileScore>, IProfileScoreRepository
+{
+    public ProfileScoreRepository(BibliothecaContext context) : base(context)
+    {
+    }
+
+    public Task<ProfileScore?> GetByProfileIdAsync(Guid profileId, CancellationToken cancellationToken = default)
+        => FindAsync(p => p.ProfileId == profileId, cancellationToken);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/ICommentRepository.cs
@@ -3830,6 +4987,7 @@ ARQUIVO: Bibliotheca.Data/Repositories/Repositories/BookRepository.cs
 using Bibliotheca.Data.Context;
 using Bibliotheca.Data.Repositories.Dto;
 using Bibliotheca.Domain.Domains;
+using Bibliotheca.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bibliotheca.Data.Repositories;
@@ -3845,6 +5003,15 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
             .Where(b => b.UserId == userId)
             .ToListAsync(cancellationToken);
 
+    public async Task IncrementViewCountAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        await DbSet
+            .Where(b => b.Id == id)
+            .ExecuteUpdateAsync(
+                setters => setters.SetProperty(b => b.ViewCount, b => b.ViewCount + 1),
+                cancellationToken);
+    }
+    
     public async Task<PagedResult<Book>> SearchPagedAsync(
         BookSearchFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
     {
@@ -3901,7 +5068,11 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
             query = query.Where(b => b.EstimatedValue <= filter.ValueTo.Value);
 
         // Feed mostra os mais recentes primeiro.
-        query = query.OrderByDescending(b => b.CreatedAt);
+        query = filter.SortBy switch
+        {
+            BookSortOptionEnum.MostViewed => query.OrderByDescending(b => b.ViewCount),
+            _ => query.OrderByDescending(b => b.CreatedAt)
+        };
 
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
@@ -3934,6 +5105,23 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
             TotalCount = totalCount
         };
     }
+    
+    public async Task<BookOwnershipStats> GetOwnershipStatsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        // Uma única consulta agregada (COUNT/AVG/SUM) em vez de três idas ao banco.
+        var stats = await DbSet.AsNoTracking()
+            .Where(b => b.UserId == userId && b.IsActive && b.IsOwner)
+            .GroupBy(b => 1)
+            .Select(g => new BookOwnershipStats
+            {
+                OwnedBooksCount = g.Count(),
+                AveragePublicationYear = (int)g.Average(b => b.PublicationYear),
+                TotalViews = g.Sum(b => b.ViewCount)
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return stats ?? new BookOwnershipStats();
+    }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IBookRepository.cs
@@ -3948,6 +5136,8 @@ public interface IBookRepository : IGenericRepository<Book>
     Task<IEnumerable<Book>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
     Task<PagedResult<Book>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
     Task<PagedResult<Book>> SearchPagedAsync(BookSearchFilter filter, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task IncrementViewCountAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<BookOwnershipStats> GetOwnershipStatsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/IUserRepository.cs
@@ -4277,6 +5467,22 @@ public class PagedResult<TEntity>
 }
 
 ==================================================
+ARQUIVO: Bibliotheca.Data/Repositories/Dto/BookOwnershipStats.cs
+==================================================
+namespace Bibliotheca.Data.Repositories.Dto;
+
+/// <summary>
+/// Estatísticas agregadas dos livros IsOwner=true de um usuário,
+/// calculadas em uma única consulta para alimentar o ProfileScore
+/// sem carregar as entidades inteiras.
+/// </summary>
+public class BookOwnershipStats
+{
+    public int OwnedBooksCount { get; set; }
+    public int AveragePublicationYear { get; set; }
+    public long TotalViews { get; set; }
+}
+==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Dto/BookSearchFilter.cs
 ==================================================
 using Bibliotheca.Domain.Enums;
@@ -4301,6 +5507,7 @@ public class BookSearchFilter
 
     public decimal? ValueFrom { get; set; }
     public decimal? ValueTo { get; set; }
+    public BookSortOptionEnum SortBy { get; set; } = BookSortOptionEnum.RecentlyAdded;
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Uow/UnitOfWork.cs
@@ -4320,12 +5527,14 @@ public class UnitOfWork : IUnitOfWork
     private ICommentRepository? _comments;
     private IProfileRepository? _profiles;
     private IUserRepository? _users;
+    private IProfileScoreRepository? _profileScores;
+    
 
     public UnitOfWork(BibliothecaContext context)
     {
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
-
+    public IProfileScoreRepository ProfileScores => _profileScores ??= new ProfileScoreRepository(_context);
     public IBookRepository Books => _books ??= new BookRepository(_context);
     public ICommentRepository Comments => _comments ??= new CommentRepository(_context);
     public IProfileRepository Profiles => _profiles ??= new ProfileRepository(_context);
@@ -4393,6 +5602,7 @@ public interface IUnitOfWork : IDisposable, IAsyncDisposable
     ICommentRepository Comments { get; }
     IProfileRepository Profiles { get; }
     IUserRepository Users { get; }
+    IProfileScoreRepository ProfileScores { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
@@ -4425,6 +5635,7 @@ public class Profile : AbstractBase
     public string Contact { get; set; } = string.Empty;
 
     public User User { get; set; } = null!;
+    public ProfileScore? ProfileScore { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Domain/Domains/User.cs
@@ -4463,6 +5674,7 @@ public class Book : AbstractBase
     public int Pages { get; set; }
     public decimal EstimatedValue { get; set; }
     public BookConditionEnum ConditionEnum { get; set; }
+    public long ViewCount { get; set; }
 
     public User User { get; set; } = null!;
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
@@ -4518,6 +5730,8 @@ public class ProfileScore : AbstractBase
     public int TotalViews { get; set; }
     public int TotalYearsOnline { get; set; }
     public int TotalScore { get; set; }
+
+    public Profile Profile { get; set; } = null!;
 }
 ==================================================
 ARQUIVO: Bibliotheca.Domain/Bibliotheca.Domain.csproj
@@ -4545,6 +5759,16 @@ public enum BookConditionEnum
     VeryGood = 4,
     Excellent = 5,
     Mint = 6
+}
+==================================================
+ARQUIVO: Bibliotheca.Domain/Enums/BookSortOptionEnum.cs
+==================================================
+namespace Bibliotheca.Domain.Enums;
+
+public enum BookSortOptionEnum
+{
+    RecentlyAdded = 1,
+    MostViewed = 2
 }
 ==================================================
 ARQUIVO: Bibliotheca.Domain/Enums/LanguageEnum.cs
@@ -5007,7 +6231,7 @@ else
     {
         <p><a asp-page="/Account/Login">Faça login</a> para comentar.</p>
     }
-}
+}   
 ==================================================
 ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
 ==================================================
@@ -5074,6 +6298,11 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
         <label asp-for="Filter.ValueTo" class="form-label">Valor até</label>
         <input asp-for="Filter.ValueTo" class="form-control"/>
     </div>
+    
+    <div class="col-6 col-md-2">
+        <label asp-for="Filter.SortBy" class="form-label">Ordenar por</label>
+        <select asp-for="Filter.SortBy" asp-items="Model.SortOptions" class="form-select"></select>
+    </div>
 
     <div class="col-12 d-flex gap-2">
         <button type="submit" class="btn btn-primary">Filtrar</button>
@@ -5100,7 +6329,7 @@ else
                     </div>
                     <div class="text-muted small text-md-end">
                         <div>Adicionado em @book.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
-                        <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum</div>
+                        <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum · @book.ViewCount visualizaç@(book.ViewCount == 1 ? "ão" : "ões")</div>
                     </div>
                 </div>
             </li>
@@ -5196,7 +6425,14 @@ public class IndexModel : PageModel
     private const int Window = 2;
 
     private readonly IBookService _bookService;
-
+    
+    public List<SelectListItem> SortOptions { get; } =
+        Enum.GetValues<BookSortOptionEnum>()
+            .Select(s => new SelectListItem(
+                s == BookSortOptionEnum.MostViewed ? "Mais vistos" : "Adicionados recentemente",
+                s.ToString()))
+            .ToList();
+    
     public IndexModel(IBookService bookService) => _bookService = bookService;
 
     [BindProperty(SupportsGet = true)]
@@ -5238,7 +6474,8 @@ public class IndexModel : PageModel
         ["Filter.Language"] = Filter.Language?.ToString() ?? "",
         ["Filter.Condition"] = Filter.Condition?.ToString() ?? "",
         ["Filter.ValueFrom"] = Filter.ValueFrom?.ToString() ?? "",
-        ["Filter.ValueTo"] = Filter.ValueTo?.ToString() ?? ""
+        ["Filter.ValueTo"] = Filter.ValueTo?.ToString() ?? "",
+            ["Filter.SortBy"] = Filter.SortBy.ToString(),
     };
 
     // Gera a lista de números de página no estilo "1 2 3 ... 8 9 10",
@@ -5339,6 +6576,8 @@ public class DetailsModel : PageModel
                 pageName: "/Feed/Details",
                 routeValues: new { id, slug = CanonicalSlug });
         }
+
+        await _bookService.RegisterViewAsync(id);
 
         var commentsResult = await _commentService.GetByBookIdPagedAsync(id, PageNumber, CommentsPageSize);
         Comments = commentsResult.Data ?? new PagedResultDto<CommentDto>();
@@ -6398,6 +7637,7 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProfileScoreService, ProfileScoreService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
