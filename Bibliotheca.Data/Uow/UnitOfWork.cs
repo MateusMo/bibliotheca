@@ -14,7 +14,7 @@ public class UnitOfWork : IUnitOfWork
     private IProfileRepository? _profiles;
     private IUserRepository? _users;
     private IProfileScoreRepository? _profileScores;
-    
+    private ILibraryRepository? _libraries;
 
     public UnitOfWork(BibliothecaContext context)
     {
@@ -25,6 +25,7 @@ public class UnitOfWork : IUnitOfWork
     public ICommentRepository Comments => _comments ??= new CommentRepository(_context);
     public IProfileRepository Profiles => _profiles ??= new ProfileRepository(_context);
     public IUserRepository Users => _users ??= new UserRepository(_context);
+    public ILibraryRepository Libraries => _libraries ??= new LibraryRepository(_context);
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         => _context.SaveChangesAsync(cancellationToken);

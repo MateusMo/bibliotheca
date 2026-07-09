@@ -1,117 +1,147 @@
 @page
 @model Bibliotheca.Web.Pages.Feed.IndexModel
+@using Bibliotheca.Application.Dtos.Feed
 @{
     ViewData["Title"] = "Feed — Bibliotheca";
 }
 
 <h1 class="mb-3">Feed</h1>
 
-<form method="get" class="row g-3 mb-4 border rounded p-3">
-    <div class="col-md-4">
-        <label asp-for="Filter.SearchText" class="form-label">Buscar</label>
-        <input asp-for="Filter.SearchText" class="form-control" placeholder="Título, autor ou ISBN"/>
+<form method="get" class="mb-4 border rounded p-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+            <label asp-for="Filter.SearchText" class="form-label">Buscar</label>
+            <input asp-for="Filter.SearchText" class="form-control" placeholder="Livro, autor, ISBN ou biblioteca"/>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+        </div>
+        <div class="col-auto">
+            <a asp-page="/Feed/Index" class="btn btn-outline-secondary">Limpar filtros</a>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#advancedFilters"
+                    aria-expanded="@(Model.HasAdvancedFilters ? "true" : "false")"
+                    aria-controls="advancedFilters">
+                Avançado
+            </button>
+        </div>
     </div>
 
-    <div class="col-6 col-md-2">
-        <label asp-for="Filter.Language" class="form-label">Idioma</label>
-        <select asp-for="Filter.Language" asp-items="Model.LanguageOptions" class="form-select">
-            <option value="">Todos</option>
-        </select>
-    </div>
+    <div class="collapse @(Model.HasAdvancedFilters ? "show" : "")" id="advancedFilters">
+        <p class="text-muted small mt-2 mb-2">Os filtros avançados se aplicam apenas a livros.</p>
+        <div class="row g-3">
+            <div class="col-6 col-md-2">
+                <label asp-for="Filter.Language" class="form-label">Idioma</label>
+                <select asp-for="Filter.Language" asp-items="Model.LanguageOptions" class="form-select">
+                    <option value="">Todos</option>
+                </select>
+            </div>
 
-    <div class="col-6 col-md-2">
-        <label asp-for="Filter.Condition" class="form-label">Condição</label>
-        <select asp-for="Filter.Condition" asp-items="Model.ConditionOptions" class="form-select">
-            <option value="">Todas</option>
-        </select>
-    </div>
+            <div class="col-6 col-md-2">
+                <label asp-for="Filter.Condition" class="form-label">Condição</label>
+                <select asp-for="Filter.Condition" asp-items="Model.ConditionOptions" class="form-select">
+                    <option value="">Todas</option>
+                </select>
+            </div>
 
-    <div class="col-6 col-md-2">
-        <label asp-for="Filter.YearFrom" class="form-label">Ano de</label>
-        <input asp-for="Filter.YearFrom" class="form-control"/>
-    </div>
-    <div class="col-6 col-md-2">
-        <label asp-for="Filter.YearTo" class="form-label">Ano até</label>
-        <input asp-for="Filter.YearTo" class="form-control"/>
-    </div>
+            <div class="col-6 col-md-2">
+                <label asp-for="Filter.YearFrom" class="form-label">Ano de</label>
+                <input asp-for="Filter.YearFrom" class="form-control"/>
+            </div>
+            <div class="col-6 col-md-2">
+                <label asp-for="Filter.YearTo" class="form-label">Ano até</label>
+                <input asp-for="Filter.YearTo" class="form-control"/>
+            </div>
 
-    <div class="col-6 col-md-3">
-        <label asp-for="Filter.AddedFrom" class="form-label">Adicionado de</label>
-        <input asp-for="Filter.AddedFrom" type="date" class="form-control"/>
-    </div>
-    <div class="col-6 col-md-3">
-        <label asp-for="Filter.AddedTo" class="form-label">Adicionado até</label>
-        <input asp-for="Filter.AddedTo" type="date" class="form-control"/>
-    </div>
+            <div class="col-6 col-md-3">
+                <label asp-for="Filter.AddedFrom" class="form-label">Adicionado de</label>
+                <input asp-for="Filter.AddedFrom" type="date" class="form-control"/>
+            </div>
+            <div class="col-6 col-md-3">
+                <label asp-for="Filter.AddedTo" class="form-label">Adicionado até</label>
+                <input asp-for="Filter.AddedTo" type="date" class="form-control"/>
+            </div>
 
-    <div class="col-6 col-md-3">
-        <label asp-for="Filter.PagesFrom" class="form-label">Páginas de</label>
-        <input asp-for="Filter.PagesFrom" class="form-control"/>
-    </div>
-    <div class="col-6 col-md-3">
-        <label asp-for="Filter.PagesTo" class="form-label">Páginas até</label>
-        <input asp-for="Filter.PagesTo" class="form-control"/>
-    </div>
+            <div class="col-6 col-md-3">
+                <label asp-for="Filter.PagesFrom" class="form-label">Páginas de</label>
+                <input asp-for="Filter.PagesFrom" class="form-control"/>
+            </div>
+            <div class="col-6 col-md-3">
+                <label asp-for="Filter.PagesTo" class="form-label">Páginas até</label>
+                <input asp-for="Filter.PagesTo" class="form-control"/>
+            </div>
 
-    <div class="col-6 col-md-3">
-        <label asp-for="Filter.ValueFrom" class="form-label">Valor de</label>
-        <input asp-for="Filter.ValueFrom" class="form-control"/>
-    </div>
-    <div class="col-6 col-md-3">
-        <label asp-for="Filter.ValueTo" class="form-label">Valor até</label>
-        <input asp-for="Filter.ValueTo" class="form-control"/>
-    </div>
-    
-    <div class="col-6 col-md-2">
-        <label asp-for="Filter.SortBy" class="form-label">Ordenar por</label>
-        <select asp-for="Filter.SortBy" asp-items="Model.SortOptions" class="form-select"></select>
-    </div>
+            <div class="col-6 col-md-3">
+                <label asp-for="Filter.ValueFrom" class="form-label">Valor de</label>
+                <input asp-for="Filter.ValueFrom" class="form-control"/>
+            </div>
+            <div class="col-6 col-md-3">
+                <label asp-for="Filter.ValueTo" class="form-label">Valor até</label>
+                <input asp-for="Filter.ValueTo" class="form-control"/>
+            </div>
 
-    <div class="col-12 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Filtrar</button>
-        <a asp-page="/Feed/Index" class="btn btn-outline-secondary">Limpar filtros</a>
+            <div class="col-6 col-md-2">
+                <label asp-for="Filter.SortBy" class="form-label">Ordenar por</label>
+                <select asp-for="Filter.SortBy" asp-items="Model.SortOptions" class="form-select"></select>
+            </div>
+        </div>
     </div>
 </form>
 
-<p class="text-muted">@Model.Books.TotalCount livro(s) encontrado(s)</p>
+<p class="text-muted">@Model.Items.TotalCount resultado(s) encontrado(s)</p>
 
-@if (!Model.Books.Items.Any())
+@if (!Model.Items.Items.Any())
 {
-    <p>Nenhum livro encontrado com esses filtros.</p>
+    <p>Nenhum resultado encontrado com esses filtros.</p>
 }
 else
 {
-    <ul class="list-group mb-3">
-        @foreach (var book in Model.Books.Items)
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-3">
+        @foreach (var item in Model.Items.Items)
         {
-            <li class="list-group-item">
-                <div class="d-flex flex-wrap justify-content-between align-items-start gap-2">
-                    <div>
-                        <a asp-page="/Feed/Details" asp-route-id="@book.Id"><strong>@book.Name</strong></a>
-                        <div class="text-muted">@book.Author — @book.PublicationYear</div>
-                        <div class="text-muted small">
-                            por <strong>@book.UserName</strong> · pontuação do perfil: @book.ProfileScore
+            <div class="col">
+                @if (item.Type == FeedItemType.Book)
+                {
+                    <partial name="_BookCard" model="Bibliotheca.Web.Pages.Feed.IndexModel.ToBookCard(item)"/>
+                }
+                else
+                {
+                    <div class="card h-100 border-warning">
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-warning text-dark align-self-start mb-2">🗂️ Biblioteca</span>
+                            <h5 class="card-title">
+                                <a asp-page="/Feed/Libraries/Details" asp-route-id="@item.Id"
+                                   asp-route-slug="@Bibliotheca.Web.Pages.Feed.IndexModel.LibrarySlug(item)">
+                                    @item.Title
+                                </a>
+                            </h5>
+                            <p class="card-text small text-muted mb-1">
+                                por <strong>@item.UserName</strong> · pontuação do perfil: @item.ProfileScore
+                            </p>
+                            <p class="card-text small text-muted mb-1">
+                                Criada em @item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")
+                            </p>
+                            <p class="card-text small text-muted mt-auto mb-0">
+                                @item.BookCount livro(s)
+                            </p>
                         </div>
                     </div>
-                    <div class="text-muted small text-md-end">
-                        <div>Adicionado em @book.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</div>
-                        <div>@book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum · @book.ViewCount visualizaç@(book.ViewCount == 1 ? "ão" : "ões")</div>
-                    </div>
-                </div>
-            </li>
+                }
+            </div>
         }
-    </ul>
+    </div>
 
-    @if (Model.Books.TotalPages > 1)
+    @if (Model.Items.TotalPages > 1)
     {
-        <nav aria-label="Paginação de livros">
+        <nav aria-label="Paginação do feed">
             <ul class="pagination flex-wrap">
 
-                @if (Model.Books.HasPreviousPage)
+                @if (Model.Items.HasPreviousPage)
                 {
                     <li class="page-item">
-                        <a class="page-link"
-                           asp-page="/Feed/Index"
+                        <a class="page-link" asp-page="/Feed/Index"
                            asp-all-route-data="@(Model.RouteValuesForPage(Model.PageNumber - 1))">
                             « Anterior
                         </a>
@@ -119,38 +149,31 @@ else
                 }
                 else
                 {
-                    <li class="page-item disabled">
-                        <span class="page-link">« Anterior</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">« Anterior</span></li>
                 }
 
                 @foreach (var page in Model.GetPageNumbers())
                 {
                     if (!page.HasValue)
                     {
-                        <li class="page-item disabled">
-                            <span class="page-link">…</span>
-                        </li>
-
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
                         continue;
                     }
 
-                    var isActive = page.Value == Model.Books.PageNumber;
+                    var isActive = page.Value == Model.Items.PageNumber;
 
                     <li class="page-item @(isActive ? "active" : null)">
-                        <a class="page-link"
-                           asp-page="/Feed/Index"
+                        <a class="page-link" asp-page="/Feed/Index"
                            asp-all-route-data="@(Model.RouteValuesForPage(page.Value))">
                             @(page).Value
                         </a>
                     </li>
                 }
 
-                @if (Model.Books.HasNextPage)
+                @if (Model.Items.HasNextPage)
                 {
                     <li class="page-item">
-                        <a class="page-link"
-                           asp-page="/Feed/Index"
+                        <a class="page-link" asp-page="/Feed/Index"
                            asp-all-route-data="@(Model.RouteValuesForPage(Model.PageNumber + 1))">
                             Próxima »
                         </a>
@@ -158,9 +181,7 @@ else
                 }
                 else
                 {
-                    <li class="page-item disabled">
-                        <span class="page-link">Próxima »</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">Próxima »</span></li>
                 }
 
             </ul>

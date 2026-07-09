@@ -4,6 +4,7 @@ using Bibliotheca.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bibliotheca.Data.Migrations
 {
     [DbContext(typeof(BibliothecaContext))]
-    partial class BibliothecaContextModelSnapshot : ModelSnapshot
+    [Migration("20260707193810_AddLibrary")]
+    partial class AddLibrary
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -200,8 +203,6 @@ namespace Bibliotheca.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IsActive");
-
-                    b.HasIndex("Title");
 
                     b.HasIndex("UserId");
 

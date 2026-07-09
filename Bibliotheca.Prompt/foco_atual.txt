@@ -30,4 +30,28 @@ public int TotalBooksAverageYear { get; set; } --Soma a idade de todos os livros
     precisa fazer serviço, repositório, adicionar no uow etc.
     Precisa ainda fazer o front. A tela onde uma library é criada é no profile, então deve haver um crud lá com a opção de adicionar o titulo da librarie, a descrição 
     e associar os livros. Uma library pode ter apenas os livros do próprio usuário.
-    O Feed deve ter a uma opção de listar books ou librarie (FAZER)
+    O Feed deve ter a uma opção de listar books ou librarie (FEITO)
+    
+  - Lógica padrão do feed:
+    O feed deve por padrão buscar os livros dos perfis com maiores pontuações caso seja o primeiro load de página, depois basta seguir o filtro.
+    O filtro do feed deve ser simplificado para 2 versões:
+    1 - Versão simples exibindo apenas a busca pelo nome
+    2 - Versão avançada, exibindo o resto dos campos já presentes atualmente
+    
+    O filtro avançado deve ser ativado por um pequeno botão ou link chamado "Avançado"
+    
+    Atualmente a listagem dos livros no feed está sendo feita por lista, porém quero cards mantendo as informações presentes.
+    Por row devem haver 3 cards mantendo a responsividade da tela (Feito)
+    
+    - Lógica Feed:
+      1 o feed deve buscar tanto livros quanto bibliotecas. O card de bibliotecas deve ter algum icone para diferenciar do livro
+      o card de livro deve ter também algum icone de livro (Feito)
+      
+     - Lógica visualização biblioteca 
+     Ao ver uma biblioteca deve-se ver os livros dela, os livros devem aparecer como aparecem no feed e serem clicáveis.
+     As bibliotecas também devem ter Slug de url (Feito)
+     
+     - Agora eu quero que você analise o código todo e veja os pedidos dessa lista.
+     Eu preciso que a minha estrutura de diretório esteja o mais clean possível, preciso que as coisas estejam em DDD
+     Preciso que os métodos estejam separando as responsabilidades.
+     Esse foco é uma autocritica para continuarmos.

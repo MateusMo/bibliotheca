@@ -1,0 +1,65 @@
+@page
+@model Bibliotheca.Web.Pages.Profile.Libraries.IndexModel
+@{
+    ViewData["Title"] = "Minhas bibliotecas";
+}
+
+<h1>Minhas bibliotecas</h1>
+
+@if (Model.ErrorMessage is not null)
+{
+    <div class="alert alert-danger">@Model.ErrorMessage</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <a asp-page="/Profile/Index">&larr; Voltar ao perfil</a>
+    <a asp-page="/Profile/Libraries/Create" class="btn btn-primary btn-sm">Nova biblioteca</a>
+</div>
+
+@if (!Model.Libraries.Items.Any())
+{
+    <p>Você ainda não criou nenhuma biblioteca.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var library in Model.Libraries.Items)
+        {
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>@library.Title</strong>
+                    <div class="text-muted small">@library.BookCount livro(s)</div>
+                    @if (!string.IsNullOrWhiteSpace(library.Description))
+                    {
+                        <div class="text-muted">@library.Description</div>
+                    }
+                </div>
+                <div>
+                    <a asp-page="/Profile/Libraries/Edit" asp-route-id="@library.Id" class="btn btn-outline-secondary btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@library.Id"
+                          asp-route-pageNumber="@Model.PageNumber" class="d-inline"
+                          onsubmit="return confirm('Tem certeza que deseja remover esta biblioteca?');">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Excluir</button>
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+
+    @if (Model.Libraries.TotalPages > 1)
+    {
+        <nav>
+            <ul class="pagination">
+                <li class="page-item @(Model.Libraries.HasPreviousPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Profile/Libraries/Index" asp-route-pageNumber="@(Model.PageNumber - 1)">Anterior</a>
+                </li>
+                <li class="page-item disabled">
+                    <span class="page-link">Página @Model.Libraries.PageNumber de @Model.Libraries.TotalPages</span>
+                </li>
+                <li class="page-item @(Model.Libraries.HasNextPage ? "" : "disabled")">
+                    <a class="page-link" asp-page="/Profile/Libraries/Index" asp-route-pageNumber="@(Model.PageNumber + 1)">Próxima</a>
+                </li>
+            </ul>
+        </nav>
+    }
+}

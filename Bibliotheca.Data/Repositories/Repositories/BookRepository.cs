@@ -85,11 +85,28 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         if (filter.ValueTo.HasValue)
             query = query.Where(b => b.EstimatedValue <= filter.ValueTo.Value);
 
-        query = filter.SortBy switch
-        {
-            BookSortOptionEnum.MostViewed => query.OrderByDescending(b => b.ViewCount),
-            _ => query.OrderByDescending(b => b.CreatedAt)
-        };
+        // Feed sem nenhum filtro/ordenação explícita: prioriza os perfis com
+        // maior pontuação (RF-15). Assim que o usuário aplica qualquer filtro
+        // ou escolhe uma ordenação, o comportamento volta a ser o solicitado.
+        var isDefaultFeedState = string.IsNullOrWhiteSpace(filter.SearchText)
+            && !filter.YearFrom.HasValue && !filter.YearTo.HasValue
+            && !filter.AddedFrom.HasValue && !filter.AddedTo.HasValue
+            && !filter.PagesFrom.HasValue && !filter.PagesTo.HasValue
+            && !filter.Language.HasValue && !filter.Condition.HasValue
+            && !filter.ValueFrom.HasValue && !filter.ValueTo.HasValue
+            && filter.SortBy == BookSortOptionEnum.RecentlyAdded;
+
+        query = isDefaultFeedState
+            ? query
+                .OrderByDescending(b => b.User.Profile != null && b.User.Profile.ProfileScore != null
+                    ? b.User.Profile.ProfileScore.TotalScore
+                    : 0)
+                .ThenByDescending(b => b.CreatedAt)
+            : filter.SortBy switch
+            {
+                BookSortOptionEnum.MostViewed => query.OrderByDescending(b => b.ViewCount),
+                _ => query.OrderByDescending(b => b.CreatedAt)
+            };
 
         var totalCount = await query.CountAsync(cancellationToken);
         var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
@@ -123,6 +140,11 @@ public class BookRepository : GenericRepository<Book>, IBookRepository
         };
     }
 
+    public Task<List<Book>> GetTrackedByIdsForUserAsync(Guid userId, IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+        => DbSet
+            .Where(b => b.UserId == userId && b.IsActive && ids.Contains(b.Id))
+            .ToListAsync(cancellationToken);
+    
     public async Task<BookOwnershipStats> GetOwnershipStatsByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var stats = await DbSet.AsNoTracking()

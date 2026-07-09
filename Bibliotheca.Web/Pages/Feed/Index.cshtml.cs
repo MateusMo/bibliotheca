@@ -1,7 +1,10 @@
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.Feed;
 using Bibliotheca.Application.Services;
 using Bibliotheca.Domain.Enums;
+using Bibliotheca.Web.Utils;
+using Bibliotheca.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -15,19 +18,18 @@ public class IndexModel : PageModel
     private const int PageSize = 20;
 
     // Quantas páginas mostrar ao redor da atual antes de recorrer a "...".
-    // Ex.: 1 ... 6 7 [8] 9 10 ... 20
     private const int Window = 2;
 
-    private readonly IBookService _bookService;
-    
+    private readonly IFeedService _feedService;
+
     public List<SelectListItem> SortOptions { get; } =
         Enum.GetValues<BookSortOptionEnum>()
             .Select(s => new SelectListItem(
                 s == BookSortOptionEnum.MostViewed ? "Mais vistos" : "Adicionados recentemente",
                 s.ToString()))
             .ToList();
-    
-    public IndexModel(IBookService bookService) => _bookService = bookService;
+
+    public IndexModel(IFeedService feedService) => _feedService = feedService;
 
     [BindProperty(SupportsGet = true)]
     public BookFilterDto Filter { get; set; } = new();
@@ -35,7 +37,16 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int PageNumber { get; set; } = 1;
 
-    public PagedResultDto<BookDto> Books { get; set; } = new();
+    public PagedResultDto<FeedItemDto> Items { get; set; } = new();
+
+    public bool HasAdvancedFilters =>
+        Filter.Language.HasValue ||
+        Filter.Condition.HasValue ||
+        Filter.YearFrom.HasValue || Filter.YearTo.HasValue ||
+        Filter.AddedFrom.HasValue || Filter.AddedTo.HasValue ||
+        Filter.PagesFrom.HasValue || Filter.PagesTo.HasValue ||
+        Filter.ValueFrom.HasValue || Filter.ValueTo.HasValue ||
+        Filter.SortBy != BookSortOptionEnum.RecentlyAdded;
 
     public List<SelectListItem> ConditionOptions { get; } =
         Enum.GetValues<BookConditionEnum>()
@@ -49,12 +60,29 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var result = await _bookService.SearchAsync(Filter, PageNumber, PageSize);
-        Books = result.Data ?? new PagedResultDto<BookDto>();
+        var result = await _feedService.SearchAsync(Filter, PageNumber, PageSize);
+        Items = result.Data ?? new PagedResultDto<FeedItemDto>();
     }
 
-    // Preserva todos os filtros ativos ao trocar de página, pra paginação
-    // e filtro conviverem na mesma URL (GET) sem se perderem.
+    public static BookCardViewModel ToBookCard(FeedItemDto item) => new()
+    {
+        Id = item.Id,
+        Name = item.Title,
+        Author = item.Subtitle,
+        PublicationYear = item.PublicationYear,
+        UserName = item.UserName,
+        ProfileScore = item.ProfileScore,
+        CreatedAt = item.CreatedAt,
+        PhotoCount = item.PhotoCount,
+        Language = item.LanguageEnum?.ToString() ?? string.Empty,
+        Condition = item.ConditionEnum?.ToString() ?? string.Empty,
+        ViewCount = item.ViewCount,
+        Slug = SlugHelper.BuildBookSlug(item.Title, item.Subtitle, item.PublicationYear)
+    };
+
+    public static string LibrarySlug(FeedItemDto item) => SlugHelper.BuildLibrarySlug(item.Title);
+
+    // Preserva todos os filtros ativos ao trocar de página.
     public Dictionary<string, string> RouteValuesForPage(int page) => new()
     {
         ["PageNumber"] = page.ToString(),
@@ -69,21 +97,19 @@ public class IndexModel : PageModel
         ["Filter.Condition"] = Filter.Condition?.ToString() ?? "",
         ["Filter.ValueFrom"] = Filter.ValueFrom?.ToString() ?? "",
         ["Filter.ValueTo"] = Filter.ValueTo?.ToString() ?? "",
-            ["Filter.SortBy"] = Filter.SortBy.ToString(),
+        ["Filter.SortBy"] = Filter.SortBy.ToString(),
     };
 
-    // Gera a lista de números de página no estilo "1 2 3 ... 8 9 10",
-    // usando null como marcador de reticências.
+    // Gera a lista de números de página no estilo "1 2 3 ... 8 9 10".
     public List<int?> GetPageNumbers()
     {
-        var total = Books.TotalPages;
-        var current = Books.PageNumber;
+        var total = Items.TotalPages;
+        var current = Items.PageNumber;
         var pages = new List<int?>();
 
         if (total <= 0)
             return pages;
 
-        // Poucas páginas: mostra todas, sem reticências.
         if (total <= (Window * 2) + 5)
         {
             for (var i = 1; i <= total; i++)

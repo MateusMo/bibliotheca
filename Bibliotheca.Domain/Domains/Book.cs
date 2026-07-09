@@ -21,4 +21,5 @@ public class Book : AbstractBase
 
     public User User { get; set; } = null!;
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+    public ICollection<Library> Libraries { get; set; } = new List<Library>();
 }

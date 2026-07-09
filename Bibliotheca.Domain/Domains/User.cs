@@ -9,4 +9,5 @@ public class User : AbstractBase
     public Profile? Profile { get; set; }
     public ICollection<Book> Books { get; set; } = new List<Book>();
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+    public ICollection<Library> Libraries { get; set; } = new List<Library>();
 }

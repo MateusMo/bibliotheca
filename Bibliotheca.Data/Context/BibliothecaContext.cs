@@ -14,6 +14,7 @@ public class BibliothecaContext : DbContext
     public DbSet<Profile> Profiles => Set<Profile>();
     public DbSet<User> Users => Set<User>();
     public DbSet<ProfileScore> ProfileScores => Set<ProfileScore>();
+    public DbSet<Library> Libraries => Set<Library>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

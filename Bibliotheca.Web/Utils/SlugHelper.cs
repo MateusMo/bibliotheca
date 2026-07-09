@@ -6,6 +6,12 @@ namespace Bibliotheca.Web.Utils;
 
 public static class SlugHelper
 {
+    /// <summary>
+    /// Slug canônico da biblioteca: apenas o título.
+    /// </summary>
+    public static string BuildLibrarySlug(string title)
+        => GenerateSlug(title);
+    
     public static string GenerateSlug(string input)
     {
         if (string.IsNullOrWhiteSpace(input))

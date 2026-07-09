@@ -1,0 +1,62 @@
+@page "{id:guid}/{slug?}"
+@model Bibliotheca.Web.Pages.Feed.Libraries.DetailsModel
+@{
+    ViewData["Title"] = Model.Library is null
+        ? "Biblioteca não encontrada"
+        : $"{Model.Library.Title} — biblioteca de {Model.Library.UserName}";
+
+    if (Model.Library is not null)
+    {
+        ViewData["MetaDescription"] = string.IsNullOrWhiteSpace(Model.Library.Description)
+            ? $"Biblioteca {Model.Library.Title}, com {Model.Library.BookCount} livro(s), organizada por {Model.Library.UserName}."
+            : Model.Library.Description;
+
+        ViewData["OgType"] = "website";
+        ViewData["CanonicalUrl"] = Url.PageLink("/Feed/Libraries/Details", values: new
+        {
+            id = Model.Library.Id,
+            slug = Model.CanonicalSlug
+        });
+    }
+}
+
+@if (Model.Library is null)
+{
+    <p>Biblioteca não encontrada.</p>
+}
+else
+{
+    <article>
+        <span class="badge bg-warning text-dark mb-2">🗂️ Biblioteca</span>
+        <h1>@Model.Library.Title</h1>
+        <p class="text-muted">
+            por <strong>@Model.Library.UserName</strong> · pontuação do perfil: @Model.Library.ProfileScore ·
+            @Model.Library.BookCount livro(s)
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Library.Description))
+        {
+            <p>@Model.Library.Description</p>
+        }
+    </article>
+
+    <hr/>
+
+    <h2>Livros da biblioteca</h2>
+
+    @if (!Model.Books.Any())
+    {
+        <p>Esta biblioteca ainda não possui livros associados.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-3">
+            @foreach (var book in Model.Books)
+            {
+                <div class="col">
+                    <partial name="_BookCard" model="book"/>
+                </div>
+            }
+        </div>
+    }
+}

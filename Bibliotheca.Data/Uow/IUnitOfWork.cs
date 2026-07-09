@@ -9,6 +9,7 @@ public interface IUnitOfWork : IDisposable, IAsyncDisposable
     IProfileRepository Profiles { get; }
     IUserRepository Users { get; }
     IProfileScoreRepository ProfileScores { get; }
+    ILibraryRepository Libraries { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 
