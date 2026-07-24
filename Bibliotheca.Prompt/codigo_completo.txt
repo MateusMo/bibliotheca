@@ -1,4 +1,5 @@
 
+Thu Jul 23 08:52:29 PM -03 2026
 ==================================================
 Foco atual
 ==================================================
@@ -49,11 +50,26 @@ public int TotalBooksAverageYear { get; set; } --Soma a idade de todos os livros
     
     - Lógica Feed:
       1 o feed deve buscar tanto livros quanto bibliotecas. O card de bibliotecas deve ter algum icone para diferenciar do livro
-      o card de livro deve ter também algum icone de livro
+      o card de livro deve ter também algum icone de livro (Feito)
       
      - Lógica visualização biblioteca 
      Ao ver uma biblioteca deve-se ver os livros dela, os livros devem aparecer como aparecem no feed e serem clicáveis.
-     As bibliotecas também devem ter Slug de url
+     As bibliotecas também devem ter Slug de url (Feito)
+     
+     - Ajustar labels do feed
+     Onde está administrador biblioteca deve estar home? ou algo compativel com o conteúdo. Pense em algo usuál em redes sociais para o usuário não se perder(FEITO)
+     - Estilo característico, como é uma biblioteca focada em livros antigos, as cores e tipografias poderiam ter uma estética do século 19. 
+     (queria manter essa aparência clean e minimalista também) (FEITO)
+     
+     - Ajuste fino de html, css. O footer está se sobrepondo as outras divs, existem textos e boxes desalinhados. Preciso manter o padrão inline quando é linha. (FEITO)
+     
+     - Agora quero limitar os usuários (futuramente terá plano pago e gratuito, implementar esse bloqueio já pensando que haverá plano pago no futuro se der certo)
+      1 - Cada usuário poderá postar apenas 4 fotos por livro (com plano pago será diferente)
+      2 - Cada usuário poderá ter apenas 3 bibliotecas (com plano pago será diferente)
+      
+      - Implementar armazenamento de imagens em nuvem. 
+     
+     
 ==================================================
 Ideação do projeto
 ==================================================
@@ -500,6 +516,35 @@ Considere sempre ter as urls mais verbosas para o ranqueamento.
 - Integração com o backend
 
 As paginas devem ser paginadas e os cruds dos dominios devem todos ser aplicados e para isso criar o numero de páginas, subpáginas e forms necessários
+
+Padrão estilo
+
+Plano revisado
+
+Paleta (bem mais contida — quase monocromática, uma cor só de destaque):
+
+--bg 
+#FAFAF9 — quase branco, frio
+--surface 
+#FFFFFF
+--ink 
+#171613 — quase preto
+--ink-soft 
+#65635B — texto secundário
+--accent 
+#6E1E24 — bordô discreto, usado só em links/CTA, nunca em fundo de card
+--line 
+#E9E7E0 — divisor mínimo, 1px
+
+Tipografia:
+
+UI/chrome (nav, botões, forms): Instrument Sans — grotesca moderna, mais caráter que Inter
+Título do livro (o "conteúdo clássico"): Newsreader — serifada editorial discreta, não grita
+Labels/legendas (metadados, nav): mesma sans, mas uppercase + letter-spacing, ao estilo Hermès
+
+Sem caixas. Cards perdem borda, sombra e badge colorido. Divisão é feita por espaço em branco e, quando necessário, uma linha de 1px.
+
+Assinatura discreta: o "número de catálogo" continua existindo, mas vira uma legenda pequena, uppercase, sem fundo colorido — como legenda de peça de museu, não etiqueta de fichário.
 ==================================================
 ESTRUTURA DO PROJETO
 ==================================================
@@ -522,6 +567,8 @@ ESTRUTURA DO PROJETO
 │   │   │   ├── BaseDto.cs
 │   │   │   ├── PagedResultDto.cs
 │   │   │   └── ResponseDto.cs
+│   │   ├── Feed
+│   │   │   └── FeedItemDto.cs
 │   │   ├── Library
 │   │   │   ├── CreateLibraryDto.cs
 │   │   │   ├── LibraryBookItemDto.cs
@@ -546,9 +593,11 @@ ESTRUTURA DO PROJETO
 │       ├── CommentService.cs
 │       ├── Common
 │       │   └── BaseService.cs
+│       ├── FeedService.cs
 │       ├── IAuthService.cs
 │       ├── IBookService.cs
 │       ├── ICommentService.cs
+│       ├── IFeedService.cs
 │       ├── ILibraryService.cs
 │       ├── IProfileScoreService.cs
 │       ├── IProfileService.cs
@@ -581,6 +630,8 @@ ESTRUTURA DO PROJETO
 │   │   ├── 20260706235513_AddProfileScore.Designer.cs
 │   │   ├── 20260707193810_AddLibrary.cs
 │   │   ├── 20260707193810_AddLibrary.Designer.cs
+│   │   ├── 20260709010535_AddLibraryTitleIndex.cs
+│   │   ├── 20260709010535_AddLibraryTitleIndex.Designer.cs
 │   │   └── BibliothecaContextModelSnapshot.cs
 │   ├── Repositories
 │   │   ├── Dto
@@ -638,7 +689,10 @@ ESTRUTURA DO PROJETO
 │   │   │   ├── Details.cshtml
 │   │   │   ├── Details.cshtml.cs
 │   │   │   ├── Index.cshtml
-│   │   │   └── Index.cshtml.cs
+│   │   │   ├── Index.cshtml.cs
+│   │   │   └── Libraries
+│   │   │       ├── Details.cshtml
+│   │   │       └── Details.cshtml.cs
 │   │   ├── Index.cshtml
 │   │   ├── Index.cshtml.cs
 │   │   ├── Profile
@@ -657,6 +711,7 @@ ESTRUTURA DO PROJETO
 │   │   │       ├── Index.cshtml
 │   │   │       └── Index.cshtml.cs
 │   │   ├── Shared
+│   │   │   ├── _BookCard.cshtml
 │   │   │   ├── _Layout.cshtml
 │   │   │   └── _ValidationScriptsPartial.cshtml
 │   │   ├── _ViewImports.cshtml
@@ -668,6 +723,8 @@ ESTRUTURA DO PROJETO
 │   │   └── DbSeeder.cs
 │   ├── Utils
 │   │   └── SlugHelper.cs
+│   ├── ViewModels
+│   │   └── BookCardViewModel.cs
 │   └── wwwroot
 │       ├── css
 │       ├── js
@@ -685,7 +742,7 @@ ESTRUTURA DO PROJETO
 ├── Bibliotheca.Web.sln
 └── global.json
 
-52 directories, 129 files
+55 directories, 138 files
 
 
 ==================================================
@@ -884,7 +941,6 @@ public class BookService : BaseService, IBookService
         book.UpdatedAt = DateTimeOffset.UtcNow;
 
         _unitOfWork.Books.Update(book);
-        await _profileScoreService.RecalculateAsync(book.UserId);
         await _unitOfWork.SaveChangesAsync();
         await _profileScoreService.RecalculateAsync(book.UserId);
         
@@ -1118,6 +1174,138 @@ public interface IProfileService
     Task<ResponseDto<ProfileDto>> CreateAsync(CreateProfileDto dto);
     Task<ResponseDto<ProfileDto>> UpdateAsync(UpdateProfileDto dto);
     Task<ResponseDto<bool>> DeleteAsync(Guid id);
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/FeedService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.Feed;
+using Bibliotheca.Data.Repositories.Dto;
+using Bibliotheca.Data.Uow;
+using Bibliotheca.Domain.Domains;
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Application.Services;
+
+public class FeedService : BaseService, IFeedService
+{
+    // Quantos itens buscar de cada fonte (livros/bibliotecas) para poder
+    // mesclar e reordenar em memória antes de paginar. Trade-off ciente:
+    // evita uma UNION real entre duas tabelas com formatos diferentes, ao
+    // custo de trazer mais linhas do banco do que o necessário para a
+    // página pedida. O teto de 300 protege contra páginas muito altas.
+    // Se o catálogo crescer muito, o próximo passo é uma tabela de
+    // projeção (feed_items) mantida por job/trigger.
+    private const int MergeWindowMultiplier = 3;
+    private const int MergeWindowCap = 300;
+
+    private readonly IUnitOfWork _unitOfWork;
+
+    public FeedService(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<ResponseDto<PagedResultDto<FeedItemDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var hasAdvancedFilters = filter.YearFrom.HasValue || filter.YearTo.HasValue
+            || filter.AddedFrom.HasValue || filter.AddedTo.HasValue
+            || filter.PagesFrom.HasValue || filter.PagesTo.HasValue
+            || filter.Language.HasValue || filter.Condition.HasValue
+            || filter.ValueFrom.HasValue || filter.ValueTo.HasValue
+            || filter.SortBy == BookSortOptionEnum.MostViewed;
+
+        var bookSearchFilter = new BookSearchFilter
+        {
+            SearchText = filter.SearchText,
+            YearFrom = filter.YearFrom,
+            YearTo = filter.YearTo,
+            AddedFrom = filter.AddedFrom,
+            AddedTo = filter.AddedTo,
+            PagesFrom = filter.PagesFrom,
+            PagesTo = filter.PagesTo,
+            Language = filter.Language,
+            Condition = filter.Condition,
+            ValueFrom = filter.ValueFrom,
+            ValueTo = filter.ValueTo,
+            SortBy = filter.SortBy
+        };
+
+        // Filtros avançados só existem para livros (ano, páginas, idioma etc.);
+        // bibliotecas não têm esses atributos, então nesse caso o feed exibe
+        // somente livros, com paginação normal no banco.
+        if (hasAdvancedFilters)
+        {
+            var pagedBooks = await _unitOfWork.Books.SearchPagedAsync(bookSearchFilter, pageNumber, pageSize);
+
+            var onlyBooks = new PagedResultDto<FeedItemDto>
+            {
+                Items = pagedBooks.Items.Select(ToBookFeedItem).ToList(),
+                PageNumber = pagedBooks.PageNumber,
+                PageSize = pagedBooks.PageSize,
+                TotalCount = pagedBooks.TotalCount
+            };
+
+            return Success(onlyBooks);
+        }
+
+        var windowSize = Math.Min(pageNumber * pageSize * MergeWindowMultiplier, MergeWindowCap);
+
+        var booksWindow = await _unitOfWork.Books.SearchPagedAsync(bookSearchFilter, 1, windowSize);
+        var librariesWindow = await _unitOfWork.Libraries.SearchPagedAsync(filter.SearchText, 1, windowSize);
+
+        var merged = booksWindow.Items.Select(ToBookFeedItem)
+            .Concat(librariesWindow.Items.Select(ToLibraryFeedItem))
+            .OrderByDescending(i => i.ProfileScore)
+            .ThenByDescending(i => i.CreatedAt)
+            .ToList();
+
+        var page = merged
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var dto = new PagedResultDto<FeedItemDto>
+        {
+            Items = page,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = booksWindow.TotalCount + librariesWindow.TotalCount
+        };
+
+        return Success(dto);
+    }
+
+    private static FeedItemDto ToBookFeedItem(Book book) => new()
+    {
+        Type = FeedItemType.Book,
+        Id = book.Id,
+        Title = book.Name,
+        Subtitle = book.Author,
+        CreatedAt = book.CreatedAt,
+        UserName = book.User?.Name ?? string.Empty,
+        ProfileScore = book.User?.Profile?.ProfileScore?.TotalScore ?? 0,
+        PublicationYear = book.PublicationYear,
+        PhotoCount = book.Photos.Length,
+        LanguageEnum = book.LanguageEnum,
+        ConditionEnum = book.ConditionEnum,
+        ViewCount = book.ViewCount
+    };
+
+    private static FeedItemDto ToLibraryFeedItem(Library library) => new()
+    {
+        Type = FeedItemType.Library,
+        Id = library.Id,
+        Title = library.Title,
+        CreatedAt = library.CreatedAt,
+        UserName = library.User?.Name ?? string.Empty,
+        ProfileScore = library.User?.Profile?.ProfileScore?.TotalScore ?? 0,
+        BookCount = library.Books.Count
+    };
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Services/ILibraryService.cs
@@ -1552,13 +1740,21 @@ public class LibraryService : BaseService, ILibraryService
             CreatedAt = library.CreatedAt,
             UpdatedAt = library.UpdatedAt,
             UserId = library.UserId,
+            UserName = library.User?.Name ?? string.Empty,
+            ProfileScore = library.User?.Profile?.ProfileScore?.TotalScore ?? 0,
             Title = library.Title,
             Description = library.Description,
             Books = library.Books.Select(b => new LibraryBookItemDto
             {
                 Id = b.Id,
                 Name = b.Name,
-                Author = b.Author
+                Author = b.Author,
+                PublicationYear = b.PublicationYear,
+                Photos = b.Photos,
+                LanguageEnum = b.LanguageEnum,
+                ConditionEnum = b.ConditionEnum,
+                ViewCount = b.ViewCount,
+                CreatedAt = b.CreatedAt
             }).ToList()
         };
     }
@@ -1674,6 +1870,19 @@ public class ProfileService : BaseService, IProfileService
             Contact = profile.Contact
         };
     }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Services/IFeedService.cs
+==================================================
+using Bibliotheca.Application.Dtos.Book;
+using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.Feed;
+
+namespace Bibliotheca.Application.Services;
+
+public interface IFeedService
+{
+    Task<ResponseDto<PagedResultDto<FeedItemDto>>> SearchAsync(BookFilterDto filter, int pageNumber, int pageSize);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Services/ICommentService.cs
@@ -1828,6 +2037,43 @@ public class ResponseDto<T>
     public string Message { get; set; } = string.Empty;
 
     public T? Data { get; set; }
+}
+==================================================
+ARQUIVO: Bibliotheca.Application/Dtos/Feed/FeedItemDto.cs
+==================================================
+using Bibliotheca.Domain.Enums;
+
+namespace Bibliotheca.Application.Dtos.Feed;
+
+public enum FeedItemType
+{
+    Book = 1,
+    Library = 2
+}
+
+/// <summary>
+/// Item unificado do feed: representa um livro ou uma biblioteca.
+/// Campos específicos de cada tipo ficam com valor padrão quando não se aplicam.
+/// </summary>
+public class FeedItemDto
+{
+    public FeedItemType Type { get; set; }
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Subtitle { get; set; } = string.Empty;
+    public DateTimeOffset CreatedAt { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public int ProfileScore { get; set; }
+
+    // Preenchido apenas quando Type == Book.
+    public int PublicationYear { get; set; }
+    public int PhotoCount { get; set; }
+    public LanguageEnum? LanguageEnum { get; set; }
+    public BookConditionEnum? ConditionEnum { get; set; }
+    public long ViewCount { get; set; }
+
+    // Preenchido apenas quando Type == Library.
+    public int BookCount { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/ProfileScore/ProfileScoreDto.cs
@@ -2085,6 +2331,8 @@ public class UserDto : BaseDto
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Library/LibraryBookItemDto.cs
 ==================================================
+using Bibliotheca.Domain.Enums;
+
 namespace Bibliotheca.Application.Dtos.Library;
 
 public class LibraryBookItemDto
@@ -2092,6 +2340,12 @@ public class LibraryBookItemDto
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Author { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
+    public string[] Photos { get; set; } = [];
+    public LanguageEnum LanguageEnum { get; set; }
+    public BookConditionEnum ConditionEnum { get; set; }
+    public long ViewCount { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
 }
 ==================================================
 ARQUIVO: Bibliotheca.Application/Dtos/Library/LibraryDto.cs
@@ -2103,6 +2357,8 @@ namespace Bibliotheca.Application.Dtos.Library;
 public class LibraryDto : BaseDto
 {
     public Guid UserId { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public int ProfileScore { get; set; }
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public List<LibraryBookItemDto> Books { get; set; } = [];
@@ -3115,6 +3371,460 @@ namespace Bibliotheca.Data.Migrations
 }
 
 ==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260709010535_AddLibraryTitleIndex.Designer.cs
+==================================================
+﻿// <auto-generated />
+using System;
+using Bibliotheca.Data.Context;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    [DbContext(typeof(BibliothecaContext))]
+    [Migration("20260709010535_AddLibraryTitleIndex")]
+    partial class AddLibraryTitleIndex
+    {
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        {
+#pragma warning disable 612, 618
+            modelBuilder
+                .HasAnnotation("ProductVersion", "9.0.17")
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<string>("ConditionEnum")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("EstimatedValue")
+                        .HasColumnType("decimal(12,2)");
+
+                    b.Property<string>("ISBN")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsOwner")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("LanguageEnum")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("Language");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.Property<int>("Pages")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Photos")
+                        .IsRequired()
+                        .HasColumnType("json");
+
+                    b.Property<int>("PublicationYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Publisher")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<long>("ViewCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasDefaultValue(0L);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Author");
+
+                    b.HasIndex("ConditionEnum");
+
+                    b.HasIndex("CreatedAt");
+
+                    b.HasIndex("EstimatedValue");
+
+                    b.HasIndex("ISBN")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("LanguageEnum");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("Pages");
+
+                    b.HasIndex("PublicationYear");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ViewCount");
+
+                    b.ToTable("Books", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Link")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Comments", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Library", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("Title");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Libraries", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Contact")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("varchar(200)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Profiles", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.ProfileScore", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<Guid>("ProfileId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("TotalBooksAverageYear")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalScore")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalViews")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalYearsOnline")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProfileId")
+                        .IsUnique();
+
+                    b.HasIndex("TotalScore");
+
+                    b.ToTable("ProfileScores", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("BookLibrary", b =>
+                {
+                    b.Property<Guid>("BooksId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("LibrariesId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("BooksId", "LibrariesId");
+
+                    b.HasIndex("LibrariesId");
+
+                    b.ToTable("BookLibraries", (string)null);
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Books")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Comment", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", "Book")
+                        .WithMany("Comments")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Comments")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Library", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithMany("Libraries")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.Profile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.ProfileScore", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Profile", "Profile")
+                        .WithOne("ProfileScore")
+                        .HasForeignKey("Bibliotheca.Domain.Domains.ProfileScore", "ProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Profile");
+                });
+
+            modelBuilder.Entity("BookLibrary", b =>
+                {
+                    b.HasOne("Bibliotheca.Domain.Domains.Book", null)
+                        .WithMany()
+                        .HasForeignKey("BooksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Bibliotheca.Domain.Domains.Library", null)
+                        .WithMany()
+                        .HasForeignKey("LibrariesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Book", b =>
+                {
+                    b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.Profile", b =>
+                {
+                    b.Navigation("ProfileScore");
+                });
+
+            modelBuilder.Entity("Bibliotheca.Domain.Domains.User", b =>
+                {
+                    b.Navigation("Books");
+
+                    b.Navigation("Comments");
+
+                    b.Navigation("Libraries");
+
+                    b.Navigation("Profile");
+                });
+#pragma warning restore 612, 618
+        }
+    }
+}
+
+==================================================
 ARQUIVO: Bibliotheca.Data/Migrations/20260707193810_AddLibrary.Designer.cs
 ==================================================
 ﻿// <auto-generated />
@@ -3771,6 +4481,8 @@ namespace Bibliotheca.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IsActive");
+
+                    b.HasIndex("Title");
 
                     b.HasIndex("UserId");
 
@@ -4870,6 +5582,37 @@ namespace Bibliotheca.Data.Migrations
 }
 
 ==================================================
+ARQUIVO: Bibliotheca.Data/Migrations/20260709010535_AddLibraryTitleIndex.cs
+==================================================
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace Bibliotheca.Data.Migrations
+{
+    /// <inheritdoc />
+    public partial class AddLibraryTitleIndex : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.CreateIndex(
+                name: "IX_Libraries_Title",
+                table: "Libraries",
+                column: "Title");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropIndex(
+                name: "IX_Libraries_Title",
+                table: "Libraries");
+        }
+    }
+}
+
+==================================================
 ARQUIVO: Bibliotheca.Data/Migrations/20260704202653_AddBookFilterIndexes.Designer.cs
 ==================================================
 ﻿// <auto-generated />
@@ -5860,6 +6603,10 @@ public class LibraryTypeConfiguration : IEntityTypeConfiguration<Library>
         builder.HasMany(l => l.Books)
             .WithMany(b => b.Libraries)
             .UsingEntity(j => j.ToTable("BookLibraries"));
+        
+        builder.HasIndex(l => l.IsActive);
+        builder.HasIndex(l => l.UserId);
+        builder.HasIndex(l => l.Title); 
     }
 }
 ==================================================
@@ -6142,6 +6889,7 @@ public interface ILibraryRepository : IGenericRepository<Library>
     Task<Library?> GetByIdTrackedWithBooksAsync(Guid id, CancellationToken cancellationToken = default);
 
     Task<PagedResult<Library>> GetByUserIdPagedAsync(Guid userId, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
+    Task<PagedResult<Library>> SearchPagedAsync(string? searchText, int pageNumber, int pageSize, CancellationToken cancellationToken = default);
 }
 ==================================================
 ARQUIVO: Bibliotheca.Data/Repositories/Repositories/UserRepository.cs
@@ -6274,7 +7022,41 @@ public class LibraryRepository : GenericRepository<Library>, ILibraryRepository
     public Task<Library?> GetByIdWithBooksAsync(Guid id, CancellationToken cancellationToken = default)
         => DbSet.AsNoTracking()
             .Include(l => l.Books)
+            .Include(l => l.User)
+            .ThenInclude(u => u.Profile)
+            .ThenInclude(p => p!.ProfileScore)
             .FirstOrDefaultAsync(l => l.Id == id, cancellationToken);
+
+    public async Task<PagedResult<Library>> SearchPagedAsync(
+        string? searchText, int pageNumber, int pageSize, CancellationToken cancellationToken = default)
+    {
+        if (pageNumber < 1) pageNumber = 1;
+        if (pageSize < 1) pageSize = 10;
+
+        var query = DbSet.AsNoTracking()
+            .Include(l => l.Books)
+            .Include(l => l.User)
+            .ThenInclude(u => u.Profile)
+            .ThenInclude(p => p!.ProfileScore)
+            .Where(l => l.IsActive);
+
+        if (!string.IsNullOrWhiteSpace(searchText))
+        {
+            var text = searchText.Trim();
+            query = query.Where(l => l.Title.Contains(text));
+        }
+
+        query = query
+            .OrderByDescending(l => l.User.Profile != null && l.User.Profile.ProfileScore != null
+                ? l.User.Profile.ProfileScore.TotalScore
+                : 0)
+            .ThenByDescending(l => l.CreatedAt);
+
+        var totalCount = await query.CountAsync(cancellationToken);
+        var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+
+        return new PagedResult<Library> { Items = items, PageNumber = pageNumber, PageSize = pageSize, TotalCount = totalCount };
+    }
 
     public Task<Library?> GetByIdTrackedWithBooksAsync(Guid id, CancellationToken cancellationToken = default)
         => DbSet
@@ -7136,11 +7918,158 @@ public static class DbSeeder
     }
 }
 ==================================================
+ARQUIVO: Bibliotheca.Web/ViewModels/BookCardViewModel.cs
+==================================================
+namespace Bibliotheca.Web.ViewModels;
+
+public class BookCardViewModel
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Author { get; set; } = string.Empty;
+    public int PublicationYear { get; set; }
+    public string UserName { get; set; } = string.Empty;
+    public int ProfileScore { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public int PhotoCount { get; set; }
+    public string Language { get; set; } = string.Empty;
+    public string Condition { get; set; } = string.Empty;
+    public long ViewCount { get; set; }
+    public string Slug { get; set; } = string.Empty;
+}
+==================================================
 ARQUIVO: Bibliotheca.Web/Pages/_ViewImports.cshtml
 ==================================================
 ﻿@using Bibliotheca.Web
 @namespace Bibliotheca.Web.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Feed/Libraries/Details.cshtml
+==================================================
+@page "{id:guid}/{slug?}"
+@model Bibliotheca.Web.Pages.Feed.Libraries.DetailsModel
+@{
+    ViewData["Title"] = Model.Library is null
+        ? "Biblioteca não encontrada"
+        : $"{Model.Library.Title} — biblioteca de {Model.Library.UserName}";
+
+    if (Model.Library is not null)
+    {
+        ViewData["MetaDescription"] = string.IsNullOrWhiteSpace(Model.Library.Description)
+            ? $"Biblioteca {Model.Library.Title}, com {Model.Library.BookCount} livro(s), organizada por {Model.Library.UserName}."
+            : Model.Library.Description;
+
+        ViewData["OgType"] = "website";
+        ViewData["CanonicalUrl"] = Url.PageLink("/Feed/Libraries/Details", values: new
+        {
+            id = Model.Library.Id,
+            slug = Model.CanonicalSlug
+        });
+    }
+}
+
+@if (Model.Library is null)
+{
+    <p>Biblioteca não encontrada.</p>
+}
+else
+{
+    <article>
+        <span class="badge bg-warning text-dark mb-2">🗂️ Biblioteca</span>
+        <h1>@Model.Library.Title</h1>
+        <p class="text-muted">
+            por <strong>@Model.Library.UserName</strong> · pontuação do perfil: @Model.Library.ProfileScore ·
+            @Model.Library.BookCount livro(s)
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Library.Description))
+        {
+            <p>@Model.Library.Description</p>
+        }
+    </article>
+
+    <hr/>
+
+    <h2>Livros da biblioteca</h2>
+
+    @if (!Model.Books.Any())
+    {
+        <p>Esta biblioteca ainda não possui livros associados.</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-3">
+            @foreach (var book in Model.Books)
+            {
+                <div class="col">
+                    <partial name="_BookCard" model="book"/>
+                </div>
+            }
+        </div>
+    }
+}
+==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Feed/Libraries/Details.cshtml.cs
+==================================================
+using Bibliotheca.Application.Dtos.Library;
+using Bibliotheca.Application.Services;
+using Bibliotheca.Web.Utils;
+using Bibliotheca.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+
+namespace Bibliotheca.Web.Pages.Feed.Libraries;
+
+[AllowAnonymous]
+public class DetailsModel : PageModel
+{
+    private readonly ILibraryService _libraryService;
+
+    public DetailsModel(ILibraryService libraryService)
+    {
+        _libraryService = libraryService;
+    }
+
+    public LibraryDto? Library { get; set; }
+    public string CanonicalSlug { get; set; } = string.Empty;
+    public List<BookCardViewModel> Books { get; set; } = [];
+
+    public async Task<IActionResult> OnGetAsync(Guid id, string? slug)
+    {
+        var result = await _libraryService.GetByIdAsync(id);
+        if (!result.IsSuccess || result.Data is null)
+            return NotFound();
+
+        Library = result.Data;
+        CanonicalSlug = SlugHelper.BuildLibrarySlug(Library.Title);
+
+        if (!string.Equals(slug, CanonicalSlug, StringComparison.Ordinal))
+        {
+            return RedirectToPagePermanent(
+                pageName: "/Feed/Libraries/Details",
+                routeValues: new { id, slug = CanonicalSlug });
+        }
+
+        Books = Library.Books.Select(b => new BookCardViewModel
+        {
+            Id = b.Id,
+            Name = b.Name,
+            Author = b.Author,
+            PublicationYear = b.PublicationYear,
+            UserName = Library.UserName,
+            ProfileScore = Library.ProfileScore,
+            CreatedAt = b.CreatedAt,
+            PhotoCount = b.Photos.Length,
+            Language = b.LanguageEnum.ToString(),
+            Condition = b.ConditionEnum.ToString(),
+            ViewCount = b.ViewCount,
+            Slug = SlugHelper.BuildBookSlug(b.Name, b.Author, b.PublicationYear)
+        }).ToList();
+
+        return Page();
+    }
+}
 ==================================================
 ARQUIVO: Bibliotheca.Web/Pages/Feed/Details.cshtml
 ==================================================
@@ -7270,6 +8199,7 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
 ==================================================
 @page
 @model Bibliotheca.Web.Pages.Feed.IndexModel
+@using Bibliotheca.Application.Dtos.Feed
 @{
     ViewData["Title"] = "Feed — Bibliotheca";
 }
@@ -7280,7 +8210,7 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
     <div class="row g-2 align-items-end">
         <div class="col-md-6">
             <label asp-for="Filter.SearchText" class="form-label">Buscar</label>
-            <input asp-for="Filter.SearchText" class="form-control" placeholder="Título, autor ou ISBN"/>
+            <input asp-for="Filter.SearchText" class="form-control" placeholder="Livro, autor, ISBN ou biblioteca"/>
         </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-primary">Filtrar</button>
@@ -7299,7 +8229,8 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
     </div>
 
     <div class="collapse @(Model.HasAdvancedFilters ? "show" : "")" id="advancedFilters">
-        <div class="row g-3 mt-1">
+        <p class="text-muted small mt-2 mb-2">Os filtros avançados se aplicam apenas a livros.</p>
+        <div class="row g-3">
             <div class="col-6 col-md-2">
                 <label asp-for="Filter.Language" class="form-label">Idioma</label>
                 <select asp-for="Filter.Language" asp-items="Model.LanguageOptions" class="form-select">
@@ -7358,51 +8289,58 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml
     </div>
 </form>
 
-<p class="text-muted">@Model.Books.TotalCount livro(s) encontrado(s)</p>
+<p class="text-muted">@Model.Items.TotalCount resultado(s) encontrado(s)</p>
 
-@if (!Model.Books.Items.Any())
+@if (!Model.Items.Items.Any())
 {
-    <p>Nenhum livro encontrado com esses filtros.</p>
+    <p>Nenhum resultado encontrado com esses filtros.</p>
 }
 else
 {
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3 mb-3">
-        @foreach (var book in Model.Books.Items)
+        @foreach (var item in Model.Items.Items)
         {
             <div class="col">
-                <div class="card h-100">
-                    <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">
-                            <a asp-page="/Feed/Details" asp-route-id="@book.Id">@book.Name</a>
-                        </h5>
-                        <h6 class="card-subtitle mb-2 text-muted">@book.Author — @book.PublicationYear</h6>
+                @if (item.Type == FeedItemType.Book)
+                {
+                    <partial name="_BookCard" model="Bibliotheca.Web.Pages.Feed.IndexModel.ToBookCard(item)"/>
+                }
+                else
+                {
+                    <div class="card h-100">
+                        <div class="catalog-card">
+                            <span class="catalog-label">Biblioteca</span>
 
-                        <p class="card-text small text-muted mb-1">
-                            por <strong>@book.UserName</strong> · pontuação do perfil: @book.ProfileScore
-                        </p>
-                        <p class="card-text small text-muted mb-1">
-                            Adicionado em @book.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")
-                        </p>
-                        <p class="card-text small text-muted mt-auto mb-0">
-                            @book.Photos.Length foto(s) · @book.LanguageEnum · @book.ConditionEnum ·
-                            @book.ViewCount visualizaç@(book.ViewCount == 1 ? "ão" : "ões")
-                        </p>
+                            <h5 class="card-title mb-1">
+                                <a asp-page="/Feed/Libraries/Details" asp-route-id="@item.Id"
+                                   asp-route-slug="@Bibliotheca.Web.Pages.Feed.IndexModel.LibrarySlug(item)">
+                                    @item.Title
+                                </a>
+                            </h5>
+                            <h6 class="card-subtitle mb-3">por @item.UserName</h6>
+
+                            <p class="meta-line mb-1">
+                                <span class="meta-mono">pontuação do perfil @item.ProfileScore</span>
+                            </p>
+                            <p class="meta-line mt-auto mb-0">
+                                <span class="meta-mono">criada em @item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy") · @item.BookCount livro(s)</span>
+                            </p>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         }
     </div>
 
-    @if (Model.Books.TotalPages > 1)
+    @if (Model.Items.TotalPages > 1)
     {
-        <nav aria-label="Paginação de livros">
+        <nav aria-label="Paginação do feed">
             <ul class="pagination flex-wrap">
 
-                @if (Model.Books.HasPreviousPage)
+                @if (Model.Items.HasPreviousPage)
                 {
                     <li class="page-item">
-                        <a class="page-link"
-                           asp-page="/Feed/Index"
+                        <a class="page-link" asp-page="/Feed/Index"
                            asp-all-route-data="@(Model.RouteValuesForPage(Model.PageNumber - 1))">
                             « Anterior
                         </a>
@@ -7410,38 +8348,31 @@ else
                 }
                 else
                 {
-                    <li class="page-item disabled">
-                        <span class="page-link">« Anterior</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">« Anterior</span></li>
                 }
 
                 @foreach (var page in Model.GetPageNumbers())
                 {
                     if (!page.HasValue)
                     {
-                        <li class="page-item disabled">
-                            <span class="page-link">…</span>
-                        </li>
-
+                        <li class="page-item disabled"><span class="page-link">…</span></li>
                         continue;
                     }
 
-                    var isActive = page.Value == Model.Books.PageNumber;
+                    var isActive = page.Value == Model.Items.PageNumber;
 
                     <li class="page-item @(isActive ? "active" : null)">
-                        <a class="page-link"
-                           asp-page="/Feed/Index"
+                        <a class="page-link" asp-page="/Feed/Index"
                            asp-all-route-data="@(Model.RouteValuesForPage(page.Value))">
                             @(page).Value
                         </a>
                     </li>
                 }
 
-                @if (Model.Books.HasNextPage)
+                @if (Model.Items.HasNextPage)
                 {
                     <li class="page-item">
-                        <a class="page-link"
-                           asp-page="/Feed/Index"
+                        <a class="page-link" asp-page="/Feed/Index"
                            asp-all-route-data="@(Model.RouteValuesForPage(Model.PageNumber + 1))">
                             Próxima »
                         </a>
@@ -7449,9 +8380,7 @@ else
                 }
                 else
                 {
-                    <li class="page-item disabled">
-                        <span class="page-link">Próxima »</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">Próxima »</span></li>
                 }
 
             </ul>
@@ -7463,8 +8392,11 @@ ARQUIVO: Bibliotheca.Web/Pages/Feed/Index.cshtml.cs
 ==================================================
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Dtos.Common;
+using Bibliotheca.Application.Dtos.Feed;
 using Bibliotheca.Application.Services;
 using Bibliotheca.Domain.Enums;
+using Bibliotheca.Web.Utils;
+using Bibliotheca.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7476,21 +8408,20 @@ namespace Bibliotheca.Web.Pages.Feed;
 public class IndexModel : PageModel
 {
     private const int PageSize = 20;
-    
+
     // Quantas páginas mostrar ao redor da atual antes de recorrer a "...".
-    // Ex.: 1 ... 6 7 [8] 9 10 ... 20
     private const int Window = 2;
 
-    private readonly IBookService _bookService;
-    
+    private readonly IFeedService _feedService;
+
     public List<SelectListItem> SortOptions { get; } =
         Enum.GetValues<BookSortOptionEnum>()
             .Select(s => new SelectListItem(
                 s == BookSortOptionEnum.MostViewed ? "Mais vistos" : "Adicionados recentemente",
                 s.ToString()))
             .ToList();
-    
-    public IndexModel(IBookService bookService) => _bookService = bookService;
+
+    public IndexModel(IFeedService feedService) => _feedService = feedService;
 
     [BindProperty(SupportsGet = true)]
     public BookFilterDto Filter { get; set; } = new();
@@ -7498,8 +8429,8 @@ public class IndexModel : PageModel
     [BindProperty(SupportsGet = true)]
     public int PageNumber { get; set; } = 1;
 
-    public PagedResultDto<BookDto> Books { get; set; } = new();
-    
+    public PagedResultDto<FeedItemDto> Items { get; set; } = new();
+
     public bool HasAdvancedFilters =>
         Filter.Language.HasValue ||
         Filter.Condition.HasValue ||
@@ -7521,12 +8452,29 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var result = await _bookService.SearchAsync(Filter, PageNumber, PageSize);
-        Books = result.Data ?? new PagedResultDto<BookDto>();
+        var result = await _feedService.SearchAsync(Filter, PageNumber, PageSize);
+        Items = result.Data ?? new PagedResultDto<FeedItemDto>();
     }
 
-    // Preserva todos os filtros ativos ao trocar de página, pra paginação
-    // e filtro conviverem na mesma URL (GET) sem se perderem.
+    public static BookCardViewModel ToBookCard(FeedItemDto item) => new()
+    {
+        Id = item.Id,
+        Name = item.Title,
+        Author = item.Subtitle,
+        PublicationYear = item.PublicationYear,
+        UserName = item.UserName,
+        ProfileScore = item.ProfileScore,
+        CreatedAt = item.CreatedAt,
+        PhotoCount = item.PhotoCount,
+        Language = item.LanguageEnum?.ToString() ?? string.Empty,
+        Condition = item.ConditionEnum?.ToString() ?? string.Empty,
+        ViewCount = item.ViewCount,
+        Slug = SlugHelper.BuildBookSlug(item.Title, item.Subtitle, item.PublicationYear)
+    };
+
+    public static string LibrarySlug(FeedItemDto item) => SlugHelper.BuildLibrarySlug(item.Title);
+
+    // Preserva todos os filtros ativos ao trocar de página.
     public Dictionary<string, string> RouteValuesForPage(int page) => new()
     {
         ["PageNumber"] = page.ToString(),
@@ -7541,21 +8489,19 @@ public class IndexModel : PageModel
         ["Filter.Condition"] = Filter.Condition?.ToString() ?? "",
         ["Filter.ValueFrom"] = Filter.ValueFrom?.ToString() ?? "",
         ["Filter.ValueTo"] = Filter.ValueTo?.ToString() ?? "",
-            ["Filter.SortBy"] = Filter.SortBy.ToString(),
+        ["Filter.SortBy"] = Filter.SortBy.ToString(),
     };
 
-    // Gera a lista de números de página no estilo "1 2 3 ... 8 9 10",
-    // usando null como marcador de reticências.
+    // Gera a lista de números de página no estilo "1 2 3 ... 8 9 10".
     public List<int?> GetPageNumbers()
     {
-        var total = Books.TotalPages;
-        var current = Books.PageNumber;
+        var total = Items.TotalPages;
+        var current = Items.PageNumber;
         var pages = new List<int?>();
 
         if (total <= 0)
             return pages;
 
-        // Poucas páginas: mostra todas, sem reticências.
         if (total <= (Window * 2) + 5)
         {
             for (var i = 1; i <= total; i++)
@@ -9032,6 +9978,32 @@ public class IndexModel : PageModel
     }
 }
 ==================================================
+ARQUIVO: Bibliotheca.Web/Pages/Shared/_BookCard.cshtml
+==================================================
+@model Bibliotheca.Web.ViewModels.BookCardViewModel
+@{
+    var initials = string.Concat(Model.Author.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Select(w => char.ToUpperInvariant(w[0]))).PadRight(3, '·')[..3];
+}
+
+<div class="card h-100">
+    <div class="catalog-card">
+        <span class="catalog-label">Livro · Nº @initials—@Model.PublicationYear</span>
+
+        <h5 class="card-title mb-1">
+            <a asp-page="/Feed/Details" asp-route-id="@Model.Id" asp-route-slug="@Model.Slug">@Model.Name</a>
+        </h5>
+        <h6 class="card-subtitle mb-3">@Model.Author</h6>
+
+        <p class="meta-line mb-1">
+            <span class="meta-mono">por @Model.UserName · pontuação @Model.ProfileScore</span>
+        </p>
+        <p class="meta-line mt-auto mb-0">
+            <span class="meta-mono">@Model.PhotoCount foto(s) · @Model.Language · @Model.Condition · @Model.ViewCount visualizaç@(Model.ViewCount == 1 ? "ão" : "ões")</span>
+        </p>
+    </div>
+</div>
+==================================================
 ARQUIVO: Bibliotheca.Web/Pages/Shared/_ValidationScriptsPartial.cshtml
 ==================================================
 ﻿<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
@@ -9051,51 +10023,33 @@ ARQUIVO: Bibliotheca.Web/Pages/Shared/_Layout.cshtml
     <link rel="stylesheet" href="~/Bibliotheca.Web.styles.css" asp-append-version="true"/>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" asp-page="/Feed/Index">Bibliotheca</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-page="/Feed/Index">Feed</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Profile/Index">@User.Identity!.Name</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Account/Logout">Sair</a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Account/Login">Entrar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Account/Register">Cadastre-se</a>
-                        </li>
-                    }
-                </ul>
-            </div>
+<nav class="navbar navbar-expand-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" asp-page="/Feed/Index">Bibliotheca</a>
+        <div class="d-flex gap-4 align-items-center">
+            <a class="nav-link d-inline" asp-page="/Feed/Index">Feed</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="nav-link d-inline" asp-page="/Profile/Libraries/Index">Minha Biblioteca</a>
+                <a class="nav-link d-inline" asp-page="/Profile/Index">@User.Identity!.Name</a>
+                <a class="nav-link d-inline" asp-page="/Account/Logout">Sair</a>
+            }
+            else
+            {
+                <a class="nav-link d-inline" asp-page="/Account/Login">Entrar</a>
+                <a class="nav-link d-inline" asp-page="/Account/Register">Cadastre-se</a>
+            }
         </div>
-    </nav>
-</header>
-<div class="container">
+    </div>
+</nav>
+
+<div class="container page-content">
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
+<footer class="footer">
     <div class="container">
         &copy; 2026 - Bibliotheca
     </div>
@@ -9140,8 +10094,8 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileScoreService, ProfileScoreService>();
-builder.Services.AddScoped<IProfileScoreService, ProfileScoreService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
+builder.Services.AddScoped<IFeedService, FeedService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
@@ -9196,6 +10150,12 @@ namespace Bibliotheca.Web.Utils;
 
 public static class SlugHelper
 {
+    /// <summary>
+    /// Slug canônico da biblioteca: apenas o título.
+    /// </summary>
+    public static string BuildLibrarySlug(string title)
+        => GenerateSlug(title);
+    
     public static string GenerateSlug(string input)
     {
         if (string.IsNullOrWhiteSpace(input))

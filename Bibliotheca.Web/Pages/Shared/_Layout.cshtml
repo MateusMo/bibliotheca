@@ -10,51 +10,33 @@
     <link rel="stylesheet" href="~/Bibliotheca.Web.styles.css" asp-append-version="true"/>
 </head>
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" asp-page="/Feed/Index">Bibliotheca</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-page="/Feed/Index">Feed</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Profile/Index">@User.Identity!.Name</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Account/Logout">Sair</a>
-                        </li>
-                    }
-                    else
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Account/Login">Entrar</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-page="/Account/Register">Cadastre-se</a>
-                        </li>
-                    }
-                </ul>
-            </div>
+<nav class="navbar navbar-expand-sm">
+    <div class="container d-flex justify-content-between align-items-center">
+        <a class="navbar-brand" asp-page="/Feed/Index">Bibliotheca</a>
+        <div class="d-flex gap-4 align-items-center">
+            <a class="nav-link d-inline" asp-page="/Feed/Index">Feed</a>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <a class="nav-link d-inline" asp-page="/Profile/Libraries/Index">Minha Biblioteca</a>
+                <a class="nav-link d-inline" asp-page="/Profile/Index">@User.Identity!.Name</a>
+                <a class="nav-link d-inline" asp-page="/Account/Logout">Sair</a>
+            }
+            else
+            {
+                <a class="nav-link d-inline" asp-page="/Account/Login">Entrar</a>
+                <a class="nav-link d-inline" asp-page="/Account/Register">Cadastre-se</a>
+            }
         </div>
-    </nav>
-</header>
-<div class="container">
+    </div>
+</nav>
+
+<div class="container page-content">
     <main role="main" class="pb-3">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
+<footer class="footer">
     <div class="container">
         &copy; 2026 - Bibliotheca
     </div>

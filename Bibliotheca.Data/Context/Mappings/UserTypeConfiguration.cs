@@ -1,4 +1,5 @@
 using Bibliotheca.Domain.Domains;
+using Bibliotheca.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -39,6 +40,12 @@ public class UserTypeConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Password)
             .IsRequired()
             .HasMaxLength(255);
+        
+        builder.Property(u => u.PlanType)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20)
+            .HasDefaultValue(PlanTypeEnum.Free);
 
         builder.HasIndex(u => u.IsActive);
         builder.HasIndex(u => u.Email).IsUnique();

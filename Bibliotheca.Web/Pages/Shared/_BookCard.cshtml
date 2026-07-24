@@ -1,22 +1,23 @@
 @model Bibliotheca.Web.ViewModels.BookCardViewModel
+@{
+    var initials = string.Concat(Model.Author.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Select(w => char.ToUpperInvariant(w[0]))).PadRight(3, '·')[..3];
+}
 
 <div class="card h-100">
-    <div class="card-body d-flex flex-column">
-        <span class="badge bg-primary align-self-start mb-2">📘 Livro</span>
-        <h5 class="card-title">
+    <div class="catalog-card">
+        <span class="catalog-label">Livro · Nº @initials—@Model.PublicationYear</span>
+
+        <h5 class="card-title mb-1">
             <a asp-page="/Feed/Details" asp-route-id="@Model.Id" asp-route-slug="@Model.Slug">@Model.Name</a>
         </h5>
-        <h6 class="card-subtitle mb-2 text-muted">@Model.Author — @Model.PublicationYear</h6>
+        <h6 class="card-subtitle mb-3">@Model.Author</h6>
 
-        <p class="card-text small text-muted mb-1">
-            por <strong>@Model.UserName</strong> · pontuação do perfil: @Model.ProfileScore
+        <p class="meta-line mb-1">
+            <span class="meta-mono">por @Model.UserName · pontuação @Model.ProfileScore</span>
         </p>
-        <p class="card-text small text-muted mb-1">
-            Adicionado em @Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")
-        </p>
-        <p class="card-text small text-muted mt-auto mb-0">
-            @Model.PhotoCount foto(s) · @Model.Language · @Model.Condition ·
-            @Model.ViewCount visualizaç@(Model.ViewCount == 1 ? "ão" : "ões")
+        <p class="meta-line mt-auto mb-0">
+            <span class="meta-mono">@Model.PhotoCount foto(s) · @Model.Language · @Model.Condition · @Model.ViewCount visualizaç@(Model.ViewCount == 1 ? "ão" : "ões")</span>
         </p>
     </div>
 </div>

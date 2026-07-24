@@ -1,31 +1,207 @@
-html {
-  font-size: 14px;
+@import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Instrument+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #FAFAF9;
+  --surface: #FFFFFF;
+  --ink: #171613;
+  --ink-soft: #65635B;
+  --accent: #6E1E24;
+  --line: #E9E7E0;
+  --danger: #7A2E2E;
 }
 
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
+* { box-sizing: border-box; }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
+/* Sticky footer real — evita que o footer sobreponha o conteúdo
+   quando a página é curta, sem depender de position:absolute. */
+html, body {
+  height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Instrument Sans', system-ui, sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.005em;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
+.page-content {
+  flex: 1 0 auto;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+h1, h2 { font-weight: 500; letter-spacing: -0.01em; }
+h1 { font-size: 1.9rem; margin-bottom: 1.5rem; }
+h2 {
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  border-bottom: none;
+  margin-top: 3rem;
+  padding-bottom: 0;
+}
+
+a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--line); }
+a:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ---------- Navbar: chrome mínimo, sem sombra/borda pesada ---------- */
+.navbar {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--line) !important;
+  box-shadow: none !important;
+  padding: 1.25rem 0;
+}
+.navbar-brand {
+  font-family: 'Newsreader', serif;
+  font-size: 1.3rem;
+  color: var(--ink) !important;
+  border-bottom: none;
+}
+.navbar .nav-link {
+  color: var(--ink-soft) !important;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+.navbar .nav-link:hover { color: var(--accent) !important; }
+
+/* ---------- Botões: retos, sem sombra, texto tracked ---------- */
+.btn {
+  border-radius: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  padding: 0.6rem 1.4rem;
+}
+.btn-primary {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+
+.btn-outline-secondary {
+  color: var(--ink-soft);
+  border-color: var(--line);
+}
+.btn-outline-secondary:hover { background: transparent; color: var(--ink); border-color: var(--ink); }
+
+.btn-outline-danger { border-radius: 0; }
+.btn-link { color: var(--ink-soft); text-transform: uppercase; font-size: 0.78rem; letter-spacing: 0.06em; }
+
+/* ---------- Cards: sem borda, sem sombra — só espaço ---------- */
+.card {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  height: 100%;
+}
+
+/* .catalog-card carrega o conteúdo E o divisor inferior. Como todo .card
+   dentro de row-cols-* já estica para a altura da linha (h-100 + flex do
+   Bootstrap), colocar a borda aqui — não no .col — garante que a linha
+   de divisão fique alinhada entre colunas, independente do conteúdo. */
+.catalog-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.row.row-cols-1 > .col,
+.row.row-cols-sm-2 > .col,
+.row.row-cols-md-3 > .col {
+  margin-bottom: 1.5rem;
+  display: flex;
+}
+
+.catalog-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.badge { display: none; } /* substituído pelo .catalog-label acima */
+
+.card-title a {
+  font-family: 'Newsreader', serif;
+  font-size: 1.15rem;
+  color: var(--ink);
+  border-bottom: none;
+}
+.card-title a:hover { color: var(--accent); }
+
+.card-subtitle {
+  color: var(--ink-soft) !important;
+  font-size: 0.85rem;
+}
+
+.meta-mono {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+
+.meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+/* ---------- Forms ---------- */
+.form-control, .form-select {
+  border-radius: 0;
+  border-color: var(--line);
+  font-size: 0.95rem;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--ink);
+  box-shadow: none;
+}
+.form-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+table { font-size: 0.9rem; }
+table th { color: var(--ink-soft); font-weight: 500; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em; }
+
+/* ---------- Paginação ---------- */
+.pagination .page-link {
+  color: var(--ink-soft);
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+}
+.pagination .page-item.active .page-link { color: var(--ink); font-weight: 600; text-decoration: underline; }
+.pagination .page-link:hover { color: var(--accent); }
+
+/* ---------- Alertas ---------- */
+.alert { border-radius: 0; border-width: 0 0 0 3px; background: transparent; }
+.alert-danger { border-color: var(--danger); color: var(--danger); }
+.alert-success { border-color: var(--ink); color: var(--ink); }
+
+/* ---------- Footer ---------- */
+.footer {
+  position: static;
+  flex-shrink: 0;
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  font-size: 0.8rem;
+  color: var(--ink-soft);
 }

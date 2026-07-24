@@ -5,6 +5,7 @@ using Bibliotheca.Data.Uow;
 using Bibliotheca.Domain.Domains;
 
 namespace Bibliotheca.Application.Services;
+using Bibliotheca.Domain.Policies;
 
 public class BookService : BaseService, IBookService
 {
@@ -105,6 +106,15 @@ public class BookService : BaseService, IBookService
 
     public async Task<ResponseDto<BookDto>> CreateAsync(CreateBookDto dto)
     {
+        var user = await _unitOfWork.Users.GetByIdAsync(dto.UserId);
+        if (user is null || !user.IsActive)
+            return Failure<BookDto>("User not found", 404);
+
+        var maxPhotos = user.PlanType.MaxPhotosPerBook();
+        if (dto.Photos.Length > maxPhotos)
+            return Failure<BookDto>($"Seu plano atual permite no máximo {maxPhotos} foto(s) por livro.", 422);
+
+        
         var book = new Book
         {
             Id = Guid.NewGuid(),
@@ -141,6 +151,14 @@ public class BookService : BaseService, IBookService
         if (book is null || !book.IsActive)
             return Failure<BookDto>("Book not found", 404);
 
+        var user = await _unitOfWork.Users.GetByIdAsync(book.UserId);
+        if (user is null || !user.IsActive)
+            return Failure<BookDto>("User not found", 404);
+
+        var maxPhotos = user.PlanType.MaxPhotosPerBook();
+        if (dto.Photos.Length > maxPhotos)
+            return Failure<BookDto>($"Seu plano atual permite no máximo {maxPhotos} foto(s) por livro.", 422);
+
         book.IsOwner = dto.IsOwner;
         book.Name = dto.Name;
         book.Author = dto.Author;
@@ -156,7 +174,6 @@ public class BookService : BaseService, IBookService
         book.UpdatedAt = DateTimeOffset.UtcNow;
 
         _unitOfWork.Books.Update(book);
-        await _profileScoreService.RecalculateAsync(book.UserId);
         await _unitOfWork.SaveChangesAsync();
         await _profileScoreService.RecalculateAsync(book.UserId);
         

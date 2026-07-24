@@ -108,23 +108,23 @@ else
                 }
                 else
                 {
-                    <div class="card h-100 border-warning">
-                        <div class="card-body d-flex flex-column">
-                            <span class="badge bg-warning text-dark align-self-start mb-2">🗂️ Biblioteca</span>
-                            <h5 class="card-title">
+                    <div class="card h-100">
+                        <div class="catalog-card">
+                            <span class="catalog-label">Biblioteca</span>
+
+                            <h5 class="card-title mb-1">
                                 <a asp-page="/Feed/Libraries/Details" asp-route-id="@item.Id"
                                    asp-route-slug="@Bibliotheca.Web.Pages.Feed.IndexModel.LibrarySlug(item)">
                                     @item.Title
                                 </a>
                             </h5>
-                            <p class="card-text small text-muted mb-1">
-                                por <strong>@item.UserName</strong> · pontuação do perfil: @item.ProfileScore
+                            <h6 class="card-subtitle mb-3">por @item.UserName</h6>
+
+                            <p class="meta-line mb-1">
+                                <span class="meta-mono">pontuação do perfil @item.ProfileScore</span>
                             </p>
-                            <p class="card-text small text-muted mb-1">
-                                Criada em @item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")
-                            </p>
-                            <p class="card-text small text-muted mt-auto mb-0">
-                                @item.BookCount livro(s)
+                            <p class="meta-line mt-auto mb-0">
+                                <span class="meta-mono">criada em @item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy") · @item.BookCount livro(s)</span>
                             </p>
                         </div>
                     </div>

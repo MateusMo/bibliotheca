@@ -2,6 +2,7 @@ using Bibliotheca.Application.Dtos.Common;
 using Bibliotheca.Application.Dtos.Library;
 using Bibliotheca.Data.Uow;
 using Bibliotheca.Domain.Domains;
+using Bibliotheca.Domain.Policies;
 
 namespace Bibliotheca.Application.Services;
 
@@ -41,9 +42,15 @@ public class LibraryService : BaseService, ILibraryService
 
     public async Task<ResponseDto<LibraryDto>> CreateAsync(CreateLibraryDto dto)
     {
-        var userExists = await _unitOfWork.Users.ExistsAsync(u => u.Id == dto.UserId && u.IsActive);
-        if (!userExists)
+        var user = await _unitOfWork.Users.GetByIdAsync(dto.UserId);
+        if (user is null || !user.IsActive)
             return Failure<LibraryDto>("User not found", 404);
+
+        var currentLibraryCount = await _unitOfWork.Libraries.CountAsync(l => l.UserId == dto.UserId && l.IsActive);
+        var maxLibraries = user.PlanType.MaxLibraries();
+        if (currentLibraryCount >= maxLibraries)
+            return Failure<LibraryDto>(
+                $"Seu plano atual permite no máximo {maxLibraries} biblioteca(s). Exclua uma biblioteca existente ou faça upgrade do plano.", 422);
 
         // Só entram na library os livros que realmente pertencem ao usuário —
         // ids de terceiros enviados pelo cliente são descartados silenciosamente aqui.

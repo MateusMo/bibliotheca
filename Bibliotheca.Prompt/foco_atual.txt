@@ -51,7 +51,17 @@ public int TotalBooksAverageYear { get; set; } --Soma a idade de todos os livros
      Ao ver uma biblioteca deve-se ver os livros dela, os livros devem aparecer como aparecem no feed e serem clicáveis.
      As bibliotecas também devem ter Slug de url (Feito)
      
-     - Agora eu quero que você analise o código todo e veja os pedidos dessa lista.
-     Eu preciso que a minha estrutura de diretório esteja o mais clean possível, preciso que as coisas estejam em DDD
-     Preciso que os métodos estejam separando as responsabilidades.
-     Esse foco é uma autocritica para continuarmos.
+     - Ajustar labels do feed
+     Onde está administrador biblioteca deve estar home? ou algo compativel com o conteúdo. Pense em algo usuál em redes sociais para o usuário não se perder(FEITO)
+     - Estilo característico, como é uma biblioteca focada em livros antigos, as cores e tipografias poderiam ter uma estética do século 19. 
+     (queria manter essa aparência clean e minimalista também) (FEITO)
+     
+     - Ajuste fino de html, css. O footer está se sobrepondo as outras divs, existem textos e boxes desalinhados. Preciso manter o padrão inline quando é linha. (FEITO)
+     
+     - Agora quero limitar os usuários (futuramente terá plano pago e gratuito, implementar esse bloqueio já pensando que haverá plano pago no futuro se der certo)
+      1 - Cada usuário poderá postar apenas 4 fotos por livro (com plano pago será diferente)
+      2 - Cada usuário poderá ter apenas 3 bibliotecas (com plano pago será diferente)
+      
+      - Implementar armazenamento de imagens em nuvem. 
+     
+     

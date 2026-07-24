@@ -35,3 +35,32 @@ Considere sempre ter as urls mais verbosas para o ranqueamento.
 - Integração com o backend
 
 As paginas devem ser paginadas e os cruds dos dominios devem todos ser aplicados e para isso criar o numero de páginas, subpáginas e forms necessários
+
+Padrão estilo
+
+Plano revisado
+
+Paleta (bem mais contida — quase monocromática, uma cor só de destaque):
+
+--bg 
+#FAFAF9 — quase branco, frio
+--surface 
+#FFFFFF
+--ink 
+#171613 — quase preto
+--ink-soft 
+#65635B — texto secundário
+--accent 
+#6E1E24 — bordô discreto, usado só em links/CTA, nunca em fundo de card
+--line 
+#E9E7E0 — divisor mínimo, 1px
+
+Tipografia:
+
+UI/chrome (nav, botões, forms): Instrument Sans — grotesca moderna, mais caráter que Inter
+Título do livro (o "conteúdo clássico"): Newsreader — serifada editorial discreta, não grita
+Labels/legendas (metadados, nav): mesma sans, mas uppercase + letter-spacing, ao estilo Hermès
+
+Sem caixas. Cards perdem borda, sombra e badge colorido. Divisão é feita por espaço em branco e, quando necessário, uma linha de 1px.
+
+Assinatura discreta: o "número de catálogo" continua existindo, mas vira uma legenda pequena, uppercase, sem fundo colorido — como legenda de peça de museu, não etiqueta de fichário.

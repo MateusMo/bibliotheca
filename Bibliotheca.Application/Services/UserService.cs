@@ -114,7 +114,8 @@ public class UserService : BaseService, IUserService
             CreatedAt = user.CreatedAt,
             UpdatedAt = user.UpdatedAt,
             Name = user.Name,
-            Email = user.Email
+            Email = user.Email,
+            PlanType = user.PlanType
         };
     }
 }

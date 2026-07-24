@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Services;
+using Bibliotheca.Domain.Enums;
+using Bibliotheca.Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -12,9 +14,12 @@ public class EditModel : PageModel
 {
     private readonly IBookService _bookService;
 
-    public EditModel(IBookService bookService)
+    private readonly IUserService _userService;
+    
+    public EditModel(IBookService bookService,IUserService userService)
     {
         _bookService = bookService;
+        _userService = userService;
     }
 
     [BindProperty]
@@ -24,11 +29,15 @@ public class EditModel : PageModel
     public Guid Id { get; set; }
 
     public string? ErrorMessage { get; set; }
+    public int MaxPhotos { get; set; }
+    
 
     public async Task<IActionResult> OnGetAsync()
     {
         var bookResult = await _bookService.GetByIdAsync(Id);
-
+        
+        await LoadMaxPhotosAsync();
+        
         if (!bookResult.IsSuccess || bookResult.Data is null || bookResult.Data.UserId != CurrentUserId)
             return NotFound();
 
@@ -53,6 +62,13 @@ public class EditModel : PageModel
         return Page();
     }
 
+    private async Task LoadMaxPhotosAsync()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userResult = await _userService.GetByIdAsync(userId);
+        MaxPhotos = (userResult.Data?.PlanType ?? PlanTypeEnum.Free).MaxPhotosPerBook();
+    }
+    
     public async Task<IActionResult> OnPostAsync()
     {
         var existing = await _bookService.GetByIdAsync(Id);

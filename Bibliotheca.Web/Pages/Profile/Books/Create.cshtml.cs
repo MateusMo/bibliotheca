@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Bibliotheca.Application.Dtos.Book;
 using Bibliotheca.Application.Services;
 using Bibliotheca.Domain.Enums;
+using Bibliotheca.Domain.Policies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,25 +14,33 @@ namespace Bibliotheca.Web.Pages.Profile.Books;
 public class CreateModel : PageModel
 {
     private readonly IBookService _bookService;
+    private readonly IUserService _userService;
 
-    public CreateModel(IBookService bookService)
+    public CreateModel(IBookService bookService, IUserService userService)
     {
         _bookService = bookService;
+        _userService = userService;
     }
 
     [BindProperty]
     public BookInputModel Input { get; set; } = new();
 
+    public int MaxPhotos { get; set; }
+
     public string? ErrorMessage { get; set; }
 
-    public void OnGet()
+    public async Task OnGetAsync()
     {
+        await LoadMaxPhotosAsync();
     }
 
     public async Task<IActionResult> OnPostAsync()
     {
         if (!ModelState.IsValid)
+        {
+            await LoadMaxPhotosAsync();
             return Page();
+        }
 
         var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
@@ -55,10 +64,18 @@ public class CreateModel : PageModel
         if (!result.IsSuccess)
         {
             ErrorMessage = result.Message;
+            await LoadMaxPhotosAsync();
             return Page();
         }
 
         return RedirectToPage("/Profile/Index");
+    }
+
+    private async Task LoadMaxPhotosAsync()
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userResult = await _userService.GetByIdAsync(userId);
+        MaxPhotos = (userResult.Data?.PlanType ?? PlanTypeEnum.Free).MaxPhotosPerBook();
     }
 }
 

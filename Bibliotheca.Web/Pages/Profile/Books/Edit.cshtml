@@ -89,6 +89,7 @@
     <div class="mb-3">
         <label asp-for="Input.PhotosText" class="form-label">Fotos (URLs separadas por vírgula)</label>
         <textarea asp-for="Input.PhotosText" class="form-control" rows="2"></textarea>
+        <div class="form-text">Seu plano atual permite até @Model.MaxPhotos foto(s) por livro.</div>
     </div>
 
     <button type="submit" class="btn btn-primary">Salvar</button>

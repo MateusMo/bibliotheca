@@ -27,7 +27,6 @@ builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProfileScoreService, ProfileScoreService>();
-builder.Services.AddScoped<IProfileScoreService, ProfileScoreService>();
 builder.Services.AddScoped<ILibraryService, LibraryService>();
 builder.Services.AddScoped<IFeedService, FeedService>();
 
